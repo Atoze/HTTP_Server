@@ -1,3 +1,4 @@
+import jp.co.topgate.atoze.web.Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +11,8 @@ import java.net.Socket;
  *
  */
 public class ServerTest {
+    private String endo;
+
     public static void main(String[] args) throws IOException {
         Server server = new Server();
         System.out.println("start up http server...");
@@ -21,9 +24,8 @@ public class ServerTest {
 
         try {
             serverSocket = new ServerSocket(server.getPort(8080));
-
-
             while (true) {
+                //ソケットを開く
                 socket = serverSocket.accept();
                 System.out.println("request incoming...");
 
@@ -37,9 +39,10 @@ public class ServerTest {
 
                 // レスポンス
                 writer = new PrintWriter(socket.getOutputStream(), true);
-                StringBuilder builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder();//文字列生成
 
-                builder.append("HTTP/1.1 200 OK").append("\n");
+                builder.append("HTTP/1.1 ");
+                builder.append("200 OK").append("\n");
                 builder.append("Content-Type: text/html").append("\n");
                 builder.append("\n");
                 builder.append("<html><head><title>Hello world!</title></head><body><h1>Hello world!</h1>Hi!</body></html>");
@@ -47,6 +50,8 @@ public class ServerTest {
                 System.out.println("responce...");
                 System.out.println(builder.toString() + "\n");
                 writer.println(builder.toString());
+
+                System.out.println("Bad Request");
 
                 socket.close();
             }
@@ -67,4 +72,5 @@ public class ServerTest {
             }
         }
     }
+
 }
