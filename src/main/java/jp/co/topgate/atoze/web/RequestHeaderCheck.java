@@ -13,10 +13,10 @@ public class RequestHeaderCheck {
 
     private final String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
 
-    private String headMethod;
-    private String filePath;
-    private String fileQuery;
-    private String protocolVer;
+    private String headMethod = null;
+    private String filePath = null;
+    private String fileQuery = null;
+    private String protocolVer = null;
 
     private boolean correctMethod = false;
 
@@ -25,6 +25,7 @@ public class RequestHeaderCheck {
     public RequestHeaderCheck(String headerText) {
         String headerTexts[] = headerText.split("\\n+");
         String headerLines[] = headerTexts[0].split(" ");
+
         if (headerLines.length == RequestHeaderValue) {
             headMethod = headerLines[0];
             protocolVer = headerLines[2];

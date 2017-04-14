@@ -6,13 +6,13 @@ import java.util.HashMap;
  * Created by atoze on 2017/04/13.
  */
 public class Status {
-    //private Integer status;
-    private String statusMessage;
+    private static Integer status;
+    private static String statusMessage;
 
-    public Status() {
-    }
+    //public Status() {
+    //}
 
-    private String StatusParameter(int status) {
+    private static String StatusParameter(int status) {
         final HashMap<Integer, String> content = new HashMap<Integer, String>() {
             {
                 put(200, "OK");
@@ -39,11 +39,16 @@ public class Status {
         }
     }
 
-    public void setStatus(int i) {
-        statusMessage = this.StatusParameter(i);
+    public static void setStatusCode(int i) {
+        status = i;
     }
 
-    public String getStatus() {
+    public static void setStatus(int i){
+        statusMessage = StatusParameter(i);
+    }
+
+    public static String getStatus() {
+        setStatus(status);
         return statusMessage;
     }
 

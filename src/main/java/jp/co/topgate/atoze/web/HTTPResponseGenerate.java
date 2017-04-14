@@ -5,7 +5,7 @@ package jp.co.topgate.atoze.web;
  */
 public class HTTPResponseGenerate {
     private String bodyText;
-    private String status;
+    private static String status;
     private StringBuilder headers;
 
     public HTTPResponseGenerate() {

@@ -8,8 +8,8 @@ import java.io.*;
 public class ServerHandler {
     private String bodyText;
 
-
-    private Status status = new Status();
+    private Status status;
+    //private Status statusu;
     private FileLook look = new FileLook();
     private StringBuilder builder = new StringBuilder();//文字列生成
 
@@ -20,64 +20,61 @@ public class ServerHandler {
 
         PrintWriter writer = new PrintWriter(out, true);
         builder.append("HTTP/1.1 ");
+        if (request.getMethod() != null) {
+            if ((request.getMethod().equals("GET"))) {
+                File file = new File(request.getFilePath());
+                ContentType contentType = new ContentType(request.getFilePath());
+                System.out.println("Responding...");
 
-        if ((request.getMethod().equals("GET"))) {
+                if (look.checkFile(file)) {
+                    status.setStatusCode(200);
+                    builder.append(status.getStatus() + "\n");
+                    builder.append("Content-Type: " + contentType.getContentType() + "/").append(contentType.getExtension()).append("\n");
+                    writer.println(builder.toString());
+                    System.out.println(builder.toString() + "\n");
 
-            File file = new File(request.getFilePath());
-            ContentType contentType = new ContentType(request.getFilePath());
-            System.out.println("Responding...");
+                    BufferedInputStream bi
+                            = new BufferedInputStream(new FileInputStream(file));
+                    try {
+                        for (int c = bi.read(); c >= 0; c = bi.read()) {
+                            out.write(c);
+                        }
 
-            if (look.checkFile(file)) {
-                status.setStatus(200);
-                builder.append(status.getStatus() + "\n");
-                builder.append("Content-Type: " + contentType.getContentType() + "/").append(contentType.getExtension()).append("\n");
-                writer.println(builder.toString());
-                System.out.println(builder.toString() + "\n");
-
-                BufferedInputStream bi
-                        = new BufferedInputStream(new FileInputStream(file));
-                try {
-                    for (int c = bi.read(); c >= 0; c = bi.read()) {
-                        out.write(c);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (bi != null) {
+                            bi.close();
+                        }
                     }
+                } else {
+                    status.setStatusCode(404);
+                    builder.append(status.getStatus() + "\n");
+                    builder.append("Content-Type: " + "text" + "/").append("html").append("\n");
+                    builder.append("<html><head><title>Hello world!</title></head><body><h1>Hello world!</h1>Hi!</body></html>");
+                    System.out.println(builder.toString() + "\n");
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (bi != null) {
-                        bi.close();
-                    }
+
+
                 }
             } else {
-                status.setStatus(404);
+                status.setStatusCode(405);
                 builder.append(status.getStatus() + "\n");
-                builder.append("Content-Type: " + contentType.getContentType() + "/").append(contentType.getExtension()).append("\n");
+                builder.append("Content-Type: plain" + "/").append("html").append("\n");
+
+                System.out.println("Responding...");
                 System.out.println(builder.toString() + "\n");
-                builder.append("<html><head><title>Hello world!</title></head><body><h1>Hello world!</h1>Hi!</body></html>");
                 writer.println(builder.toString());
 
-
             }
+        }else{
+            status.setStatusCode(400);
+            builder.append(status.getStatus() + "\n");
+            builder.append("Content-Type: plain" + "/").append("text").append("\n");
 
-            //}else{
-            //builder.append("\n"+ status.getStatusCode(405)+"\n");
-            //File file = new File(requestHeader.getFilePath());
-            //builder.append("Content-Type: "+contentType.getContentType()+"/").append(contentType.getExtension()).append("\n");
-            //System.out.println("Responding...");
-            //System.out.println(builder.toString() + "\n");
-            //writer.println(builder.toString());
-            //}
-
-        } else {
-            status.setStatus(404);
-            builder.append("\n" + status.getStatus() + "\n");
-            //File file = new File(requestHeader.getFilePath());
-            builder.append("Content-Type: plain" + "/").append("html").append("\n");
-            builder.append("<html><head><title>Hello world!</title></head><body><h1>Hello world!</h1>Hi!</body></html>");
             System.out.println("Responding...");
             System.out.println(builder.toString() + "\n");
-
-
+            writer.println(builder.toString());
         }
 
 

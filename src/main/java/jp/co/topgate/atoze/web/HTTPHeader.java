@@ -12,13 +12,14 @@ import java.util.regex.Pattern;
  */
 
 public class HTTPHeader {
+    private Status status;
     private String headerText;
-    private final String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
+    private final static String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
 
-    private String headMethod;
-    private String filePath;
-    private String fileQuery;
-    private String protocolVer;
+    private String headMethod = null;
+    private String filePath = null;
+    private String fileQuery = null;
+    private String protocolVer = null;
 
     private boolean correctMethod = false;
 
@@ -33,12 +34,10 @@ public class HTTPHeader {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String line = br.readLine();
 
-        //String headerTexts[] = headerText.split("\\n+");
         String headerLines[] = line.split(" ");
 
         if (headerLines.length == RequestHeaderValue) {
-
-            this.headMethod = headerLines[0];
+            checkHTTPMethod(headerLines[0]);
             this.protocolVer = headerLines[2];
             String URIQuerys[] = headerLines[1].split("\\?");
             if (URIQuerys[0] != headerLines[1]) {
@@ -47,10 +46,8 @@ public class HTTPHeader {
 
             this.filePath = "." + URIQuerys[0];
         } else {
-
-            System.out.println("500エラー不正なリクエスト1");
-            correctMethod = false;
-            Status status = new Status();
+            status.setStatusCode(400);
+            this.correctMethod = false;
         }
 
         StringBuilder header = new StringBuilder();
@@ -63,14 +60,16 @@ public class HTTPHeader {
         return header.toString();
     }
 
-    private void checkHTTPMethod() { //正しいヘッダであるか否か
+    private void checkHTTPMethod(String method) { //正しいヘッダであるか否か
         Pattern p = Pattern.compile(this.method);
-        Matcher m = p.matcher(this.headMethod);
+        Matcher m = p.matcher(method);
 
         if (m.find()) {
             this.headMethod = m.group();
-            //eturn true;
-        }//return false;
+        } else {
+            this.status.setStatus(500);
+            this.correctMethod = false;
+        }
     }
 
 
