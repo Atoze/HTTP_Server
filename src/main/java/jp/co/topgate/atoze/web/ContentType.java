@@ -10,31 +10,31 @@ public class ContentType {
     private String fileContentTypeText;
     private String fileExtension;
 
-    private void allContentTypeLists (String contentTyp){
-        HashMap<String,String> content = new HashMap<String, String>() {
+    private void allContentTypeLists(String contentTyp) {
+        HashMap<String, String> content = new HashMap<String, String>() {
             {
-                put("plain" ,"text");
-                put("html"  ,"text");
-                put("css"   ,"text");
-                put("xml"   ,"text");
+                put("plain", "text");
+                put("html", "text");
+                put("css", "text");
+                put("xml", "text");
 
-                put("js"    ,"application");
-                put("json"  ,"application");
+                put("js", "application");
+                put("json", "application");
 
-                put("jpeg"  ,"image");
-                put("jpg"   ,"image");
-                put("png"   ,"image");
-                put("gif"   ,"image");
+                put("jpeg", "image");
+                put("jpg", "image");
+                put("png", "image");
+                put("gif", "image");
 
-                put("mp4"   ,"video");
+                put("mp4", "video");
 
 
             }
         };
-        if (content.containsKey(contentTyp)){
-            this.fileContentTypeText= content.get(contentTyp);
-        }else{
-            this.fileContentTypeText= content.get("plain");
+        if (content.containsKey(contentTyp)) {
+            this.fileContentTypeText = content.get(contentTyp);
+        } else {
+            this.fileContentTypeText = content.get("plain");
             //this.fileExtension = "plain";
         }
 
@@ -44,18 +44,18 @@ public class ContentType {
 
         int point = fileName.lastIndexOf(".");
         if (point != -1) {
-            this.fileExtension = fileName.substring(point+1, fileName.length());
+            this.fileExtension = fileName.substring(point + 1, fileName.length());
             allContentTypeLists(this.fileExtension);
         }
 
     }
 
-    public String getContentType(){
+    public String getContentType() {
         return this.fileContentTypeText;
 
     }
 
-    public String getExtension(){
+    public String getExtension() {
         return this.fileExtension;
     }
 }

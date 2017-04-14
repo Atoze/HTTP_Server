@@ -2,6 +2,7 @@ package jp.co.topgate.atoze.web;
 
 //import java.util.Arrays;
 //import java.util.List;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,41 +15,59 @@ public class RequestHeaderCheck {
 
     private String headMethod;
     private String filePath;
+    private String fileQuery;
     private String protocolVer;
+
+    private boolean correctMethod = false;
 
     private final int RequestHeaderValue = 3;
 
-    public RequestHeaderCheck(String headerText){
+    public RequestHeaderCheck(String headerText) {
         String headerTexts[] = headerText.split("\\n+");
         String headerLines[] = headerTexts[0].split(" ");
         if (headerLines.length == RequestHeaderValue) {
             headMethod = headerLines[0];
-            filePath = "."+headerLines[1];
             protocolVer = headerLines[2];
-            if(!checkHTTPMethod()){
+            String URIQuerys[] = headerLines[1].split("\\?");
+            if (URIQuerys[0] != headerLines[1]) {
+                fileQuery = URIQuerys[1];
+            }
+            filePath = "." + URIQuerys[0];
+
+            if (!checkHTTPMethod()) {
                 System.out.println("500エラー不正なリクエスト2");
+                correctMethod = true;
             }
 
-        }else{
+        } else {
+
             System.out.println("500エラー不正なリクエスト1");
+            correctMethod = false;
             Status status = new Status();
         }
     }
 
-    private boolean checkHTTPMethod (){ //正しいヘッダであるか否か
-        Pattern p = Pattern.compile(method);
-        Matcher m = p.matcher(headMethod);
-        if(m.find()){
-                headMethod = m.group();
-                return true;
-        }return false;
+    boolean checkHTTPMethod() { //正しいヘッダであるか否か
+        Pattern p = Pattern.compile(this.method);
+        Matcher m = p.matcher(this.headMethod);
+
+        if (m.find()) {
+            this.headMethod = m.group();
+            return true;
+        }
+        return false;
     }
 
-    public String getMethod(){
+    public String getMethod() {
         return this.headMethod;
     }
-    public String getFilePath(){
+
+    public String getFilePath() {
         return this.filePath;
+    }
+
+    public boolean getCheckHTTPMethod() {
+        return this.correctMethod;
     }
 
 

@@ -10,19 +10,18 @@ public class HTTPResponse {
     private String bodyText;
     private File bodyFile;
 
-    HTTPResponse(OutputStream out) throws IOException{
+    HTTPResponse(OutputStream out) throws IOException {
 
     }
 
-    public String getResponseHeader(){
-        return"";
+    public String getResponseHeader() {
+        return "";
     }
 
-    public StringBuilder getResponseBody(){
+    public StringBuilder getResponseBody() {
         StringBuilder paipai = new StringBuilder();
         return paipai;
     }
-
 
 
 }

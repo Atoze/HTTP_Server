@@ -8,12 +8,17 @@ public class HTTPResponseGenerate {
     private String status;
     private StringBuilder headers;
 
-    public HTTPResponseGenerate(){
+    public HTTPResponseGenerate() {
+
+    }
+
+    public void setBody(String text) {
 
     }
 
 
-    public void addHeaderLine(String name, String type){
+    public void addHeaderLine(String type, String name) {
+
 
     }
 

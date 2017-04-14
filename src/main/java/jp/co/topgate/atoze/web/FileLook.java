@@ -8,10 +8,11 @@ import java.io.File;
 public class FileLook {
     public File file;
 
-    public void readFile(File file){
+    public void readFile(File file) {
 
     }
-    public boolean checkFile(File file){
+
+    public boolean checkFile(File file) {
         if (file.exists()) {
             if (file.isFile() && file.canRead()) {
                 return true;
@@ -20,7 +21,7 @@ public class FileLook {
         return false;
     }
 
-    public void getcheckFile(File file){
+    public void getcheckFile(File file) {
 
 
     }
