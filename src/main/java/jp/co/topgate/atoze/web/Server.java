@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
  */
 
 public class Server {
-    //private ExecutorService service = Executors.newCachedThreadPool();
+    Status status;
 
     public void startServer() {
         System.out.println("Starting up HTTP server...");
@@ -24,33 +24,29 @@ public class Server {
                 this.serverProcess(serverSocket);
             }
         } catch (IOException e) {
-            //e.printStackTrace();
         }
     }
 
     //Request受信
     private void serverProcess(ServerSocket serverSocket) throws IOException {
         Socket socket = serverSocket.accept();
-        //socket.setSoTimeout(1000);
-        //this.service.execute(() -> {
         System.out.println("Request incoming...");
         try
                 (
                         InputStream in = socket.getInputStream();
-                        OutputStream out = socket.getOutputStream();
+                        OutputStream out = socket.getOutputStream()
                 ) {
-            ServerHandler server = new ServerHandler(in, out);
-            //out.close();
+            new ServerHandler (in, out);
+
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                //e.printStackTrace();
+                //status.setStatusCode();
             }
         }
-        //});
     }
 }
 

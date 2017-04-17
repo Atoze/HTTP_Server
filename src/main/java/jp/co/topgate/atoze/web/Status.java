@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Created by atoze on 2017/04/13.
  */
-public class Status {
+class Status {
     private static Integer status;
     private static String statusMessage;
 

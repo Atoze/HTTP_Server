@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Created by atoze on 2017/04/12.
  */
-public class RequestHeaderCheck {
+class RequestHeaderCheck {
 
     private final String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
 
@@ -36,19 +36,17 @@ public class RequestHeaderCheck {
             filePath = "." + URIQuerys[0];
 
             if (!checkHTTPMethod()) {
-                System.out.println("500エラー不正なリクエスト2");
                 correctMethod = true;
+                Status.setStatusCode(500);
             }
 
         } else {
-
-            System.out.println("500エラー不正なリクエスト1");
             correctMethod = false;
-            Status status = new Status();
+            Status.setStatusCode(500);
         }
     }
 
-    boolean checkHTTPMethod() { //正しいヘッダであるか否か
+    private boolean checkHTTPMethod() { //正しいヘッダであるか否か
         Pattern p = Pattern.compile(this.method);
         Matcher m = p.matcher(this.headMethod);
 

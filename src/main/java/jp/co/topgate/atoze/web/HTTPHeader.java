@@ -11,17 +11,18 @@ import java.util.regex.Pattern;
  * Created by atoze on 2017/04/12.
  */
 
-public class HTTPHeader {
+class HTTPHeader {
     private Status status;
     private String headerText;
     private final static String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
+    private static String host = "http://localhost";
 
     private String headMethod = null;
     private String filePath = null;
     private String fileQuery = null;
     private String protocolVer = null;
 
-    private boolean correctMethod = false;
+    private boolean isMethod = false;
 
     private final int RequestHeaderValue = 3;
 
@@ -34,41 +35,34 @@ public class HTTPHeader {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String line = br.readLine();
 
+        //リクエストヘッダをパース
         String headerLines[] = line.split(" ");
-
         if (headerLines.length == RequestHeaderValue) {
-            checkHTTPMethod(headerLines[0]);
+            isHTTPMethod(headerLines[0]);
+            this.filePath = headerLines[1];
             this.protocolVer = headerLines[2];
-            String URIQuerys[] = headerLines[1].split("\\?");
-            if (URIQuerys[0] != headerLines[1]) {
-                this.fileQuery = URIQuerys[1];
-            }
-
-            this.filePath = "." + URIQuerys[0];
         } else {
-            status.setStatusCode(400);
-            this.correctMethod = false;
+            Status.setStatusCode(400);
+            this.isMethod = false;
         }
 
         StringBuilder header = new StringBuilder();
-
         while (line != null && !line.isEmpty()) {
-
             header.append(line + "\r\n");
             line = br.readLine();
         }
         return header.toString();
     }
 
-    private void checkHTTPMethod(String method) { //正しいヘッダであるか否か
-        Pattern p = Pattern.compile(this.method);
+    private void isHTTPMethod(String method) { //正しいヘッダであるか否か
+        Pattern p = Pattern.compile(HTTPHeader.method);
         Matcher m = p.matcher(method);
 
         if (m.find()) {
             this.headMethod = m.group();
         } else {
-            this.status.setStatus(500);
-            this.correctMethod = false;
+            Status.setStatus(500);
+            this.isMethod = false;
         }
     }
 
@@ -82,12 +76,22 @@ public class HTTPHeader {
         return this.headerText;
     }
 
+    public void setHTTPHeader(){}
+
     public String getMethod() {
         return this.headMethod;
     }
 
     public String getFilePath() {
         return this.filePath;
+    }
+
+    public String getFileQuery() {
+        return this.fileQuery;
+    }
+
+    public String getProtocolVer() {
+        return this.protocolVer;
     }
 
 }

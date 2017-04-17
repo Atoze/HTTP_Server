@@ -5,14 +5,14 @@ import java.io.File;
 /**
  * Created by atoze on 2017/04/12.
  */
-public class FileLook {
-    public File file;
+class FileLook {
+    public static File file;
 
     public void readFile(File file) {
 
     }
 
-    public boolean checkFile(File file) {
+    public boolean ifcheckFile(File file) {
         if (file.exists()) {
             if (file.isFile() && file.canRead()) {
                 return true;

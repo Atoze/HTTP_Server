@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by atoze on 2017/04/13.
  */
-public class ContentType {
+class ContentType {
     private String fileContentTypeText;
     private String fileExtension;
 
@@ -39,18 +39,30 @@ public class ContentType {
         }
 
     }
-
-    public ContentType(String fileName) {
-
+    public void setContentType(String fileName) {
         int point = fileName.lastIndexOf(".");
         if (point != -1) {
             this.fileExtension = fileName.substring(point + 1, fileName.length());
             allContentTypeLists(this.fileExtension);
         }
+    }
+
+    public void setContentTypeDefault(){
+        allContentTypeLists("none");
+
+
 
     }
 
+    //public String getContentTypeDefault(){
+    //    return "text" + "/" + "plain";
+    //}
+
     public String getContentType() {
+        return this.fileContentTypeText + "/" + this.fileExtension;
+    }
+
+    public String getContentTypeValue() {
         return this.fileContentTypeText;
 
     }

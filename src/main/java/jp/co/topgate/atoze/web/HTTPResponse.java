@@ -5,12 +5,17 @@ import java.io.*;
 /**
  * Created by atoze on 2017/04/12.
  */
-public class HTTPResponse {
+class HTTPResponse {
     private String headerText;
     private String bodyText;
     private File bodyFile;
 
-    HTTPResponse(OutputStream out) throws IOException {
+    public void HTTPResponse(){
+
+
+    }
+
+    void HTTPResponseoo(OutputStream out) throws IOException {
 
     }
 
