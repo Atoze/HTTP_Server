@@ -56,7 +56,6 @@ class ContentType {
 
     //public String getContentTypeDefault(){
     //    return "text" + "/" + "plain";
-    //}
 
     public String getContentType() {
         return this.fileContentTypeText + "/" + this.fileExtension;

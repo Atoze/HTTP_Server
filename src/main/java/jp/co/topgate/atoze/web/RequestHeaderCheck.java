@@ -22,7 +22,7 @@ class RequestHeaderCheck {
 
     private final int RequestHeaderValue = 3;
 
-    public RequestHeaderCheck(String headerText) {
+    private RequestHeaderCheck(String headerText) {
         String headerTexts[] = headerText.split("\\n+");
         String headerLines[] = headerTexts[0].split(" ");
 

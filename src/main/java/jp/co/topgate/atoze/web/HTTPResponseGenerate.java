@@ -32,7 +32,7 @@ class HTTPResponseGenerate {
     }
 
     public void writeTo(OutputStream out) throws IOException {
-        PrintWriter writer = new PrintWriter(out, true);
+        //PrintWriter writer = new PrintWriter(out, true);
         response.append("HTTP/1.1 " + Status.getStatus() + "\n");
 
         this.headers.forEach((key, value) -> {
@@ -43,7 +43,7 @@ class HTTPResponseGenerate {
             response.append("\n");
             response.append(this.bodyText + "\n");
         }
-        writer.print(response.toString());
+        //writer.print(response.toString());
     }
     public String getResponse() {
         return response.toString();

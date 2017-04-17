@@ -16,24 +16,16 @@ class HTTPRequest {
     private String filepath;
     private String fileQuery;
     private String protocol;
-
-    private String host = "localhost";
+    //private String getFileQuery;
+    private String host;
 
     public HTTPRequest(InputStream input) throws IOException {
         HTTPHeader header = new HTTPHeader(input);
-        headerText = header.getHeaderText();
-        method = header.getMethod();
-        filepath = header.getFilePath();
-        protocol = header.getProtocolVer();
-    }
-    /*
-        private StringBuilder readRequestBody(InputStream in){
-            StringBuilder bodyText = new StringBuilder();
-            return bodyText;
-        }
-    */
-    public void setHeaderText(InputStream input) throws IOException {
-        //input = headerText;
+        this.headerText = header.getHeaderText();
+        this.method = header.getMethod();
+        this.filepath = header.getFilePath();
+        this.protocol = header.getProtocolVer();
+        this.host=header.getHost();
     }
     public String getHeaderText() {
         return this.headerText;
@@ -62,28 +54,30 @@ class HTTPRequest {
                 System.out.println(this.filepath);
             }
         }
-
         String URIQuerys[] = filepath.split("\\?");
+        this.filepath = URIQuerys[0];
         if (URIQuerys[0] != filepath) {
             this.fileQuery = URIQuerys[1];
-        } else {
         }
-        this.filepath = URIQuerys[0];
     }
+
 
     public String getProtocol() {
         ProtocolVer(this.protocol);
         return this.protocol;
     }
 
-    public String ProtocolVer(String proto) {
-        if (proto != null) {
-            if (proto.startsWith("HTTP/")) {
+    public String getHost(){
+        return this.host;
+    }
+
+    public void ProtocolVer(String proto) {
+        if (proto != null && proto.startsWith("HTTP/")) {
                 this.protocol = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
             } else {
-                this.protocol = null;
+                //this.protocol = null;
+                Status.setStatusCode(400);
             }
+        //eturn this.protocol;
         }
-            return this.protocol;
     }
-}

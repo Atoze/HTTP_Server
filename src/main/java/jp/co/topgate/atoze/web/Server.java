@@ -1,9 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +21,7 @@ public class Server {
                 this.serverProcess(serverSocket);
             }
         } catch (IOException e) {
+
         }
     }
 
@@ -36,6 +34,7 @@ public class Server {
                         InputStream in = socket.getInputStream();
                         OutputStream out = socket.getOutputStream()
                 ) {
+
             new ServerHandler (in, out);
 
         } catch (IOException e) {
@@ -44,6 +43,7 @@ public class Server {
             try {
                 socket.close();
             } catch (IOException e) {
+
                 //status.setStatusCode();
             }
         }

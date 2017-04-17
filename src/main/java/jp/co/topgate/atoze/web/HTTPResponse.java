@@ -28,5 +28,10 @@ class HTTPResponse {
         return paipai;
     }
 
+    public void setBodyFile(File file){
+
+
+    }
+
 
 }

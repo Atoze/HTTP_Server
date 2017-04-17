@@ -15,14 +15,15 @@ class HTTPHeader {
     private Status status;
     private String headerText;
     private final static String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
-    private static String host = "http://localhost";
 
-    private String headMethod = null;
-    private String filePath = null;
-    private String fileQuery = null;
-    private String protocolVer = null;
+    private String headMethod;
+    private String filePath;
+    private String fileQuery;
+    private String protocolVer;
 
-    private boolean isMethod = false;
+    private String host;
+
+    //private boolean isMethod = false;
 
     private final int RequestHeaderValue = 3;
 
@@ -36,15 +37,19 @@ class HTTPHeader {
         String line = br.readLine();
 
         //リクエストヘッダをパース
+        if (br!=null){
         String headerLines[] = line.split(" ");
         if (headerLines.length == RequestHeaderValue) {
             isHTTPMethod(headerLines[0]);
             this.filePath = headerLines[1];
-            this.protocolVer = headerLines[2];
-        } else {
+            this.protocolVer = headerLines[2];}
+        }else {
             Status.setStatusCode(400);
-            this.isMethod = false;
+            //this.isMethod = false;
         }
+
+        //ホスト宣言確認
+        this.host = br.readLine();
 
         StringBuilder header = new StringBuilder();
         while (line != null && !line.isEmpty()) {
@@ -61,8 +66,8 @@ class HTTPHeader {
         if (m.find()) {
             this.headMethod = m.group();
         } else {
-            Status.setStatus(500);
-            this.isMethod = false;
+            Status.setStatus(400);
+            //this.isMethod = false;
         }
     }
 
@@ -76,10 +81,12 @@ class HTTPHeader {
         return this.headerText;
     }
 
-    public void setHTTPHeader(){}
-
     public String getMethod() {
         return this.headMethod;
+    }
+
+    public String getHost() {
+        return this.host;
     }
 
     public String getFilePath() {
