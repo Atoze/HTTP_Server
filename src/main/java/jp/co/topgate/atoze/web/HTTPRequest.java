@@ -61,12 +61,10 @@ class HTTPRequest {
         }
     }
 
-
     public String getProtocol() {
         ProtocolVer(this.protocol);
         return this.protocol;
     }
-
     public String getHost(){
         return this.host;
     }
@@ -78,6 +76,6 @@ class HTTPRequest {
                 //this.protocol = null;
                 Status.setStatusCode(400);
             }
-        //eturn this.protocol;
+        //return this.protocol;
         }
     }

@@ -10,22 +10,22 @@ class ServerHandler {
     String hostname = "localhost";
 
     private FileLook look = new FileLook();
-    HTTPResponseGenerate response = new HTTPResponseGenerate();
+    HTTPResponse response = new HTTPResponse();
 
-    public ServerHandler(InputStream in, OutputStream out) throws IOException {
+    public ServerHandler(InputStream in, OutputStream out, Integer PORT) throws IOException {
 
-        String bodyText;
         HTTPRequest request = new HTTPRequest(in);
         System.out.println(request.getHeaderText());
         PrintWriter writer = new PrintWriter(out, true);
         ContentType contentType = new ContentType();
 
-        HTTPResponseGenerate response = new HTTPResponseGenerate();
+        HTTPResponse response = new HTTPResponse();
         System.out.println("Responding...");
+        //System.out.println(request.getProtocol());
 
-        if (request.getMethod()!=null && request.getMethod().equals("GET")) {
+        if(request.getHost()!=null && request.getHost().startsWith("Host: " +this.hostname+ ":" +PORT.toString())){
+            if (request.getMethod()!=null && request.getMethod().equals("GET")) {
 
-            
             File file = new File(request.getFilePath());
             contentType.setContentType(request.getFilePath());
 
@@ -34,7 +34,7 @@ class ServerHandler {
                 response.addLine("Content-Type", contentType.getContentType());
                 //response.addLine("Content-Length", contentType.getContentType());
                 response.setResponseBody(file);
-                response.writeTo(out);
+                response.writeTo();
                 writer.println(response.getResponse());
 
                 BufferedInputStream bi
@@ -44,6 +44,7 @@ class ServerHandler {
                         out.write(c);
                     }
                 } catch (IOException e) {
+                    response.setError(500);
                     e.printStackTrace();
                 } finally {
                     if (bi != null) {
@@ -55,8 +56,11 @@ class ServerHandler {
             }
         } else {
             response.setError(400);
+            }
+        }else{
+            response.setError(400);
         }
-        response.writeTo(out);
+        response.writeTo();
         writer.println(response.getResponse());
     }
 }

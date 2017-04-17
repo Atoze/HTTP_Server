@@ -12,11 +12,12 @@ import java.util.concurrent.Executors;
 
 public class Server {
     Status status;
+    final Integer PORT = 8080;
 
     public void startServer() {
         System.out.println("Starting up HTTP server...");
         try {
-            ServerSocket serverSocket = new ServerSocket(8080);
+            ServerSocket serverSocket = new ServerSocket(PORT);
             while (true) {
                 this.serverProcess(serverSocket);
             }
@@ -35,7 +36,7 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            new ServerHandler (in, out);
+            new ServerHandler (in, out, PORT);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

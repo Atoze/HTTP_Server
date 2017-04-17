@@ -27,8 +27,6 @@ class ContentType {
                 put("gif", "image");
 
                 put("mp4", "video");
-
-
             }
         };
         if (content.containsKey(contentTyp)) {
@@ -49,9 +47,6 @@ class ContentType {
 
     public void setContentTypeDefault(){
         allContentTypeLists("none");
-
-
-
     }
 
     //public String getContentTypeDefault(){
@@ -63,7 +58,6 @@ class ContentType {
 
     public String getContentTypeValue() {
         return this.fileContentTypeText;
-
     }
 
     public String getExtension() {
