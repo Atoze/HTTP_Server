@@ -18,11 +18,13 @@ class HTTPHeader {
     private String host;
 
     private final int RequestHeaderValue = 3;
+    public HTTPHeader(String line){this.readRequestHeader(line);}
 
+    /*
     public void setHTTPHeader(String line){
         this.readRequestHeader(line);
     }
-
+*/
     private void readRequestHeader(String line) {
         //リクエストヘッダをパース
         if (line != null) {

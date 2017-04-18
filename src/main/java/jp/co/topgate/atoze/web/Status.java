@@ -40,13 +40,16 @@ class Status {
             return "Unknown Error";
         }
     }
+    /*
 
     public static void setStatusCode(int i) {
         statuscode = i;
     }
+    */
 
     public static void setStatus(int i){
-        setStatusCode(i);
+        statuscode = i;
+        //setStatusCode(i);
         status = StatusParameter(i);
     }
 

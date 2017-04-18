@@ -32,8 +32,8 @@ class HTTPRequest {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         String line = br.readLine();
 
-        HTTPHeader header = new HTTPHeader();
-        header.setHTTPHeader(line);
+        HTTPHeader header = new HTTPHeader(line);
+        //header.setHTTPHeader(line);
 
         StringBuilder text= new StringBuilder();
         while (line != null && !line.isEmpty()) {
@@ -108,7 +108,7 @@ class HTTPRequest {
         if (proto != null && proto.startsWith("HTTP/")) {
             this.protocolVer = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
         } else {
-            Status.setStatusCode(400);
+            Status.setStatus(400);
         }
     }
 }
