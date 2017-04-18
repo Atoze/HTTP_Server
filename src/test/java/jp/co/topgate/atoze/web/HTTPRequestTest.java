@@ -13,7 +13,7 @@ public class HTTPRequestTest {
     @Test
     public void HTTPRequestのデータ保管するクラス () throws IOException{
         HTTPRequest request = new HTTPRequest();
-        File file = new File("test.txt");
+        File file = new File("Document/test.txt");
         InputStream input = new FileInputStream(file);
 
         assertNull(request.getHeaderText());
