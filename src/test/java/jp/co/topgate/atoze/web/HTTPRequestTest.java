@@ -31,7 +31,7 @@ public class HTTPRequestTest {
         assertNotNull(request.getProtocolVer());
 
         assertThat("GET", is(request.getMethod()));
-        assertThat("./public/index.html",is(request.getFilePath()));
+        assertThat("/public/index.html",is(request.getFilePath()));
         assertThat("1.1",is(request.getProtocolVer()));
 
         assertThat("Host: localhost:8080",is(request.getSpecificRequestLine("Host")));
