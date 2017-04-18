@@ -7,10 +7,10 @@
 Java 1.8.0
 
 ## Usage
-* 起動方法　　
-1.cloneする　　
-2.IntelliJにて開く.　　
-3.`./gradlew run`を、ルートフォルダで行う.　　
+起動方法　　
+* 1.cloneする　　
+* 2.IntelliJにて開く.　　
+* 3.`./gradlew run`を、ルートフォルダで行う.　　
 
 ## Author
 [Atoze](https://github.com/Atoze)
