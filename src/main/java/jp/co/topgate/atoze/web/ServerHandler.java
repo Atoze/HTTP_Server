@@ -21,7 +21,6 @@ class ServerHandler {
         System.out.println("Responding...");
 
         String host = request.getSpecificRequestLine("Host");
-        //System.out.println(host);
         if (host != null && host.startsWith("Host: " + this.hostname + ":" + PORT.toString())) {
 
             if (request.getMethod() != null && request.getMethod().equals("GET")) {
@@ -29,15 +28,13 @@ class ServerHandler {
                 String filepath = "." + request.getFilePath();
 
                 if (filepath.endsWith("/")) {
-                    filepath += "index.html";/*
-                    File indexfile = new File(filepath);
-                    if(look.ifcheckFile(indexfile)){}*/
+                    filepath += "index.html";
                 }
                 File file = new File(filepath);
                 contentType.setContentType(filepath);
 
                 if (look.ifcheckFile(file)) {
-                    Status.setStatusCode(200);
+                    Status.setStatus(200);
                     response.addLine("Content-Type", contentType.getContentType());
                     //response.addLine("Content-Length", file.length());
                     response.setResponseBody(file);
