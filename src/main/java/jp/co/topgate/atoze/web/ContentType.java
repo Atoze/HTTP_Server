@@ -1,7 +1,6 @@
 package jp.co.topgate.atoze.web;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by atoze on 2017/04/13.
@@ -33,6 +32,7 @@ class ContentType {
             this.fileContentTypeText = content.get(contentTyp);
         } else {
             this.fileContentTypeText = content.get("plain");
+            this.fileExtension = "plain";
             //this.fileExtension = "plain";
         }
 

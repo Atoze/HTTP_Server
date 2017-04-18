@@ -1,7 +1,11 @@
 package jp.co.topgate.atoze.web;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.io.InputStreamReader;
+import java.util.HashMap;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,23 +14,43 @@ import java.util.regex.Pattern;
  * Created by atoze on 2017/04/12.
  */
 class HTTPRequest {
-    private String bodyText;
     private String headerText;
+    private String bodyText;
     private String method;
     private String filepath;
     private String fileQuery;
-    private String protocol;
+    private String protocolVer;
     //private String getFileQuery;
     private String host;
+    HashMap<String, Object> headerData = new HashMap<String, Object>();
 
-    public HTTPRequest(InputStream input) throws IOException {
-        HTTPHeader header = new HTTPHeader(input);
-        this.headerText = header.getHeaderText();
+    private void setHTTPRequestHeader(String key, Object value) {
+        this.headerData.put(key, value);
+    }
+
+    public void setRequestText(InputStream input) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+        String line = br.readLine();
+
+        HTTPHeader header = new HTTPHeader();
+        header.setHTTPHeader(line);
+
+        StringBuilder text= new StringBuilder();
+        while (line != null && !line.isEmpty()) {
+            //System.out.println(line);
+            text.append(line).append("\n");
+            String[] headerData = line.split(": ");
+            if (headerData.length >= 2) {
+                this.setHTTPRequestHeader(headerData[0], headerData[1]);
+            }
+            line = br.readLine();
+        }
+        this.headerText = text.toString();
         this.method = header.getMethod();
         this.filepath = header.getFilePath();
-        this.protocol = header.getProtocolVer();
-        this.host=header.getHost();
+        this.protocolVer = header.getProtocol();
     }
+
     public String getHeaderText() {
         return this.headerText;
     }
@@ -41,7 +65,7 @@ class HTTPRequest {
 
     public String getFilePath() {
         URIDivider(this.filepath);
-        return "." + this.filepath;
+        return this.filepath;
     }
 
     private void URIDivider(String filepath) {
@@ -61,21 +85,27 @@ class HTTPRequest {
         }
     }
 
-    public String getProtocol() {
-        ProtocolVer(this.protocol);
-        return this.protocol;
-    }
-    public String getHost(){
-        return this.host;
-    }
-
-    public void ProtocolVer(String proto) {
-        if (proto != null && proto.startsWith("HTTP/")) {
-                this.protocol = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
-            } else {
-                //this.protocol = null;
-                Status.setStatusCode(400);
-            }
-        //return this.protocol;
+    public String getSpecificRequestLine(String key) {
+        if (headerData.containsKey(key)) {
+            return key + ": " + headerData.get(key);
+        } else {
+            return "No Data";
         }
     }
+    public Object getRequestValue(String value) {
+        return headerData.getOrDefault(value, "No Data");
+    }
+
+    public String getProtocolVer() {
+        ProtocolVer(this.protocolVer);
+        return this.protocolVer;
+    }
+
+    private void ProtocolVer(String proto) {
+        if (proto != null && proto.startsWith("HTTP/")) {
+            this.protocolVer = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
+        } else {
+            Status.setStatusCode(400);
+        }
+    }
+}
