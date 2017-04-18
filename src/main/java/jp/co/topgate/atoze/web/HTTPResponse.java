@@ -9,16 +9,8 @@ import java.util.Map;
  */
 class HTTPResponse {
     private String bodyText;
-    private static String status;
     private StringBuilder response = new StringBuilder();
-
-    private Map<String, String> headers = new HashMap<>();
-
-    ContentType contentType = new ContentType();
-
-
-    public HTTPResponse() {
-    }
+    private Map<String, Object> headers = new HashMap<>();
 
     public void setResponseBody(String text) {
         this.bodyText = text;
@@ -27,7 +19,7 @@ class HTTPResponse {
     public void setResponseBody(File file) {
     }
 
-    public void addLine(String type, String name) {
+    public void addLine(String type, Object name) {
         this.headers.put(type, name);
     }
 
@@ -45,18 +37,8 @@ class HTTPResponse {
         }
         //writer.print(response.toString());
     }
+
     public String getResponse() {
         return response.toString();
-    }
-
-    public void setError(Integer error) {
-        Status.setStatusCode(error);
-        File file = new File(error.toString() + ".html");
-        if (file.exists() && file.isFile() && file.canRead()) {
-            this.setResponseBody(file);
-        } else {
-            this.setResponseBody("<html><head><title>" + Status.getStatus() + "</title></head><body><h1>" +
-                    Status.getStatus() + "</h1></body></html>");
-        }
     }
 }
