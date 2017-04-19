@@ -12,10 +12,9 @@ import java.net.Socket;
  */
 
 public class Server {
-    Status status;
-    final Integer PORT = 8080;
+    final int PORT = 8080;
 
-    public void startServer() {
+    public void start() {
         System.out.println("Starting up HTTP server...");
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
@@ -23,6 +22,7 @@ public class Server {
                 this.serverProcess(serverSocket);
             }
         } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     //Request受信
@@ -43,7 +43,7 @@ public class Server {
             try {
                 socket.close();
             } catch (IOException e) {
-                //status.setStatusCode();
+                throw new RuntimeException(e);
             }
         }
     }

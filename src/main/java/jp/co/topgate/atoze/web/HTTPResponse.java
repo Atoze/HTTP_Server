@@ -11,12 +11,15 @@ class HTTPResponse {
     private String bodyText;
     private StringBuilder response = new StringBuilder();
     private Map<String, Object> headers = new HashMap<>();
+    private Status status = new Status();
 
     public void setResponseBody(String text) {
         this.bodyText = text;
     }
 
     public void setResponseBody(File file) {
+
+
     }
 
     public void addLine(String type, Object name) {
@@ -24,8 +27,7 @@ class HTTPResponse {
     }
 
     public void writeTo() throws IOException {
-        //PrintWriter writer = new PrintWriter(out, true);
-        response.append("HTTP/1.1 " + Status.getStatus() + "\n");
+        response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
         this.headers.forEach((key, value) -> {
             response.append(key + ": " + value + "\n");
@@ -35,7 +37,6 @@ class HTTPResponse {
             response.append("\n");
             response.append(this.bodyText + "\n");
         }
-        //writer.print(response.toString());
     }
 
     public String getResponse() {

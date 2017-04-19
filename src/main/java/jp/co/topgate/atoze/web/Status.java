@@ -6,14 +6,11 @@ import java.util.HashMap;
  * Created by atoze on 2017/04/13.
  */
 class Status {
-    private static Integer statuscode;
-    private static String status;
-    private static String statusMessage;
+    private int statusCode;
+    private String status;
+    private String statusMessage;
 
-    //public Status() {
-    //}
-
-    private static String StatusParameter(int status) {
+    private String StatusParameter(int status) {
         final HashMap<Integer, String> content = new HashMap<Integer, String>() {
             {
                 put(200, "OK");
@@ -37,7 +34,7 @@ class Status {
             statusMessage = content.get(status);
             return status + " " + content.get(status);
         } else {
-            return "Unknown Error";
+            return this.status + "Unknown Status";
         }
     }
     /*
@@ -47,19 +44,19 @@ class Status {
     }
     */
 
-    public static void setStatus(int i){
-        statuscode = i;
+    public void setStatus(int i){
+        this.statusCode = i;
         //setStatusCode(i);
-        status = StatusParameter(i);
+        this.status = StatusParameter(i);
     }
 
-    public static Integer getStatusCode(){ return statuscode;}
+    public int getStatusCode(){ return this.statusCode;}
 
-    public static String getStatusMessage(){
-        return statusMessage;}
+    public String getStatusMessage(){
+        return this.statusMessage;}
 
-    public static String getStatus() {
-        return status;
+    public String getStatus() {
+        return this.status;
     }
 
 }

@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +10,16 @@ import java.util.regex.Pattern;
  */
 
 class HTTPHeader {
+    private final  static Set<String> methods = new HashSet<>();
+    static {
+        methods.add("GET");
+        methods.add("POST");
+        methods.add("HEAD");
+        methods.add("OPTIONS");
+        methods.add("PUT");
+        methods.add("DELETE");
+        methods.add("TRACE");}
+
     private final static String method = "GET|POST|HEAD|OPTIONS|PUT|DELETE|TRACE";
 
     private String headMethod;
@@ -18,13 +30,13 @@ class HTTPHeader {
     private String host;
 
     private final int RequestHeaderValue = 3;
-    public HTTPHeader(String line){this.readRequestHeader(line);}
+    //public HTTPHeader(String line){this.readRequestHeader(line);}
+    public HTTPHeader(){}
 
-    /*
     public void setHTTPHeader(String line){
         this.readRequestHeader(line);
     }
-*/
+
     private void readRequestHeader(String line) {
         //リクエストヘッダをパース
         if (line != null) {
@@ -35,11 +47,9 @@ class HTTPHeader {
                 this.protocol = headerLines[2];
             }
         } else {
-            //Status.setStatusCode(400);
             this.filePath = "";
             this.protocol = "";
         }
-        //return header.toString();
     }
 
     //正しいHTTPメソッドであるか否か
@@ -49,10 +59,7 @@ class HTTPHeader {
 
         if (m.find()) {
             this.headMethod = m.group();
-            //return true;
         } else {
-            Status.setStatus(400);
-            //return = false;
         }
     }
     public String getMethod() {

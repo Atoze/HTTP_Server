@@ -17,12 +17,16 @@ class HTTPRequest {
     private String headerText;
     private String bodyText;
     private String method;
-    private String filepath;
+    private String filePath;
     private String fileQuery;
     private String protocolVer;
     //private String getFileQuery;
     private String host="localhost:8080";
     HashMap<String, Object> headerData = new HashMap<String, Object>();
+
+    HTTPRequest()  {
+
+    }
 
     private void setHTTPRequestHeader(String key, Object value) {
         this.headerData.put(key, value);
@@ -32,8 +36,8 @@ class HTTPRequest {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         String line = br.readLine();
 
-        HTTPHeader header = new HTTPHeader(line);
-        //header.setHTTPHeader(line);
+        HTTPHeader header = new HTTPHeader();
+        header.setHTTPHeader(line);
 
         StringBuilder text= new StringBuilder();
         while (line != null && !line.isEmpty()) {
@@ -46,7 +50,7 @@ class HTTPRequest {
         }
         this.headerText = text.toString();
         this.method = header.getMethod();
-        this.filepath = header.getFilePath();
+        this.filePath = header.getFilePath();
         this.protocolVer = header.getProtocol();
     }
 
@@ -63,52 +67,51 @@ class HTTPRequest {
     }
 
     public String getFilePath() {
-        URIDivider(this.filepath);
-        URIQuerySplitter(this.filepath);
-        return this.filepath;
+        this.filePath = uriQuerySplitter(uriDivider(this.filePath));
+        return this.filePath;
     }
 
-    private void URIDivider(String filepath) {
+    private String uriDivider(String filepath) {
         String pattern = "http*.//";
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(filepath);
 
         if (m.find()) {
             if (filepath.startsWith(m.group())) {
-                this.filepath = filepath.substring(filepath.indexOf(this.host) + this.host.length());
+                return filepath.substring(filepath.indexOf(this.host) + this.host.length());
             }
-        }
+        }return "";
     }
 
-    private void URIQuerySplitter(String filepath){
+    private String uriQuerySplitter(String filepath){
         String URIQuerys[] = filepath.split("\\?");
-        this.filepath = URIQuerys[0];
         if (URIQuerys[0] != filepath) {
             this.fileQuery = URIQuerys[1];
         }
+        return URIQuerys[0];
     }
 
     public String getSpecificRequestLine(String key) {
         if (headerData.containsKey(key)) {
             return key + ": " + headerData.get(key);
         } else {
-            return "No Data";
+            return null;
         }
     }
     public Object getRequestValue(String value) {
-        return headerData.getOrDefault(value, "No Data");
+        return headerData.getOrDefault(value, null);
     }
 
     public String getProtocolVer() {
-        ProtocolVer(this.protocolVer);
+        this.protocolVer = ProtocolVer(this.protocolVer);
         return this.protocolVer;
     }
 
-    private void ProtocolVer(String proto) {
+    private String ProtocolVer(String proto) {
         if (proto != null && proto.startsWith("HTTP/")) {
-            this.protocolVer = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
+            return proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
         } else {
-            Status.setStatus(400);
+            return null;
         }
     }
 }
