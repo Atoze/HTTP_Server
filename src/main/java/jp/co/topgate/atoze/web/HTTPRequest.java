@@ -27,7 +27,7 @@ class HTTPRequest {
     HTTPRequest()  {
 
     }
-    private void addHTTPRequestHeader(String key, String value) {
+    private void addRequestHeader(String key, String value) {
         this.headerData.put(key, value);
     }
 
@@ -43,7 +43,7 @@ class HTTPRequest {
             text.append(line).append("\n");
             String[] headerData = line.split(": ");
             if (headerData.length >= 2) {
-                this.addHTTPRequestHeader(headerData[0], headerData[1]);
+                this.addRequestHeader(headerData[0], headerData[1]);
             }
             line = br.readLine();
         }
@@ -66,18 +66,18 @@ class HTTPRequest {
     }
 
     public String getFilePath() {
-        this.filePath = uriQuerySplitter(uriDivider(this.filePath));
+        this.filePath = uriQuerySplitter(urlDivider(this.filePath, this.host));
         return this.filePath;
     }
 
-    private String uriDivider(String filepath) {
+    private String urlDivider(String filepath, String host) {
         String pattern = "http*.//";
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(filepath);
 
         if (m.find()) {
             if (filepath.startsWith(m.group())) {
-                return filepath.substring(filepath.indexOf(this.host) + this.host.length());
+                return filepath.substring(filepath.indexOf(host) + host.length());
             }
         }return filepath;
     }

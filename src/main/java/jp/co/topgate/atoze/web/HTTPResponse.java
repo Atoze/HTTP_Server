@@ -11,7 +11,6 @@ class HTTPResponse {
     private String bodyText;
     private StringBuilder response = new StringBuilder();
     private Map<String, Object> headers = new HashMap<>();
-    private Status status = new Status();
 
     public void setResponseBody(String text) {
         this.bodyText = text;
@@ -26,7 +25,9 @@ class HTTPResponse {
         this.headers.put(type, name);
     }
 
-    public void writeTo() throws IOException {
+    public void writeTo(int statusCode) throws IOException {
+        Status status = new Status();
+        status.setStatus(statusCode);
         response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
         this.headers.forEach((key, value) -> {

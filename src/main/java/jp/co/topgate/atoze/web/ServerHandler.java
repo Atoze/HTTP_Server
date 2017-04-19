@@ -8,10 +8,9 @@ import java.io.*;
 class ServerHandler {
 
     private final String hostname = "localhost";
-    private FileLook look = new FileLook();
     private HTTPResponse response = new HTTPResponse();
     private HTTPRequest request = new HTTPRequest();
-    private Status status = new Status();
+
 
     public ServerHandler(InputStream in, OutputStream out, Integer PORT) throws IOException {
         request.setRequestText(in);
@@ -25,14 +24,14 @@ class ServerHandler {
 
         if (host == null || request.getMethod() == null || !host.startsWith("Host: " + this.hostname + ":" + PORT.toString())) {
             setError(400);
-            response.writeTo();
+            response.writeTo(400);
             writer.println(response.getResponse());
             return;
         }
 
         if(!request.getMethod().equals("GET")){
             setError(405);
-            response.writeTo();
+            response.writeTo(405);
             writer.println(response.getResponse());
             return;
         }
@@ -45,12 +44,11 @@ class ServerHandler {
             System.out.println(filepath);
             contentType.setContentType(filepath);
 
-            if (look.ifcheckFile(file)) {
-                this.status.setStatus(200);
+            if (checkFile(file)) {
                 response.addLine("Content-Type", contentType.getContentType());
                 //response.addLine("Content-Length", file.length());
                 response.setResponseBody(file);
-                response.writeTo();
+                response.writeTo(200);
                 writer.println(response.getResponse());
 
                 BufferedInputStream bi
@@ -69,7 +67,7 @@ class ServerHandler {
                 }
             } else {
                 setError(404);
-                response.writeTo();
+                response.writeTo(404);
                 writer.println(response.getResponse());
             }
         System.out.println(response.getResponse());
@@ -77,13 +75,23 @@ class ServerHandler {
 
 
     private void setError(Integer error) {
-        this.status.setStatus(error);
+        Status status = new Status();
+        status.setStatus(error);
         File file = new File(error.toString() + ".html");
         if (file.exists() && file.isFile() && file.canRead()) {
             response.setResponseBody(file);
         } else {
-            response.setResponseBody("<html><head><title>" + this.status.getStatus() + "</title></head><body><h1>" +
-                    this.status.getStatus() + "</h1></body></html>");
+            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
+                    status.getStatus() + "</h1></body></html>");
         }
+    }
+
+    private boolean checkFile(File file) {
+        if (file.exists()) {
+            if (file.isFile() && file.canRead()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
