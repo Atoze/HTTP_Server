@@ -9,6 +9,8 @@ class ContentType {
     private String fileContentTypeText;
     private String fileExtension;
 
+    
+
     private void allContentTypeLists(String contentType) {
         HashMap<String, String> content = new HashMap<String, String>() {
             {

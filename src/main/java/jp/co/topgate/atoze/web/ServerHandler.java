@@ -46,7 +46,7 @@ class ServerHandler {
         contentType.setContentType(filepath);
 
         if (checkFile(file)) {
-            response.addLine("Content-Type", contentType.getContentType(filepath));
+            response.addLine("Content-Type", contentType.getContentType());
             //response.addLine("Content-Length", file.length());
             response.setResponseBody(file);
             response.writeTo(200);
