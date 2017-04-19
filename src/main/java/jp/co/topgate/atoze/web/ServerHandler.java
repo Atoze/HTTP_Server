@@ -8,85 +8,135 @@ import java.io.*;
 class ServerHandler {
 
     private final String hostname = "localhost";
-    private FileLook look = new FileLook();
     private HTTPResponse response = new HTTPResponse();
     private HTTPRequest request = new HTTPRequest();
+    private Status status = new Status();
+    ServerHandler(){}
 
-    public ServerHandler(InputStream in, OutputStream out, Integer PORT) throws IOException {
+
+
+    public void ServerHandler2(InputStream in, OutputStream out, Integer PORT) throws IOException {
         request.setRequestText(in);
         System.out.println(request.getHeaderText());
-        PrintWriter writer = new PrintWriter(out, true);
-        ContentType contentType = new ContentType();
 
         System.out.println("Responding...");
+        String host = request.getRequestValue("Host");
 
-        String host = request.getSpecificRequestLine("Host");
-        if (host != null && host.startsWith("Host: " + this.hostname + ":" + PORT.toString())) {
-
-            if (request.getMethod() != null && request.getMethod().equals("GET")) {
-
-                String filepath = "." + request.getFilePath();
-
-                if (filepath.endsWith("/")) {
-                    filepath += "index.html";
-                }
-                File file = new File(filepath);
-                contentType.setContentType(filepath);
-
-                if (look.ifcheckFile(file)) {
-                    Status.setStatus(200);
-                    response.addLine("Content-Type", contentType.getContentType());
-                    //response.addLine("Content-Length", file.length());
-                    response.setResponseBody(file);
-                    response.writeTo();
-                    writer.println(response.getResponse());
-
-                    BufferedInputStream bi
-                            = new BufferedInputStream(new FileInputStream(file));
-                    try {
-                        for (int c = bi.read(); c >= 0; c = bi.read()) {
-                            out.write(c);
-                        }
-                    } catch (IOException e) {
-                        //setError(500);
-                        e.printStackTrace();
-                    } finally {
-                        if (bi != null) {
-                            bi.close();
-                        }
-                    }
-                } else {
-                    setError(404);
-                    response.writeTo();
-                    writer.println(response.getResponse());
-                }
-            } else {
-                setError(400);
-                response.writeTo();
-                writer.println(response.getResponse());
-            }
-        } else {
+        if (host == null || request.getMethod() == null || !host.startsWith(this.hostname + ":" + PORT.toString())) {
             setError(400);
-            response.writeTo();
-            writer.println(response.getResponse());
+            response.writeTo(out, this.status);
+            return;
         }
+
+        if (!request.getMethod().equals("GET")) {
+            setError(405);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        String filePath = "." + request.getFilePath();
+
+        if (filePath.endsWith("/")) {
+            filePath += "index.html";
+        }
+
+        File file = new File(filePath);
+
+        if(!file.canRead()){
+            setError(403);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        if(!file.exists() || !file.isFile()){
+            setError(404);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        //if (checkFile(file)) {
+            this.status.setStatus(200);
+            response.addText("Content-Type", ContentTypeUtil.getContentType(filePath));
+            response.setResponseBody(file);
+            response.writeTo(out, this.status);
+        /*} else {
+            setError(404);
+            response.writeTo(out, this.status);
+        }*/
+        System.out.println(response.getResponse());
+    }
+    public void handleIn(InputStream in){
+        request.setRequestText(in);
+        System.out.println(request.getHeaderText());
+    }
+
+    public void handleOut(OutputStream out , int PORT) throws IOException {
+        String host = request.getRequestValue("Host");
+        if (host == null || request.getMethod() == null || !host.startsWith(this.hostname + ":" + PORT)) {
+            setError(400);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        if (!request.getMethod().equals("GET")) {
+            setError(405);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        String filePath = "." + request.getFilePath();
+
+        if (filePath.endsWith("/")) {
+            filePath += "index.html";
+        }
+
+        File file = new File(filePath);
+
+        if(!file.canRead()){
+            setError(403);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        if(!file.exists() || !file.isFile()){
+            setError(404);
+            response.writeTo(out, this.status);
+            return;
+        }
+
+        //if (checkFile(file)) {
+        this.status.setStatus(200);
+        response.addText("Content-Type", ContentTypeUtil.getContentType(filePath));
+        response.setResponseBody(file);
+        response.writeTo(out, this.status);
+        /*} else {
+            setError(404);
+            response.writeTo(out, this.status);
+        }*/
+        System.out.println(response.getResponse());
 
     }
 
-    private void setError(Integer error) {
-        Status.setStatus(error);
-        File file = new File(error.toString() + ".html");
+
+
+
+    private void setError(int error) {
+        this.status.setStatus(error);
+        File file = new File(error + ".html");
         if (file.exists() && file.isFile() && file.canRead()) {
             response.setResponseBody(file);
         } else {
-            response.setResponseBody("<html><head><title>" + Status.getStatus() + "</title></head><body><h1>" +
-                    Status.getStatus() + "</h1></body></html>");
+            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
+                    status.getStatus() + "</h1></body></html>");
         }
     }
 
-    private void getRequestText() {
-
+    /*
+    private boolean checkFile(File file) {
+        if (file.exists() && file.isFile()) {
+                return true;
+            }
+        return false;
     }
-
-
+    */
 }

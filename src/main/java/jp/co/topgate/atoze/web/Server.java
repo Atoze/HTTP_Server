@@ -12,10 +12,9 @@ import java.net.Socket;
  */
 
 public class Server {
-    Status status;
-    final Integer PORT = 8080;
+    final int PORT = 8080;
 
-    public void startServer() {
+    public void start() {
         System.out.println("Starting up HTTP server...");
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
@@ -23,11 +22,18 @@ public class Server {
                 this.serverProcess(serverSocket);
             }
         } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     //Request受信
-    private void serverProcess(ServerSocket serverSocket) throws IOException {
-        Socket socket = serverSocket.accept();
+    private void serverProcess(ServerSocket serverSocket)  {
+        Socket socket = null;
+        try {
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         System.out.println("Request incoming...");
         try
                 (
@@ -35,7 +41,9 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            new ServerHandler (in, out, PORT);
+            ServerHandler serverHandler = new ServerHandler();
+            serverHandler.handleIn(in);
+            serverHandler.handleOut(out, PORT);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -43,7 +51,7 @@ public class Server {
             try {
                 socket.close();
             } catch (IOException e) {
-                //status.setStatusCode();
+                throw new RuntimeException(e);
             }
         }
     }

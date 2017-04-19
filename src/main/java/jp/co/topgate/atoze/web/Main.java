@@ -5,8 +5,12 @@ package jp.co.topgate.atoze.web;
  */
 class Main {
 
-    public static void main(String[] args) throws Exception {
-        Server server = new Server();
-        server.startServer();
+    public static void main(String[] args) {
+        try {
+            Server server = new Server();
+            server.start();
+        } catch (Throwable e) {
+
+        }
     }
 }

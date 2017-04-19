@@ -3,10 +3,9 @@ package jp.co.topgate.atoze.web;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.io.InputStreamReader;
 import java.util.HashMap;
-
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,38 +14,48 @@ import java.util.regex.Pattern;
  */
 class HTTPRequest {
     private String headerText;
-    private String bodyText;
     private String method;
-    private String filepath;
+    private String filePath;
     private String fileQuery;
     private String protocolVer;
     //private String getFileQuery;
-    private String host="localhost:8080";
-    HashMap<String, Object> headerData = new HashMap<String, Object>();
+    private String host = "localhost:8080";
+    Map<String, String> headerData = new HashMap<String, String>();
 
-    private void setHTTPRequestHeader(String key, Object value) {
+    HTTPRequest() {
+    }
+
+    private void addRequestData(String key, String value) {
         this.headerData.put(key, value);
     }
 
-    public void setRequestText(InputStream input) throws IOException {
+    public void setRequestText(InputStream input) {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
-        String line = br.readLine();
+        String line = null;
+        try {
+            line = br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        HTTPHeader header = new HTTPHeader();
-        header.setHTTPHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line);
 
-        StringBuilder text= new StringBuilder();
+        StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {
             text.append(line).append("\n");
-            String[] headerData = line.split(": ");
-            if (headerData.length >= 2) {
-                this.setHTTPRequestHeader(headerData[0], headerData[1]);
+            String[] headerLineData = line.split(": ");
+            if (headerLineData.length >= 2) {
+                this.addRequestData(headerLineData[0], headerLineData[1]);
             }
-            line = br.readLine();
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         this.headerText = text.toString();
         this.method = header.getMethod();
-        this.filepath = header.getFilePath();
+        this.filePath = header.getFilePath();
         this.protocolVer = header.getProtocol();
     }
 
@@ -54,61 +63,50 @@ class HTTPRequest {
         return this.headerText;
     }
 
-    public String getBodyText() {
-        return this.bodyText;
-    }
-
     public String getMethod() {
         return this.method;
     }
 
     public String getFilePath() {
-        URIDivider(this.filepath);
-        URIQuerySplitter(this.filepath);
-        return this.filepath;
+        this.filePath = uriQuerySplitter(urlDivider(this.filePath, this.host));
+        return this.filePath;
     }
 
-    private void URIDivider(String filepath) {
+    private String urlDivider(String filePath, String host) {
         String pattern = "http*.//";
         Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(filepath);
+        Matcher m = p.matcher(filePath);
 
         if (m.find()) {
-            if (filepath.startsWith(m.group())) {
-                this.filepath = filepath.substring(filepath.indexOf(this.host) + this.host.length());
+            if (filePath.startsWith(m.group())) {
+                return filePath.substring(filePath.indexOf(host) + host.length());
             }
         }
+        return filePath;
     }
 
-    private void URIQuerySplitter(String filepath){
-        String URIQuerys[] = filepath.split("\\?");
-        this.filepath = URIQuerys[0];
-        if (URIQuerys[0] != filepath) {
-            this.fileQuery = URIQuerys[1];
+    private String uriQuerySplitter(String filepath) {
+        String urlQuery[] = filepath.split("\\?");
+        if (urlQuery[0] != filepath) {
+            this.fileQuery = urlQuery[1];
         }
+        return urlQuery[0];
     }
 
-    public String getSpecificRequestLine(String key) {
-        if (headerData.containsKey(key)) {
-            return key + ": " + headerData.get(key);
-        } else {
-            return "No Data";
-        }
-    }
-    public Object getRequestValue(String value) {
-        return headerData.getOrDefault(value, "No Data");
+    public String getRequestValue(String value) {
+        return headerData.getOrDefault(value, null);
     }
 
     public String getProtocolVer() {
-        ProtocolVer(this.protocolVer);
+        this.protocolVer = ProtocolVer(this.protocolVer);
         return this.protocolVer;
     }
 
-    private void ProtocolVer(String proto) {
-        if (proto != null && proto.startsWith("HTTP/")) {
-            this.protocolVer = proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
+    private String ProtocolVer(String protocol) {
+        if (protocol != null && protocol.startsWith("HTTP/")) {
+            return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
         } else {
-            Status.setStatusCode(400);
+            return protocol;
         }
     }
 }
