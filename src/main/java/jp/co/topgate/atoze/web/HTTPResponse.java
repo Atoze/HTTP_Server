@@ -16,7 +16,16 @@ class HTTPResponse {
         this.bodyText = text;
     }
 
-    public void setResponseBody(File file) {
+    public void setResponseBody(File file) throws IOException {
+
+        BufferedInputStream bi
+                = new BufferedInputStream(new FileInputStream(file));
+        int i1;
+
+        while ((i1 = bi.read()) != -1) {
+            response.append((char)i1);
+        }
+        bi.close();
 
 
     }

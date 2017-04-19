@@ -48,7 +48,7 @@ class ServerHandler {
         if (checkFile(file)) {
             response.addLine("Content-Type", contentType.getContentType());
             //response.addLine("Content-Length", file.length());
-            response.setResponseBody(file);
+            //response.setResponseBody(file);
             response.writeTo(200);
             writer.println(response.getResponse());
 
@@ -78,7 +78,7 @@ class ServerHandler {
         status.setStatus(error);
         File file = new File(error.toString() + ".html");
         if (file.exists() && file.isFile() && file.canRead()) {
-            response.setResponseBody(file);
+            //response.setResponseBody(file);
         } else {
             response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
                     status.getStatus() + "</h1></body></html>");

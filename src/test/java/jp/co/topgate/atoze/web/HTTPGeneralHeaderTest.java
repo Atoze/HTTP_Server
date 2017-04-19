@@ -15,7 +15,6 @@ public class HTTPGeneralHeaderTest {
         HTTPHeader header = new HTTPHeader();
 
         assertNull(header.getFilePath());
-        assertNull(header.getFileQuery());
         assertNull(header.getMethod());
         assertNull(header.getProtocol());
 
@@ -23,7 +22,6 @@ public class HTTPGeneralHeaderTest {
         header.setHTTPHeader(line);
 
         assertThat("/", is(header.getFilePath()));
-        assertThat(null, is(header.getFileQuery()));
         assertThat("GET", is(header.getMethod()));
         assertThat("HTTP/1.1", is(header.getProtocol()));
 
@@ -37,7 +35,6 @@ public class HTTPGeneralHeaderTest {
         header.setHTTPHeader(line);
 
         assertNull(header.getFilePath());
-        assertNull(header.getFileQuery());
         assertNull(header.getMethod());
         assertNull(header.getProtocol());
 
