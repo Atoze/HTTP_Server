@@ -9,24 +9,24 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by atoze on 2017/04/18.
  */
-public class ContentTypeTest {
+public class ContentTypeUtilTest {
     @Test
     public void ContentTypeを判断する() {
         //NULL
-        assertThat(null, is(ContentType.getContentType(null)));
+        assertThat(null, is(ContentTypeUtil.getContentType(null)));
 
         //ファイルをいれてみる
         File file = new File("test.html");
-        assertThat("text/html", is(ContentType.getContentType(file.toString())));
+        assertThat("text/html", is(ContentTypeUtil.getContentType(file.toString())));
 
         //拡張子がMIME-Typeにない場合
-        assertThat("text/plain", is(ContentType.getContentType("hoge.hoge")));
+        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.hoge")));
 
         //拡張子がない場合=ファイルではない
-        assertThat(null, is(ContentType.getContentType("hoge")));
+        assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
 
         //二重に'.'がある場合
-        assertThat("text/html", is(ContentType.getContentType("hoge.hoge.html")));
+        assertThat("text/html", is(ContentTypeUtil.getContentType("hoge.hoge.html")));
 
     }
 }

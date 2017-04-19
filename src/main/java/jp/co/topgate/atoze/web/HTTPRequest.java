@@ -3,10 +3,9 @@ package jp.co.topgate.atoze.web;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.io.InputStreamReader;
 import java.util.HashMap;
-
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,37 +14,44 @@ import java.util.regex.Pattern;
  */
 class HTTPRequest {
     private String headerText;
-    private String bodyText;
     private String method;
     private String filePath;
     private String fileQuery;
     private String protocolVer;
     //private String getFileQuery;
     private String host = "localhost:8080";
-    HashMap<String, String> headerData = new HashMap<String, String>();
+    Map<String, String> headerData = new HashMap<String, String>();
 
     HTTPRequest() {
-
     }
 
-    private void addRequestHeader(String key, String value) {
+    private void addRequestData(String key, String value) {
         this.headerData.put(key, value);
     }
 
-    public void setRequestText(InputStream input) throws IOException {
+    public void setRequestText(InputStream input) {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
-        String line = br.readLine();
+        String line = null;
+        try {
+            line = br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        HTTPHeader header = new HTTPHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line);
 
         StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {
             text.append(line).append("\n");
-            String[] headerData = line.split(": ");
-            if (headerData.length >= 2) {
-                this.addRequestHeader(headerData[0], headerData[1]);
+            String[] headerLineData = line.split(": ");
+            if (headerLineData.length >= 2) {
+                this.addRequestData(headerLineData[0], headerLineData[1]);
             }
-            line = br.readLine();
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         this.headerText = text.toString();
         this.method = header.getMethod();
@@ -55,10 +61,6 @@ class HTTPRequest {
 
     public String getHeaderText() {
         return this.headerText;
-    }
-
-    public String getBodyText() {
-        return this.bodyText;
     }
 
     public String getMethod() {
@@ -91,15 +93,7 @@ class HTTPRequest {
         return urlQuery[0];
     }
 
-    public String getSpecificRequestLine(String key) {
-        if (headerData.containsKey(key)) {
-            return key + ": " + headerData.get(key);
-        } else {
-            return null;
-        }
-    }
-
-    public Object getRequestValue(String value) {
+    public String getRequestValue(String value) {
         return headerData.getOrDefault(value, null);
     }
 

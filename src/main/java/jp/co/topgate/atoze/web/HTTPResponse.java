@@ -11,7 +11,7 @@ class HTTPResponse {
     private String bodyText;
     private File bodyFile;
     private StringBuilder response = new StringBuilder();
-    private Map<String, Object> headers = new HashMap<>();
+    private Map<String, String> headers = new HashMap<>();
 
     public void setResponseBody(String text) {
         this.bodyText = text;
@@ -21,7 +21,7 @@ class HTTPResponse {
         this.bodyFile = file;
     }
 
-    public void addLine(String type, Object name) {
+    public void addText(String type, String name) {
         this.headers.put(type, name);
     }
 

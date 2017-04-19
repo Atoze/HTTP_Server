@@ -9,12 +9,12 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by atoze on 2017/04/17.
  */
-public class HTTPGeneralHeaderTest {
+public class HTTPRequestLineTest {
     @Test
     public void HTTPRequestのジェネラルヘッダを処理するクラスのテスト() {
         String line = "GET / HTTP/1.1";
 
-        HTTPHeader header = new HTTPHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line);
 
         assertThat("/", is(header.getFilePath()));
         assertThat("GET", is(header.getMethod()));
@@ -26,11 +26,16 @@ public class HTTPGeneralHeaderTest {
     public void エラーテスト() {
         String line = null;
 
-        HTTPHeader header = new HTTPHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line);
 
         assertNull(header.getFilePath());
         assertNull(header.getMethod());
         assertNull(header.getProtocol());
+
+    }
+
+    @Test
+    public void 絶対パスのテスト(){
 
     }
 

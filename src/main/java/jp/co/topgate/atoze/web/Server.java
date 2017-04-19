@@ -26,8 +26,14 @@ public class Server {
         }
     }
     //Request受信
-    private void serverProcess(ServerSocket serverSocket) throws IOException {
-        Socket socket = serverSocket.accept();
+    private void serverProcess(ServerSocket serverSocket)  {
+        Socket socket = null;
+        try {
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         System.out.println("Request incoming...");
         try
                 (
@@ -35,7 +41,9 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            new ServerHandler (in, out, PORT);
+            ServerHandler serverHandler = new ServerHandler();
+            serverHandler.handleIn(in);
+            serverHandler.handleOut(out, PORT);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

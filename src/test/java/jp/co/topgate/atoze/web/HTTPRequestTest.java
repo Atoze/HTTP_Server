@@ -34,9 +34,6 @@ public class HTTPRequestTest {
         assertThat("/public/index.html",is(request.getFilePath()));
         assertThat("1.1",is(request.getProtocolVer()));
 
-        assertThat("Host: localhost:8080",is(request.getSpecificRequestLine("Host")));
-        assertThat("Connection: keep-alive",is(request.getSpecificRequestLine("Connection")));
-
         assertThat("localhost:8080",is(request.getRequestValue("Host")));
     }
 }

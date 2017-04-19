@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by atoze on 2017/04/13.
  */
-class ContentType {
+class ContentTypeUtil {
     private static final Map<String, String> content = new HashMap<String, String>() {
         {
             put("plain", "text");
@@ -30,7 +30,6 @@ class ContentType {
         if (filePath == null){
             return null;
         }
-
         int point = filePath.lastIndexOf(".");
         if (point != -1) {
             filePath = filePath.substring(point + 1, filePath.length());
@@ -44,6 +43,4 @@ class ContentType {
         }
         return null;
     }
-
-
 }
