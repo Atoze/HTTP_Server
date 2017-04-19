@@ -9,7 +9,7 @@ class ContentType {
     private String fileContentTypeText;
     private String fileExtension;
 
-    private void allContentTypeLists(String contentTyp) {
+    private void allContentTypeLists(String contentType) {
         HashMap<String, String> content = new HashMap<String, String>() {
             {
                 put("plain", "text");
@@ -28,8 +28,8 @@ class ContentType {
                 put("mp4", "video");
             }
         };
-        if (content.containsKey(contentTyp)) {
-            this.fileContentTypeText = content.get(contentTyp);
+        if (content.containsKey(contentType)) {
+            this.fileContentTypeText = content.get(contentType);
         } else {
             this.fileContentTypeText = content.get("plain");
             this.fileExtension = "plain";
@@ -37,6 +37,7 @@ class ContentType {
         }
 
     }
+
     public void setContentType(String fileName) {
         int point = fileName.lastIndexOf(".");
         if (point != -1) {
@@ -45,14 +46,15 @@ class ContentType {
         }
     }
 
-    public void setContentTypeDefault(){
+    public void setContentTypeDefault() {
         allContentTypeLists("none");
     }
 
     //public String getContentTypeDefault(){
     //    return "text" + "/" + "plain";
 
-    public String getContentType() {
+    public String getContentType(String fileName) {
+
         return this.fileContentTypeText + "/" + this.fileExtension;
     }
 

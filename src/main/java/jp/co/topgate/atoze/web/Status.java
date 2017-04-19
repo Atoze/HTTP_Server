@@ -44,16 +44,19 @@ class Status {
     }
     */
 
-    public void setStatus(int i){
+    public void setStatus(int i) {
         this.statusCode = i;
         //setStatusCode(i);
         this.status = StatusParameter(i);
     }
 
-    public int getStatusCode(){ return this.statusCode;}
+    public int getStatusCode() {
+        return this.statusCode;
+    }
 
-    public String getStatusMessage(){
-        return this.statusMessage;}
+    public String getStatusMessage() {
+        return this.statusMessage;
+    }
 
     public String getStatus() {
         return this.status;

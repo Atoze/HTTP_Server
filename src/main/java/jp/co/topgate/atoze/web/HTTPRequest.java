@@ -21,12 +21,13 @@ class HTTPRequest {
     private String fileQuery;
     private String protocolVer;
     //private String getFileQuery;
-    private String host="localhost:8080";
+    private String host = "localhost:8080";
     HashMap<String, String> headerData = new HashMap<String, String>();
 
-    HTTPRequest()  {
+    HTTPRequest() {
 
     }
+
     private void addRequestHeader(String key, String value) {
         this.headerData.put(key, value);
     }
@@ -38,7 +39,7 @@ class HTTPRequest {
         HTTPHeader header = new HTTPHeader();
         header.setHTTPHeader(line);
 
-        StringBuilder text= new StringBuilder();
+        StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {
             text.append(line).append("\n");
             String[] headerData = line.split(": ");
@@ -70,19 +71,20 @@ class HTTPRequest {
         return this.filePath;
     }
 
-    private String urlDivider(String filepath, String host) {
+    private String urlDivider(String filePath, String host) {
         String pattern = "http*.//";
         Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(filepath);
+        Matcher m = p.matcher(filePath);
 
         if (m.find()) {
-            if (filepath.startsWith(m.group())) {
-                return filepath.substring(filepath.indexOf(host) + host.length());
+            if (filePath.startsWith(m.group())) {
+                return filePath.substring(filePath.indexOf(host) + host.length());
             }
-        }return filepath;
+        }
+        return filePath;
     }
 
-    private String uriQuerySplitter(String filepath){
+    private String uriQuerySplitter(String filepath) {
         String urlQuery[] = filepath.split("\\?");
         if (urlQuery[0] != filepath) {
             this.fileQuery = urlQuery[1];
@@ -97,6 +99,7 @@ class HTTPRequest {
             return null;
         }
     }
+
     public Object getRequestValue(String value) {
         return headerData.getOrDefault(value, null);
     }
