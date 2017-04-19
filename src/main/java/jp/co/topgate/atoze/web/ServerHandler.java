@@ -16,7 +16,6 @@ class ServerHandler {
     public ServerHandler(InputStream in, OutputStream out, Integer PORT) throws IOException {
         request.setRequestText(in);
         System.out.println(request.getHeaderText());
-        ContentType contentType = new ContentType();
 
         System.out.println("Responding...");
 
@@ -34,18 +33,16 @@ class ServerHandler {
             return;
         }
 
-        String filepath = "." + request.getFilePath();
+        String filePath = "." + request.getFilePath();
 
-        if (filepath.endsWith("/")) {
-            filepath += "index.html";
+        if (filePath.endsWith("/")) {
+            filePath += "index.html";
         }
 
-        File file = new File(filepath);
-        contentType.setContentType(filepath);
-
+        File file = new File(filePath);
         if (checkFile(file)) {
             this.status.setStatus(200);
-            response.addLine("Content-Type", contentType.getContentType());
+            response.addLine("Content-Type", ContentType.getContentType(filePath));
             //response.addLine("Content-Length", file.length());
             response.setResponseBody(file);
             response.writeTo(out, this.status);
