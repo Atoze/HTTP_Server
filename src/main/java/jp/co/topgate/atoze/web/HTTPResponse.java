@@ -9,6 +9,7 @@ import java.util.Map;
  */
 class HTTPResponse {
     private String bodyText;
+    private File bodyFile;
     private StringBuilder response = new StringBuilder();
     private Map<String, Object> headers = new HashMap<>();
 
@@ -16,36 +17,42 @@ class HTTPResponse {
         this.bodyText = text;
     }
 
-    public void setResponseBody(File file) throws IOException {
-
-        BufferedInputStream bi
-                = new BufferedInputStream(new FileInputStream(file));
-        int i1;
-
-        while ((i1 = bi.read()) != -1) {
-            response.append((char)i1);
-        }
-        bi.close();
-
-
+    public void setResponseBody(File file) {
+        this.bodyFile = file;
     }
 
     public void addLine(String type, Object name) {
         this.headers.put(type, name);
     }
 
-    public void writeTo(int statusCode) throws IOException {
-        Status status = new Status();
-        status.setStatus(statusCode);
-        response.append("HTTP/1.1 " + status.getStatus() + "\n");
+    public void writeTo(OutputStream out, Status status) throws IOException {
+        PrintWriter writer = new PrintWriter(out, true);
+
+        this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
         this.headers.forEach((key, value) -> {
-            response.append(key + ": " + value + "\n");
+            this.response.append(key + ": " + value + "\n");
         });
 
         if (this.bodyText != null) {
-            response.append("\n");
-            response.append(this.bodyText + "\n");
+            this.response.append("\n").append(this.bodyText + "\n");
+        }
+        writer.println(this.response.toString());
+
+        if (this.bodyFile != null) {
+            BufferedInputStream bi
+                    = new BufferedInputStream(new FileInputStream(this.bodyFile));
+            try {
+                for (int c = bi.read(); c >= 0; c = bi.read()) {
+                    out.write(c);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (bi != null) {
+                    bi.close();
+                }
+            }
         }
     }
 

@@ -25,7 +25,6 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
     //Request受信
     private void serverProcess(ServerSocket serverSocket) throws IOException {
         Socket socket = serverSocket.accept();
@@ -36,7 +35,7 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            new ServerHandler(in, out, PORT);
+            new ServerHandler (in, out, PORT);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

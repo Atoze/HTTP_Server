@@ -12,14 +12,9 @@ import static org.junit.Assert.assertThat;
 public class HTTPGeneralHeaderTest {
     @Test
     public void HTTPRequestのジェネラルヘッダを処理するクラスのテスト() {
-        HTTPHeader header = new HTTPHeader();
-
-        assertNull(header.getFilePath());
-        assertNull(header.getMethod());
-        assertNull(header.getProtocol());
-
         String line = "GET / HTTP/1.1";
-        header.setHTTPHeader(line);
+
+        HTTPHeader header = new HTTPHeader(line);
 
         assertThat("/", is(header.getFilePath()));
         assertThat("GET", is(header.getMethod()));
@@ -29,10 +24,9 @@ public class HTTPGeneralHeaderTest {
 
     @Test
     public void エラーテスト() {
-        HTTPHeader header = new HTTPHeader();
+        String line = null;
 
-        String line = "HogeHoge";
-        header.setHTTPHeader(line);
+        HTTPHeader header = new HTTPHeader(line);
 
         assertNull(header.getFilePath());
         assertNull(header.getMethod());

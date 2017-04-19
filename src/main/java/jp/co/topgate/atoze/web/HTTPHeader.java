@@ -30,13 +30,7 @@ class HTTPHeader {
 
     private final int RequestHeaderValue = 3;
 
-    //public HTTPHeader(String line){this.readRequestHeader(line);}
-    public HTTPHeader() {
-    }
-
-    public void setHTTPHeader(String line) {
-        this.readRequestHeader(line);
-    }
+    public HTTPHeader(String line){this.readRequestHeader(line);}
 
     private void readRequestHeader(String line) {
         //リクエストヘッダをパース
@@ -47,9 +41,6 @@ class HTTPHeader {
                 this.filePath = headerLines[1];
                 this.protocol = headerLines[2];
             }
-        } else {
-            this.filePath = "";
-            this.protocol = "";
         }
     }
 

@@ -36,8 +36,7 @@ class HTTPRequest {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         String line = br.readLine();
 
-        HTTPHeader header = new HTTPHeader();
-        header.setHTTPHeader(line);
+        HTTPHeader header = new HTTPHeader(line);
 
         StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {

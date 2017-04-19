@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by atoze on 2017/04/13.
@@ -9,10 +10,10 @@ class ContentType {
     private String fileContentTypeText;
     private String fileExtension;
 
-    
+
 
     private void allContentTypeLists(String contentType) {
-        HashMap<String, String> content = new HashMap<String, String>() {
+        Map<String, String> content = new HashMap<String, String>() {
             {
                 put("plain", "text");
                 put("html", "text");
@@ -35,9 +36,7 @@ class ContentType {
         } else {
             this.fileContentTypeText = content.get("plain");
             this.fileExtension = "plain";
-            //this.fileExtension = "plain";
         }
-
     }
 
     public void setContentType(String fileName) {
@@ -48,15 +47,14 @@ class ContentType {
         }
     }
 
-    public void setContentTypeDefault() {
-        allContentTypeLists("none");
-    }
+    //public void setContentTypeDefault() {
+      //  allContentTypeLists("none");
+    //}
 
     //public String getContentTypeDefault(){
     //    return "text" + "/" + "plain";
 
     public String getContentType() {
-
         return this.fileContentTypeText + "/" + this.fileExtension;
     }
 
