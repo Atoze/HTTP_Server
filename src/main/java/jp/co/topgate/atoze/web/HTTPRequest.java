@@ -22,13 +22,12 @@ class HTTPRequest {
     private String protocolVer;
     //private String getFileQuery;
     private String host="localhost:8080";
-    HashMap<String, Object> headerData = new HashMap<String, Object>();
+    HashMap<String, String> headerData = new HashMap<String, String>();
 
     HTTPRequest()  {
 
     }
-
-    private void setHTTPRequestHeader(String key, Object value) {
+    private void addHTTPRequestHeader(String key, String value) {
         this.headerData.put(key, value);
     }
 
@@ -44,7 +43,7 @@ class HTTPRequest {
             text.append(line).append("\n");
             String[] headerData = line.split(": ");
             if (headerData.length >= 2) {
-                this.setHTTPRequestHeader(headerData[0], headerData[1]);
+                this.addHTTPRequestHeader(headerData[0], headerData[1]);
             }
             line = br.readLine();
         }
@@ -80,15 +79,15 @@ class HTTPRequest {
             if (filepath.startsWith(m.group())) {
                 return filepath.substring(filepath.indexOf(this.host) + this.host.length());
             }
-        }return "";
+        }return filepath;
     }
 
     private String uriQuerySplitter(String filepath){
-        String URIQuerys[] = filepath.split("\\?");
-        if (URIQuerys[0] != filepath) {
-            this.fileQuery = URIQuerys[1];
+        String urlQuery[] = filepath.split("\\?");
+        if (urlQuery[0] != filepath) {
+            this.fileQuery = urlQuery[1];
         }
-        return URIQuerys[0];
+        return urlQuery[0];
     }
 
     public String getSpecificRequestLine(String key) {
@@ -107,11 +106,11 @@ class HTTPRequest {
         return this.protocolVer;
     }
 
-    private String ProtocolVer(String proto) {
-        if (proto != null && proto.startsWith("HTTP/")) {
-            return proto.substring(proto.indexOf("HTTP/") + "HTTP/".length());
+    private String ProtocolVer(String protocol) {
+        if (protocol != null && protocol.startsWith("HTTP/")) {
+            return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
         } else {
-            return null;
+            return protocol;
         }
     }
 }

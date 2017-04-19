@@ -22,6 +22,7 @@ class ServerHandler {
         System.out.println("Responding...");
 
         String host = request.getSpecificRequestLine("Host");
+
         if (host == null || request.getMethod() == null || !host.startsWith("Host: " + this.hostname + ":" + PORT.toString())) {
             setError(400);
             response.writeTo();
@@ -41,6 +42,7 @@ class ServerHandler {
                 filepath += "index.html";
             }
             File file = new File(filepath);
+            System.out.println(filepath);
             contentType.setContentType(filepath);
 
             if (look.ifcheckFile(file)) {
