@@ -24,12 +24,13 @@ public class ContentTypeUtilTest {
         assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
 
         //'.'しか送られてこなかった場合
-        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.")));
+        assertThat("text/plain", is(ContentTypeUtil.getContentType(".")));
 
         //二重に'.'がある場合
-        assertThat("text/html", is(ContentTypeUtil.getContentType("hoge.hoge.html")));
+        assertThat("text/html", is(ContentTypeUtil.getContentType("hoge..html")));
 
-
+        //終わりに拡張子がない場合
+        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.")));
     }
 
     @Test
@@ -44,10 +45,12 @@ public class ContentTypeUtilTest {
         assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
 
         //'.'しか送られてこなかった場合
-        assertThat(null, is(ContentTypeUtil.getFileExtension(".")));
+        assertThat("", is(ContentTypeUtil.getFileExtension("."))); //
 
         //二重に'.'がある場合
-        assertThat(".", is(ContentTypeUtil.getFileExtension("hoge..")));
+        assertThat("html", is(ContentTypeUtil.getFileExtension("hoge..html")));
 
+        //終わりに拡張子がない場合
+        assertThat("", is(ContentTypeUtil.getFileExtension("hoge.")));
     }
 }

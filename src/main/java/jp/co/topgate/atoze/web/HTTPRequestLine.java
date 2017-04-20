@@ -34,7 +34,7 @@ class HTTPRequestLine {
         if (line == null) {
             return;
         }
-        String headerLines[] = line.split(" ", this.RequestHeaderValue);
+        String headerLines[] = line.split(" ");
         if (headerLines.length == this.RequestHeaderValue) {
             this.headMethod = isMethod(headerLines[0]);
             this.filePath = headerLines[1];

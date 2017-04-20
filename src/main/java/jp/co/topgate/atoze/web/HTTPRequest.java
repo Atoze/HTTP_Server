@@ -104,10 +104,11 @@ class HTTPRequest {
 
     private String ProtocolVer(String protocol) {
         //if("HTTP/".startsWith(protocol)){
-        //if (protocol != null && protocol.startsWith("HTTP/")) {
+        if (protocol != null) {
             return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
-        //} else {
-        //      return protocol;
+        } else {
+            return null;
+        }
         //}
     }
 

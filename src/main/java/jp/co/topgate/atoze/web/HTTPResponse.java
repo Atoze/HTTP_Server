@@ -28,14 +28,14 @@ class HTTPResponse {
     public void writeTo(OutputStream out, Status status) throws IOException {
         PrintWriter writer = new PrintWriter(out, true);
 
-        this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
+        this.response.append("HTTP/1.1 " + status.getStatus() + "\\n");
 
         this.headers.forEach((key, value) -> {
-            this.response.append(key + ": " + value + "\n");
+            this.response.append(key + ": " + value + "\\n");
         });
 
         if (this.bodyText != null) {
-            this.response.append("\n").append(this.bodyText + "\n");
+            this.response.append("\\n").append(this.bodyText + "\\n");
         }
         writer.println(this.response.toString());
 

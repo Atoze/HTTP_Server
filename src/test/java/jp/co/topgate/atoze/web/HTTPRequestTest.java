@@ -14,13 +14,13 @@ public class HTTPRequestTest {
     @Test
     public void HTTPRequestのデータ保管するクラスのテスト()throws IOException {
         HTTPRequest request = new HTTPRequest();
-        File file = new File("Document/test.txt");
+        File file = new File("Document/test.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        assertNull(request.getHeaderText());
-        assertNull(request.getMethod());
-        assertNull(request.getFilePath());
-        assertNull(request.getProtocolVer());
+        assertThat(null, is(request.getHeaderText()));
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
 
         //データ挿入
         try {
@@ -51,8 +51,6 @@ public class HTTPRequestTest {
         input = new FileInputStream(test);
         request.readRequestText(input, "localhost:8080");
 
-        assertNotNull(request.getHeaderText());
-
         assertThat("GET", is(request.getMethod()));
         assertThat("/hoge.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
@@ -82,13 +80,13 @@ public class HTTPRequestTest {
         request.readRequestText(input, "localhost:8080");
         assertThat("/hoge.html", is(request.getFilePath()));
 
-        //間違ったローカルホスト指定
+        //間違ったローカルホスト指定 そのまま返して来る
         writer.flush();
         sr.getBuffer().setLength(0);
-        writer.println("GET http://hogehoge:8080/hoge.html HTTP/1.1");
+        writer.println("GET http://hogehoge/hoge.html HTTP/1.1");
 
         request.readRequestText(input, "localhost:8080");
-        assertThat("http://hogehoge:8080/hoge.html", is(request.getFilePath()));
+        assertThat("http://hogehoge/hoge.html", is(request.getFilePath()));
 
 
     }
@@ -107,10 +105,29 @@ public class HTTPRequestTest {
         writer.println("GET/HTTP/1.1");
         request.readRequestText(input, "localhost:8080");
 
-        assertNull(request.getHeaderText());
-        assertNull(request.getMethod());
-        assertNull(request.getFilePath());
-        assertNull(request.getProtocolVer());
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
+
+        //スペースが2つだけの場合
+        writer.flush();
+        sr.getBuffer().setLength(0);
+        writer.println("GET https://localhost:8080/hoge.htmlHTTP/1.1");
+        request.readRequestText(input, "localhost:8080");
+
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
+
+        //スペースが４つ以上の場合
+        writer.flush();
+        sr.getBuffer().setLength(0);
+        writer.println("GET https://localhost:8080/hoge.html HTTP/1.1 hogehoge");
+        request.readRequestText(input, "localhost:8080");
+
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
 
         //順番がバラバラの場合
         writer.flush();
@@ -118,22 +135,32 @@ public class HTTPRequestTest {
         writer.println("HTTP/1.1 GET https://localhost:8080/hoge.html");
         request.readRequestText(input, "localhost:8080");
 
-        assertNull(request.getHeaderText());
-        assertNull(request.getMethod());
-        assertNull(request.getFilePath());
-        assertNull(request.getProtocolVer());
+        assertThat(null, is(request.getMethod()));
+        assertThat("GET", is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
 
-        //順番がバラバラの場合
+        //Methodが間違っている場合
         writer.flush();
         sr.getBuffer().setLength(0);
-        writer.println("GET: https://localhost:8080/hoge.html HTTP/1.1");
+        writer.println("Foo: https://localhost:8080/hoge.html HTTP/1.1");
 
         request.readRequestText(input, "localhost:8080");
 
-        assertNull(request.getHeaderText());
-        assertNull(request.getMethod());
-        assertNull(request.getFilePath());
-        assertNull(request.getProtocolVer());
+        assertThat(null, is(request.getMethod()));
+        assertThat("/hoge.html", is(request.getFilePath()));
+        assertThat("1.1", is(request.getProtocolVer()));
+
+        //HTTP指定が間違っている場合
+        writer.flush();
+        sr.getBuffer().setLength(0);
+        writer.println("GET https://localhost:8080/hoge.html HTTPhoge");
+
+        request.readRequestText(input, "localhost:8080");
+
+        assertThat("GET", is(request.getMethod()));
+        assertThat("/hoge.html", is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
+
     }
 
 

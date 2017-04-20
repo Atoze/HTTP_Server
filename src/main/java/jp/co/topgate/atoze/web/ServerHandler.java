@@ -68,13 +68,4 @@ class ServerHandler {
                     status.getStatus() + "</h1></body></html>");
         }
     }
-
-    /*
-    private boolean checkFile(File file) {
-        if (file.exists() && file.isFile()) {
-                return true;
-            }
-        return false;
-    }
-    */
 }
