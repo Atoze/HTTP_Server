@@ -33,7 +33,7 @@ public class HTTPRequestTest {
         assertThat("/public/index.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
 
-        assertThat("localhost:8080", is(request.getRequestValue("Host")));
+        assertThat("localhost:8080", is(request.getRequestValue("HOST")));
 
 
         File test = new File("Document/request.txt");
@@ -54,11 +54,11 @@ public class HTTPRequestTest {
         assertThat("/hoge.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
 
-        assertThat("localhost:8080", is(request.getRequestValue("Host")));
-        assertThat("hogehoge", is(request.getRequestValue("test")));
-        assertThat("hoge: hoge: hoge", is(request.getRequestValue("ManyCollon")));
-        assertThat("hoge", is(request.getRequestValue("hoge")));
-        assertThat(null, is(request.getRequestValue("foo")));
+        assertThat("localhost:8080", is(request.getRequestValue("HOST")));
+        assertThat("hogehoge", is(request.getRequestValue("TEST")));
+        assertThat("hoge: hoge: hoge", is(request.getRequestValue("MANYCOLLON")));
+        assertThat("hoge", is(request.getRequestValue("HOGE")));
+        assertThat(null, is(request.getRequestValue("FOO")));
     }
 
     @Test
