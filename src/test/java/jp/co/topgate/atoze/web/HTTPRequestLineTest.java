@@ -47,8 +47,8 @@ public class HTTPRequestLineTest {
         line = "GET  /  HTTP/1.1";
 
         header = new HTTPRequestLine(line);
-        assertThat("GET", is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getMethod()));
+        assertThat(null, is(header.getFilePath()));
         assertThat(null, is(header.getProtocol()));
 
         //URI指定忘れ

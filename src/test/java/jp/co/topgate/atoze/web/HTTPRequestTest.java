@@ -150,15 +150,15 @@ public class HTTPRequestTest {
         assertThat("/hoge.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
 
-        //HTTP指定が間違っている場合
+        //URL指定忘れ & HTTP指定が間違っている場合
         writer.flush();
         sr.getBuffer().setLength(0);
-        writer.println("GET https://localhost:8080/hoge.html HTTPhoge");
+        writer.println("GET  HTTPhoge");
 
         request.readRequestText(input, "localhost:8080");
 
         assertThat("GET", is(request.getMethod()));
-        assertThat("/hoge.html", is(request.getFilePath()));
+        assertThat("", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
 
     }
