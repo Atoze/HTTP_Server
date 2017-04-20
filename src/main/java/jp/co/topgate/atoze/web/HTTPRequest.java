@@ -18,7 +18,6 @@ class HTTPRequest {
     private String filePath;
     private String fileQuery;
     private String protocolVer;
-    private String host;
     Map<String, String> headerData = new HashMap<String, String>();
 
     HTTPRequest() {
@@ -30,25 +29,24 @@ class HTTPRequest {
 
     public void readRequestText(InputStream input, String host) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
-        String line = null;
-        line = br.readLine();
+        String line = br.readLine();
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
         StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {
             text.append(line).append("\n");
-            String[] headerLineData = line.split(":",2);
+            String[] headerLineData = line.split(":", 2);
             if (headerLineData.length == 2) {
                 this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
             line = br.readLine();
         }
-        this.host = host;
+
         this.headerText = text.toString();
         this.method = header.getMethod();
-        this.filePath = header.getFilePath();
-        this.protocolVer = header.getProtocol();
+        this.filePath = uriQuerySplitter(urlDivider(header.getFilePath(), host));
+        this.protocolVer = ProtocolVer(header.getProtocol());
     }
 
     public String getHeaderText() {
@@ -60,7 +58,6 @@ class HTTPRequest {
     }
 
     public String getFilePath() {
-        this.filePath = uriQuerySplitter(urlDivider(this.filePath, this.host));
         return this.filePath;
     }
 
@@ -74,7 +71,7 @@ class HTTPRequest {
         Matcher m = p.matcher(filePath);
 
         if (m.find()) {
-            if (filePath.startsWith(m.group()+host)) {
+            if (filePath.startsWith(m.group() + host)) {
                 return filePath.substring(filePath.indexOf(host) + host.length());
             }
         }
@@ -86,7 +83,7 @@ class HTTPRequest {
             return null;
         }
 
-        String urlQuery[] = filePath.split("\\?",2);
+        String urlQuery[] = filePath.split("\\?", 2);
         if (urlQuery[0] != filePath) {
             this.fileQuery = urlQuery[1];
         }
@@ -98,7 +95,6 @@ class HTTPRequest {
     }
 
     public String getProtocolVer() {
-        this.protocolVer = ProtocolVer(this.protocolVer);
         return this.protocolVer;
     }
 

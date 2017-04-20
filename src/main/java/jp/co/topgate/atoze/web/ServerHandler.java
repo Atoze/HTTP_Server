@@ -38,7 +38,7 @@ class ServerHandler {
             return 403;
         }
 
-        this.response.addText("Content-Type", ContentTypeUtil.getContentType(filePath));
+        this.response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(filePath));
         this.response.setResponseBody(file);
         return 200;
     }

@@ -21,7 +21,7 @@ class HTTPResponse {
         this.bodyFile = file;
     }
 
-    public void addText(String type, String name) {
+    public void addResponseHeader(String type, String name) {
         this.headers.put(type, name);
     }
 
