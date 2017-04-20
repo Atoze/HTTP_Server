@@ -42,8 +42,8 @@ public class Server {
                 ) {
 
             ServerHandler serverHandler = new ServerHandler();
-            serverHandler.handleIn(in);
-            serverHandler.handleOut(out, PORT);
+            serverHandler.handle(in, out, PORT);
+            //serverHandler.handleOut();
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

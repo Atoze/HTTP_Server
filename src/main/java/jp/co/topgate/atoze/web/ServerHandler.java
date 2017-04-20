@@ -12,9 +12,6 @@ class ServerHandler {
     private HTTPRequest request = new HTTPRequest();
     private Status status = new Status();
     ServerHandler(){}
-
-
-
     public void ServerHandler2(InputStream in, OutputStream out, Integer PORT) throws IOException {
         request.setRequestText(in);
         System.out.println(request.getHeaderText());
@@ -65,12 +62,10 @@ class ServerHandler {
         }*/
         System.out.println(response.getResponse());
     }
-    public void handleIn(InputStream in){
+    public void handle(InputStream in, OutputStream out, int PORT) throws IOException {
         request.setRequestText(in);
         System.out.println(request.getHeaderText());
-    }
 
-    public void handleOut(OutputStream out , int PORT) throws IOException {
         String host = request.getRequestValue("Host");
         if (host == null || request.getMethod() == null || !host.startsWith(this.hostname + ":" + PORT)) {
             setError(400);
@@ -92,33 +87,26 @@ class ServerHandler {
 
         File file = new File(filePath);
 
-        if(!file.canRead()){
-            setError(403);
-            response.writeTo(out, this.status);
-            return;
-        }
-
         if(!file.exists() || !file.isFile()){
             setError(404);
             response.writeTo(out, this.status);
             return;
         }
 
-        //if (checkFile(file)) {
+        if(!file.canRead()){
+            setError(403);
+            response.writeTo(out, this.status);
+            return;
+        }
+
         this.status.setStatus(200);
         response.addText("Content-Type", ContentTypeUtil.getContentType(filePath));
         response.setResponseBody(file);
         response.writeTo(out, this.status);
-        /*} else {
-            setError(404);
-            response.writeTo(out, this.status);
-        }*/
+
         System.out.println(response.getResponse());
 
     }
-
-
-
 
     private void setError(int error) {
         this.status.setStatus(error);
