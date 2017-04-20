@@ -40,7 +40,7 @@ class HTTPRequest {
             text.append(line).append("\n");
             String[] headerLineData = line.split(":",2);
             if (headerLineData.length == 2) {
-                this.addRequestData(headerLineData[0], headerLineData[1].trim());
+                this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
             line = br.readLine();
         }

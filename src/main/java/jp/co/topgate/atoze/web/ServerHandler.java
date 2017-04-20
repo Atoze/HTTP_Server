@@ -10,7 +10,6 @@ class ServerHandler {
     private final String hostname = "localhost";
     private HTTPResponse response = new HTTPResponse();
     private HTTPRequest request = new HTTPRequest();
-    private Status status = new Status();
     private int PORT;
 
     ServerHandler(int PORT) {
@@ -18,7 +17,7 @@ class ServerHandler {
     }
 
     private int checkHTTPCode() throws IOException {
-        String host = this.request.getRequestValue("Host");
+        String host = this.request.getRequestValue("HOST");
         if (host == null || this.request.getMethod() == null || !host.startsWith(this.hostname + ":" + PORT)) {
             return 400;
         }
@@ -50,20 +49,17 @@ class ServerHandler {
     }
 
     public void handleOut(OutputStream out) throws IOException {
-        this.status.setStatus(this.checkHTTPCode());
+        Status status = new Status();
+        status.setStatus(this.checkHTTPCode());
         if (this.checkHTTPCode() != 200) {
-            this.setError(checkHTTPCode());
+            File file = new File(this.checkHTTPCode() + ".html");
+            if (file.exists() && file.isFile() && file.canRead()) {
+                this.response.setResponseBody(file);
+            } else {
+                this.response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
+                        status.getStatus() + "</h1></body></html>");
+            }
         }
-        this.response.writeTo(out, this.status);
-    }
-
-    private void setError(int error) {
-        File file = new File(error + ".html");
-        if (file.exists() && file.isFile() && file.canRead()) {
-            this.response.setResponseBody(file);
-        } else {
-            this.response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
-                    status.getStatus() + "</h1></body></html>");
-        }
+        this.response.writeTo(out, status);
     }
 }
