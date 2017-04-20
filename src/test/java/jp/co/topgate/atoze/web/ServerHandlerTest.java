@@ -14,7 +14,7 @@ public class ServerHandlerTest {
         File file = new File("Document/test.txt");
         InputStream input = new FileInputStream(file);
 
-        File log = new File("Document/log.txt");
+        File log = new File("Document/request.txt");
         OutputStream output = new FileOutputStream(log);
 
         serverHandler.handle(input, output, 8080);
