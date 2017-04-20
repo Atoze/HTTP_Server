@@ -3,7 +3,6 @@ package jp.co.topgate.atoze.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -42,11 +41,11 @@ public class Server {
                 ) {
 
             ServerHandler serverHandler = new ServerHandler();
-            serverHandler.handleIn(in);
-            serverHandler.handleOut(out, PORT);
+            serverHandler.handle(in, out, PORT);
+            //serverHandler.handleOut();
 
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new RuntimeException(e);
         } finally {
             try {
                 socket.close();

@@ -26,21 +26,28 @@ class ContentTypeUtil {
         }
     };
 
-    public static String getContentType(String filePath){
-        if (filePath == null){
+    public static String getFileExtension(String fileName) {
+        if (fileName == null) {
             return null;
         }
-        int point = filePath.lastIndexOf(".");
+        int point = fileName.lastIndexOf(".");
         if (point != -1) {
-            filePath = filePath.substring(point + 1, filePath.length());
-
-            if (content.containsKey(filePath)) {
-                return content.get(filePath)+"/" + filePath;
-            } else {
-                //DefaultContentType
-                return content.get("plain")+"/plain";
-            }
+            return fileName.substring(point + 1, fileName.length());
         }
         return null;
+    }
+
+    public static String getContentType(String filePath) {
+        filePath = getFileExtension(filePath);
+        if (filePath == null) {
+            return null;
+        }
+
+        if (content.containsKey(filePath)) {
+            return content.get(filePath) + "/" + filePath;
+        } else {
+            //DefaultContentType
+            return content.get("plain") + "/plain";
+        }
     }
 }

@@ -37,12 +37,6 @@ class Status {
             return this.status + "Unknown Status";
         }
     }
-    /*
-
-    public static void setStatusCode(int i) {
-        statuscode = i;
-    }
-    */
 
     public void setStatus(int i) {
         this.statusCode = i;

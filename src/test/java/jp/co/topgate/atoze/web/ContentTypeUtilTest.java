@@ -2,8 +2,6 @@ package jp.co.topgate.atoze.web;
 
 import org.junit.Test;
 
-import java.io.File;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 /**
@@ -15,18 +13,44 @@ public class ContentTypeUtilTest {
         //NULL
         assertThat(null, is(ContentTypeUtil.getContentType(null)));
 
-        //ファイルをいれてみる
-        File file = new File("test.html");
-        assertThat("text/html", is(ContentTypeUtil.getContentType(file.toString())));
+        //通常ファイル
+        String file = "test.html";
+        assertThat("text/html", is(ContentTypeUtil.getContentType(file)));
 
-        //拡張子がMIME-Typeにない場合
+        //拡張子がcontent Mapにない場合
         assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.hoge")));
 
-        //拡張子がない場合=ファイルではない
+        //拡張子がない場合
         assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
 
-        //二重に'.'がある場合
-        assertThat("text/html", is(ContentTypeUtil.getContentType("hoge.hoge.html")));
+        //'.'しか送られてこなかった場合
+        assertThat("text/plain", is(ContentTypeUtil.getContentType(".")));
 
+        //二重に'.'がある場合
+        assertThat("text/html", is(ContentTypeUtil.getContentType("hoge..html")));
+
+        //終わりに拡張子がない場合
+        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.")));
+    }
+
+    @Test
+    public void ファイル拡張子を確認する(){
+        //NULL
+        assertThat(null, is(ContentTypeUtil.getFileExtension(null)));
+
+        //通常ファイル
+        assertThat("html", is(ContentTypeUtil.getFileExtension("hoge.html")));
+
+        //拡張子がない場合
+        assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
+
+        //'.'しか送られてこなかった場合
+        assertThat("", is(ContentTypeUtil.getFileExtension("."))); //
+
+        //二重に'.'がある場合
+        assertThat("html", is(ContentTypeUtil.getFileExtension("hoge..html")));
+
+        //終わりに拡張子がない場合
+        assertThat("", is(ContentTypeUtil.getFileExtension("hoge.")));
     }
 }
