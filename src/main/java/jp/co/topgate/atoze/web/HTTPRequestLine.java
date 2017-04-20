@@ -26,16 +26,19 @@ class HTTPRequestLine {
 
     private final int RequestHeaderValue = 3;
 
-    public HTTPRequestLine(String line) {
+    HTTPRequestLine(String line) {
         this.readRequestHeader(line);
     }
 
     private void readRequestHeader(String line) {
-        if (line != null) {
-            String headerLines[] = line.split(" ", this.RequestHeaderValue);
-            if (headerLines.length == this.RequestHeaderValue) {
-                this.headMethod = isMethod(headerLines[0]);
-                this.filePath = headerLines[1];
+        if (line == null) {
+            return;
+        }
+        String headerLines[] = line.split(" ", this.RequestHeaderValue);
+        if (headerLines.length == this.RequestHeaderValue) {
+            this.headMethod = isMethod(headerLines[0]);
+            this.filePath = headerLines[1];
+            if (headerLines[2].startsWith("HTTP/")) {
                 this.protocol = headerLines[2];
             }
         }

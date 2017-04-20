@@ -11,32 +11,54 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPRequestLineTest {
     @Test
-    public void HTTPRequestのジェネラルヘッダを処理するクラスのテスト() {
+    public void HTTPRequestのRequestLineを分けるクラスのテスト() {
         String line = "GET / HTTP/1.1";
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
-        assertThat("/", is(header.getFilePath()));
         assertThat("GET", is(header.getMethod()));
+        assertThat("/", is(header.getFilePath()));
         assertThat("HTTP/1.1", is(header.getProtocol()));
-
     }
 
     @Test
-    public void エラーテスト() {
+    public void nullテスト() {
         String line = null;
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
-        assertNull(header.getFilePath());
         assertNull(header.getMethod());
+        assertNull(header.getFilePath());
         assertNull(header.getProtocol());
-
     }
 
     @Test
-    public void 絶対パスのテスト(){
+    public void エラーテスト() {
+        //スペースなし
+        String line = "GET/HTTP/1.1";
 
+        HTTPRequestLine header = new HTTPRequestLine(line);
+
+        assertNull(header.getMethod());
+        assertNull(header.getFilePath());
+        assertNull(header.getProtocol());
+
+        //二重スペース
+        line = "GET  /  HTTP/1.1";
+
+        header = new HTTPRequestLine(line);
+        assertThat("GET", is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocol()));
+
+        //URI指定忘れ
+        line = "GET  HTTP/1.1";
+
+        header = new HTTPRequestLine(line);
+
+        assertThat("GET", is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat("HTTP/1.1", is(header.getProtocol()));
     }
 
 }

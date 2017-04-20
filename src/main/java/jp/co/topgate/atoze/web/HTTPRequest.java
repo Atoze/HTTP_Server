@@ -18,8 +18,7 @@ class HTTPRequest {
     private String filePath;
     private String fileQuery;
     private String protocolVer;
-    //private String getFileQuery;
-    private String host = "localhost:8080";
+    private String host;
     Map<String, String> headerData = new HashMap<String, String>();
 
     HTTPRequest() {
@@ -29,30 +28,23 @@ class HTTPRequest {
         this.headerData.put(key, value);
     }
 
-    public void setRequestText(InputStream input) {
+    public void readRequestText(InputStream input, String host) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         String line = null;
-        try {
-            line = br.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        line = br.readLine();
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
         StringBuilder text = new StringBuilder();
         while (line != null && !line.isEmpty()) {
             text.append(line).append("\n");
-            String[] headerLineData = line.split(": ");
-            if (headerLineData.length >= 2) {
-                this.addRequestData(headerLineData[0], headerLineData[1]);
+            String[] headerLineData = line.split(":",2);
+            if (headerLineData.length == 2) {
+                this.addRequestData(headerLineData[0], headerLineData[1].trim());
             }
-            try {
-                line = br.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            line = br.readLine();
         }
+        this.host = host;
         this.headerText = text.toString();
         this.method = header.getMethod();
         this.filePath = header.getFilePath();
@@ -73,21 +65,29 @@ class HTTPRequest {
     }
 
     private String urlDivider(String filePath, String host) {
-        String pattern = "http*.//";
+        if (filePath == null) {
+            return null;
+        }
+
+        String pattern = "http*.://";
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(filePath);
 
         if (m.find()) {
-            if (filePath.startsWith(m.group())) {
+            if (filePath.startsWith(m.group()+host)) {
                 return filePath.substring(filePath.indexOf(host) + host.length());
             }
         }
         return filePath;
     }
 
-    private String uriQuerySplitter(String filepath) {
-        String urlQuery[] = filepath.split("\\?");
-        if (urlQuery[0] != filepath) {
+    private String uriQuerySplitter(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
+
+        String urlQuery[] = filePath.split("\\?",2);
+        if (urlQuery[0] != filePath) {
             this.fileQuery = urlQuery[1];
         }
         return urlQuery[0];
@@ -103,10 +103,15 @@ class HTTPRequest {
     }
 
     private String ProtocolVer(String protocol) {
-        if (protocol != null && protocol.startsWith("HTTP/")) {
+        //if("HTTP/".startsWith(protocol)){
+        //if (protocol != null && protocol.startsWith("HTTP/")) {
             return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
-        } else {
-            return protocol;
-        }
+        //} else {
+        //      return protocol;
+        //}
+    }
+
+    public String getFileQuery() {
+        return this.fileQuery;
     }
 }
