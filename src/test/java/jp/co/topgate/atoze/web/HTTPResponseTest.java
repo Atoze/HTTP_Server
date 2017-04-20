@@ -19,13 +19,13 @@ public class HTTPResponseTest {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
 
-        File log = new File("Document/log.txt");
+        File log = new File("Document/response.txt");
         OutputStream output = new FileOutputStream(log);
 
         status.setStatus(200);
         response.addText("ContentType", "text/html");
         response.writeTo(output, status);
-        assertThat("HTTP/1.1 "+status.getStatus()+"\\n"+"ContentType: text/html\\n", is(response.getResponse()));
+        assertThat("HTTP/1.1 "+status.getStatus()+"\n"+"ContentType: text/html\n", is(response.getResponse()));
 
     }
 }

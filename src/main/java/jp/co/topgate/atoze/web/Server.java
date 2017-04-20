@@ -40,10 +40,9 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            ServerHandler serverHandler = new ServerHandler();
-            serverHandler.handle(in, out, PORT);
-            //serverHandler.handleOut();
-
+            ServerHandler serverHandler = new ServerHandler(this.PORT);
+            serverHandler.handleIn(in);
+            serverHandler.handleOut(out);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

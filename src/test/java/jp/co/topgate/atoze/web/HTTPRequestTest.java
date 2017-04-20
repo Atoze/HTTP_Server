@@ -36,10 +36,9 @@ public class HTTPRequestTest {
         assertThat("localhost:8080", is(request.getRequestValue("Host")));
 
 
-        File test = new File("Document/Request.txt");
+        File test = new File("Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
-        StringWriter sr = new StringWriter();
 
         //検証ファイルにデータ挿入
         writer.println("GET http://localhost:8080/hoge.html HTTP/1.1");
@@ -64,10 +63,9 @@ public class HTTPRequestTest {
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("Document/Request.txt");
+        File test = new File("Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
-        StringWriter sr = new StringWriter();
 
         HTTPRequest request = new HTTPRequest();
 
@@ -82,7 +80,6 @@ public class HTTPRequestTest {
 
         //間違ったローカルホスト指定 そのまま返して来る
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("GET http://hogehoge/hoge.html HTTP/1.1");
 
         request.readRequestText(input, "localhost:8080");
@@ -93,10 +90,9 @@ public class HTTPRequestTest {
 
     @Test
     public void 間違ったリクエストがきた場合() throws IOException {
-        File test = new File("Document/Request.txt");
+        File test = new File("Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
-        StringWriter sr = new StringWriter();
 
         HTTPRequest request = new HTTPRequest();
         InputStream input = new FileInputStream(test);
@@ -111,7 +107,6 @@ public class HTTPRequestTest {
 
         //スペースが2つだけの場合
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("GET https://localhost:8080/hoge.htmlHTTP/1.1");
         request.readRequestText(input, "localhost:8080");
 
@@ -121,7 +116,6 @@ public class HTTPRequestTest {
 
         //スペースが４つ以上の場合
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("GET https://localhost:8080/hoge.html HTTP/1.1 hogehoge");
         request.readRequestText(input, "localhost:8080");
 
@@ -131,7 +125,6 @@ public class HTTPRequestTest {
 
         //順番がバラバラの場合
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("HTTP/1.1 GET https://localhost:8080/hoge.html");
         request.readRequestText(input, "localhost:8080");
 
@@ -141,7 +134,6 @@ public class HTTPRequestTest {
 
         //Methodが間違っている場合
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("Foo: https://localhost:8080/hoge.html HTTP/1.1");
 
         request.readRequestText(input, "localhost:8080");
@@ -152,7 +144,6 @@ public class HTTPRequestTest {
 
         //URL指定忘れ & HTTP指定が間違っている場合
         writer.flush();
-        sr.getBuffer().setLength(0);
         writer.println("GET  HTTPhoge");
 
         request.readRequestText(input, "localhost:8080");
@@ -160,8 +151,5 @@ public class HTTPRequestTest {
         assertThat("GET", is(request.getMethod()));
         assertThat("", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
-
     }
-
-
 }
