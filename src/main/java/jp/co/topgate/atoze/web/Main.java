@@ -10,7 +10,7 @@ class Main {
             Server server = new Server();
             server.start();
         } catch (Throwable e) {
-
+            throw new RuntimeException(e);
         }
     }
 }

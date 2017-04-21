@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,6 +10,7 @@ import java.net.Socket;
 /**
  * Server
  *
+ * @author atoze
  */
 public class Server {
     final int PORT = 8080;
@@ -26,7 +28,7 @@ public class Server {
         }
     }
 
-    private void serverProcess(ServerSocket serverSocket)  {
+    private void serverProcess(ServerSocket serverSocket) {
         Socket socket = null;
         try {
             socket = serverSocket.accept();
@@ -42,12 +44,14 @@ public class Server {
                 ) {
 
             HTTPRequest request = new HTTPRequest();
-            request.readRequestText(in, this.hostName + ":" + this.PORT);
-            System.out.println(request.getHeaderText());
+            request.readRequestHeader(in, this.hostName + ":" + this.PORT);
+            System.out.println(request.getRequestHeader());
 
-            ResponseHandler responseHandler = new ResponseHandler(this.hostName, this.PORT);
-            responseHandler.responseOutput(request, out);
+            String filePath = "." + request.getFilePath();
+            File file = new File(filePath);
 
+            int statusCode = checkStatusCode(request, file);
+            responseOutput(statusCode, file, out);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -57,6 +61,45 @@ public class Server {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private int checkStatusCode(HTTPRequest request, File file) throws IOException {
+        String host = request.getHeaderParam("HOST");
+        if (host == null || request.getMethod() == null || !host.startsWith(this.hostName + ":" + PORT)) {
+            return 400;
+        }
+        if (!request.getMethod().equals("GET")) {
+            return 405;
+        }
+
+        if (!file.exists() || !file.isFile()) {
+            return 404;
+        }
+        if (!file.canRead()) {
+            return 403;
+        }
+        return 200;
+    }
+
+    private void responseOutput(int statusCode, File file, OutputStream out) throws IOException {
+        HTTPResponse response = new HTTPResponse();
+        Status status = new Status();
+        status.setStatus(statusCode);
+        if (statusCode == 200) {
+            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
+            response.setResponseBody(file);
+            response.writeTo(out, status);
+            return;
+        }
+        File errorFile = new File(statusCode + ".html");
+        if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
+            response.setResponseBody(errorFile);
+        } else {
+            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html"));
+            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
+                    status.getStatus() + "</h1></body></html>");
+        }
+        response.writeTo(out, status);
     }
 }
 

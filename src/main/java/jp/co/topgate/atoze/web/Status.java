@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 /**
  * ステータスコードを受け取り、それに対応したステータスメッセージを返します.
- * @author Atoze
+ *
+ * @author atoze
  */
 class Status {
     private int statusCode;
@@ -41,6 +42,7 @@ class Status {
 
     /**
      * ステータス値を設定します.
+     *
      * @param i ステータスコード
      */
     public void setStatus(int i) {
@@ -50,6 +52,7 @@ class Status {
 
     /**
      * 現在設定されているステータスのコードを取得します.
+     *
      * @return コード
      */
     public int getStatusCode() {
@@ -58,6 +61,7 @@ class Status {
 
     /**
      * 現在設定されているステータスのメッセージを取得します.
+     *
      * @return メッセージ
      */
     public String getStatusMessage() {
@@ -66,6 +70,7 @@ class Status {
 
     /**
      * 現在設定されているステータスを取得します.
+     *
      * @return ステータス
      */
     public String getStatus() {

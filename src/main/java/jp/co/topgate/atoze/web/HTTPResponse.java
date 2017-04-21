@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * HTTPレスポンスを生成し、出力します.
+ *
  * @author atoze
  */
 class HTTPResponse {
@@ -16,6 +17,7 @@ class HTTPResponse {
 
     /**
      * HTTPレスポンスボディを設定します.
+     *
      * @param text テキスト
      */
     public void setResponseBody(String text) {
@@ -24,6 +26,7 @@ class HTTPResponse {
 
     /**
      * HTTPレスポンスボディにファイルを設定します.
+     *
      * @param file ファイル
      */
     public void setResponseBody(File file) {
@@ -32,7 +35,8 @@ class HTTPResponse {
 
     /**
      * HTTPレスポンスに新たなレスポンスヘッダを追加します.
-     * @param type キー
+     *
+     * @param type  キー
      * @param value 値
      */
     public void addResponseHeader(String type, String value) {
@@ -75,6 +79,7 @@ class HTTPResponse {
 
     /**
      * HTTPレスポンスを取得します.
+     *
      * @return HTTPレスポンス
      */
     public String getResponse() {

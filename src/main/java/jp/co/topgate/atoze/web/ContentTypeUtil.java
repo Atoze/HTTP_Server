@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * ファイルの名前から拡張子を取得し,それに合わせた適切なContent-Typeを返します.
+ *
  * @author atoze
  */
 class ContentTypeUtil {
@@ -29,33 +30,35 @@ class ContentTypeUtil {
 
     /**
      * ファイルの拡張子を返します.
-     * @param filePath ファイル名
+     *
+     * @param fileName ファイル名
      * @return ファイル拡張子
      */
-    public static String getFileExtension(String filePath) {
-        if (filePath == null) {
+    public static String getFileExtension(String fileName) {
+        if (fileName == null) {
             return null;
         }
-        int point = filePath.lastIndexOf(".");
+        int point = fileName.lastIndexOf(".");
         if (point != -1) {
-            return filePath.substring(point + 1, filePath.length());
+            return fileName.substring(point + 1, fileName.length());
         }
         return null;
     }
 
     /**
      * Content-Typeを返します.
-     * @param filePath ファイル名
+     *
+     * @param fileName ファイル名
      * @return Content-Type
      */
-    public static String getContentType(String filePath) {
-        filePath = getFileExtension(filePath);
-        if (filePath == null) {
+    public static String getContentType(String fileName) {
+        fileName = getFileExtension(fileName);
+        if (fileName == null) {
             return null;
         }
 
-        if (content.containsKey(filePath)) {
-            return content.get(filePath) + "/" + filePath;
+        if (content.containsKey(fileName)) {
+            return content.get(fileName) + "/" + fileName;
         } else {
             //DefaultContentType
             return content.get("plain") + "/plain";

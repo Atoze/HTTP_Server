@@ -5,7 +5,8 @@ import java.util.Set;
 
 /**
  * 初期要求行(Initial Request Line)を受け取り、
- * メソッド名、要求するリソースのパス、HTTPプロトコルバージョンの決められた3要素を保持します.
+ * メソッド名、要求するリソースのパス、HTTPプロトコルバージョンの決められた3要素を取得します.
+ *
  * @author atoze
  */
 
@@ -38,15 +39,20 @@ class HTTPRequestLine {
         }
         String headerLines[] = line.split(" ");
         if (headerLines.length == this.RequestHeaderValue) {
-            this.headMethod = isMethod(headerLines[0]);
+            this.headMethod = rightMethod(headerLines[0]);
             this.filePath = headerLines[1];
             if (headerLines[2].startsWith("HTTP/")) {
                 this.protocol = headerLines[2];
             }
         }
     }
-
-    private String isMethod(String method) {
+    /**
+     * 要求したメソッド名が存在しているか確認します.
+     * メソッドが存在しない場合は取得しません.
+     *
+     * @return メソッド名
+    */
+    private String rightMethod(String method) {
         if (methods.contains(method)) {
             return method;
         }
@@ -55,6 +61,7 @@ class HTTPRequestLine {
 
     /**
      * 要求するHTTPメソッドを取得します.
+     *
      * @return メソッド名
      */
     public String getMethod() {
@@ -63,6 +70,7 @@ class HTTPRequestLine {
 
     /**
      * 要求するリソースのパスを取得します.
+     *
      * @return リソースのパス
      */
     public String getFilePath() {
@@ -71,6 +79,7 @@ class HTTPRequestLine {
 
     /**
      * HTTPプロトコルのバージョンを取得します.
+     *
      * @return HTTPプロトコルバージョン
      */
     public String getProtocol() {

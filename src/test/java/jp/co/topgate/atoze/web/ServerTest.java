@@ -9,7 +9,7 @@ import java.io.*;
 public class ServerTest {
 
     @Test
-    public void ServerHandlerテスト () throws IOException{
+    public void Serverテスト () throws IOException{
         ResponseHandler responseHandler = new ResponseHandler("localhost",8080);
         File file = new File("Document/test.txt");
         InputStream input = new FileInputStream(file);
@@ -18,9 +18,9 @@ public class ServerTest {
         OutputStream output = new FileOutputStream(log);
 
         HTTPRequest request = new HTTPRequest();
-        request.readRequestText(input, "localhost:8080");
+        request.readRequestHeader(input, "localhost:8080");
 
-        responseHandler.responseOutput(request,output);
+        //responseHandler.responseOutput(request,output);
 
     }
 }
