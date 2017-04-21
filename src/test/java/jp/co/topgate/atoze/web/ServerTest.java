@@ -6,19 +6,21 @@ import java.io.*;
 /**
  * Created by atoze on 2017/04/20.
  */
-public class ServerHandlerTest {
+public class ServerTest {
 
     @Test
     public void ServerHandlerテスト () throws IOException{
-        ServerHandler serverHandler = new ServerHandler(8080);
+        ResponseHandler responseHandler = new ResponseHandler("localhost",8080);
         File file = new File("Document/test.txt");
         InputStream input = new FileInputStream(file);
 
         File log = new File("Document/request.txt");
         OutputStream output = new FileOutputStream(log);
 
-        serverHandler.handleIn(input);
-        serverHandler.handleOut(output);
+        HTTPRequest request = new HTTPRequest();
+        request.readRequestText(input, "localhost:8080");
+
+        responseHandler.responseOutput(request,output);
 
     }
 }

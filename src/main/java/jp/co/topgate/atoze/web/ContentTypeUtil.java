@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by atoze on 2017/04/13.
+ * ファイルの名前から拡張子を取得し,それに合わせた適切なContent-Typeを返します.
+ * @author atoze
  */
 class ContentTypeUtil {
     private static final Map<String, String> content = new HashMap<String, String>() {
@@ -26,17 +27,27 @@ class ContentTypeUtil {
         }
     };
 
-    public static String getFileExtension(String fileName) {
-        if (fileName == null) {
+    /**
+     * ファイルの拡張子を返します.
+     * @param filePath ファイル名
+     * @return ファイル拡張子
+     */
+    public static String getFileExtension(String filePath) {
+        if (filePath == null) {
             return null;
         }
-        int point = fileName.lastIndexOf(".");
+        int point = filePath.lastIndexOf(".");
         if (point != -1) {
-            return fileName.substring(point + 1, fileName.length());
+            return filePath.substring(point + 1, filePath.length());
         }
         return null;
     }
 
+    /**
+     * Content-Typeを返します.
+     * @param filePath ファイル名
+     * @return Content-Type
+     */
     public static String getContentType(String filePath) {
         filePath = getFileExtension(filePath);
         if (filePath == null) {

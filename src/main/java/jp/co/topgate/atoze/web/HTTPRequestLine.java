@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by atoze on 2017/04/12.
+ * 初期要求行(Initial Request Line)を受け取り、
+ * メソッド名、要求するリソースのパス、HTTPプロトコルバージョンの決められた3要素を保持します.
+ * @author atoze
  */
 
 class HTTPRequestLine {
@@ -51,14 +53,26 @@ class HTTPRequestLine {
         return null;
     }
 
+    /**
+     * 要求するHTTPメソッドを取得します.
+     * @return メソッド名
+     */
     public String getMethod() {
         return this.headMethod;
     }
 
+    /**
+     * 要求するリソースのパスを取得します.
+     * @return リソースのパス
+     */
     public String getFilePath() {
         return this.filePath;
     }
 
+    /**
+     * HTTPプロトコルのバージョンを取得します.
+     * @return HTTPプロトコルバージョン
+     */
     public String getProtocol() {
         return this.protocol;
     }

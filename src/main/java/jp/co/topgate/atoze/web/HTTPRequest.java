@@ -10,7 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by atoze on 2017/04/12.
+ * HTTPリクエストデータを保持します.
+ * @author atoze
  */
 class HTTPRequest {
     private String headerText;
@@ -20,13 +21,15 @@ class HTTPRequest {
     private String protocolVer;
     Map<String, String> headerData = new HashMap<String, String>();
 
-    HTTPRequest() {
-    }
-
     private void addRequestData(String key, String value) {
         this.headerData.put(key, value);
     }
 
+    /**
+     * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
+     * またRequestLineクラスにRequestLineを送り、受け取った３要素のローカルパスとHTTPプロトコルバージョンを分析します.
+     * @param host HTTPホスト+ドメイン名
+     */
     public void readRequestText(InputStream input, String host) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
         String line = br.readLine();
@@ -49,14 +52,26 @@ class HTTPRequest {
         this.protocolVer = ProtocolVer(header.getProtocol());
     }
 
+    /**
+     * HTTPリクエストヘッダを取得します.
+     * @return HTTPリクエストヘッダ
+     */
     public String getHeaderText() {
         return this.headerText;
     }
 
+    /**
+     * 要求するHTTPメソッドを取得します.
+     * @return メソッド名
+     */
     public String getMethod() {
         return this.method;
     }
 
+    /**
+     * 要求するリソースのローカルパスを取得します.
+     * @return ファイルパス
+     */
     public String getFilePath() {
         return this.filePath;
     }
@@ -90,10 +105,18 @@ class HTTPRequest {
         return urlQuery[0];
     }
 
+    /**
+     * 保管されたHTTPリクエストヘッダから、指定したキーに対応した値を取得します.
+     * @return 値
+     */
     public String getRequestValue(String value) {
         return headerData.getOrDefault(value, null);
     }
 
+    /**
+     * HTTPプロトコルのバージョンの値を取得します.
+     * @return HTTPプロトコルバージョンの値
+     */
     public String getProtocolVer() {
         return this.protocolVer;
     }
@@ -108,6 +131,10 @@ class HTTPRequest {
         //}
     }
 
+    /**
+     * 要求するクエリ値を取得します.
+     * @return クエリ値
+     */
     public String getFileQuery() {
         return this.fileQuery;
     }

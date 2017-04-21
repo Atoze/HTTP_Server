@@ -7,11 +7,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Created by atoze on 2017/04/12.
+ * Server
+ *
  */
-
 public class Server {
     final int PORT = 8080;
+    private final String hostName = "localhost";
 
     public void start() {
         System.out.println("Starting up HTTP server...");
@@ -24,7 +25,7 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-    //Request受信
+
     private void serverProcess(ServerSocket serverSocket)  {
         Socket socket = null;
         try {
@@ -40,9 +41,13 @@ public class Server {
                         OutputStream out = socket.getOutputStream()
                 ) {
 
-            ServerHandler serverHandler = new ServerHandler(this.PORT);
-            serverHandler.handleIn(in);
-            serverHandler.handleOut(out);
+            HTTPRequest request = new HTTPRequest();
+            request.readRequestText(in, this.hostName + ":" + this.PORT);
+            System.out.println(request.getHeaderText());
+
+            ResponseHandler responseHandler = new ResponseHandler(this.hostName, this.PORT);
+            responseHandler.responseOutput(request, out);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

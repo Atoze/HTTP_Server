@@ -3,7 +3,8 @@ package jp.co.topgate.atoze.web;
 import java.util.HashMap;
 
 /**
- * Created by atoze on 2017/04/13.
+ * ステータスコードを受け取り、それに対応したステータスメッセージを返します.
+ * @author Atoze
  */
 class Status {
     private int statusCode;
@@ -38,20 +39,35 @@ class Status {
         }
     }
 
+    /**
+     * ステータス値を設定します.
+     * @param i ステータスコード
+     */
     public void setStatus(int i) {
         this.statusCode = i;
-        //setStatusCode(i);
         this.status = StatusParameter(i);
     }
 
+    /**
+     * 現在設定されているステータスのコードを取得します.
+     * @return コード
+     */
     public int getStatusCode() {
         return this.statusCode;
     }
 
+    /**
+     * 現在設定されているステータスのメッセージを取得します.
+     * @return メッセージ
+     */
     public String getStatusMessage() {
         return this.statusMessage;
     }
 
+    /**
+     * 現在設定されているステータスを取得します.
+     * @return ステータス
+     */
     public String getStatus() {
         return this.status;
     }
