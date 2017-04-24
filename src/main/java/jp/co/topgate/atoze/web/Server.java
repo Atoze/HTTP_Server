@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Server
+ * HTTPリクエストに応じた処理を行います.
  *
  * @author atoze
  */
@@ -28,7 +28,7 @@ public class Server {
         }
     }
 
-    private void serverProcess(ServerSocket serverSocket) {
+    private void serverProcess(ServerSocket serverSocket) throws IOException {
         Socket socket = null;
         try {
             socket = serverSocket.accept();
@@ -49,20 +49,14 @@ public class Server {
             String filePath = "." + request.getFilePath();
             File file = new File(filePath);
 
-            if (request.getMethod() != null) {
-                switch (request.getMethod()) {
-                    case "GET":
-                        int statusCode = checkStatusCode(request, file);
-                        runGETResponse(statusCode, file, out);
-                        break;
+            if ("GET".equals(request.getMethod())) {
+                int statusCode = checkStatusCode(request, file);
+                runGETResponse(statusCode, file, out);
 
-                    default:
-                        setError(405, out);
-                }
+                setError(405, out);
             } else {
                 setError(400, out);
             }
-
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -75,9 +69,16 @@ public class Server {
         }
     }
 
+    /**
+     * HTTPリクエストに応じてステータスコードを設定します.
+     *
+     * @param request　HTTPリクエスト
+     * @param file 要求されたファイルパス
+     * @return ステータスコード
+     */
     private int checkStatusCode(HTTPRequest request, File file) throws IOException {
         String host = request.getHeaderParam("HOST");
-        if (host == null || request.getMethod() == null || !host.startsWith(this.hostName + ":" + PORT)) {
+        if (host == null || !host.startsWith(this.hostName + ":" + PORT)) {
             return 400;
         }
         if (!file.exists() || !file.isFile()) {
@@ -102,6 +103,14 @@ public class Server {
         this.setError(statusCode, out);
     }
 
+    /**
+     * エラー発生時のステータスコードに合わせたページを設定、またはテンプレートを作成します.
+     * 設置したホームディレクトリの "ステータスコード".html を参照します.
+     * 存在しない場合は、テンプレートを送信します.
+     *
+     * @param statusCode　ステータスコード
+     * @param out 書き出し先
+     */
     private void setError(int statusCode, OutputStream out) throws IOException {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();

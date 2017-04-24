@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * HTTPリクエストデータを保持します.
+ * HTTPリクエストデータを読み込み、整理します.
  *
  * @author atoze
  */
@@ -29,7 +29,9 @@ class HTTPRequest {
     /**
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
      *
+     * @param input HTTPリクエストのデータストリーム
      * @param host HTTPホスト名
+     * @throws IOException ストリームデータ取得エラー
      */
     public void readRequest(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
@@ -83,6 +85,12 @@ class HTTPRequest {
         }
     }
 
+    /**
+     * HTTPジェネラルヘッダを読み込み、整理します.
+     *
+     * @param line
+     * @param host
+     */
     private void readRequestLine(String line, String host) {
         HTTPRequestLine header = new HTTPRequestLine(line);
         this.method = header.getMethod();
@@ -144,6 +152,12 @@ class HTTPRequest {
         return filePath;
     }
 
+    /**
+     * ファイルパスとクエリデータを分割します.
+     *
+     * @param filePath
+     * @return ファイルパス
+     */
     private String uriQuerySplitter(String filePath) {
         if (filePath == null) {
             return "";
@@ -159,10 +173,11 @@ class HTTPRequest {
     /**
      * 保管されたHTTPリクエストヘッダから、指定したキーに対応した値を取得します.
      *
+     * @param key キー
      * @return 値
      */
-    public String getHeaderParam(String value) {
-        return headerData.getOrDefault(value.toUpperCase(), null);
+    public String getHeaderParam(String key) {
+        return headerData.getOrDefault(key.toUpperCase(), null);
     }
 
     /**
