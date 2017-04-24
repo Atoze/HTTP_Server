@@ -23,7 +23,7 @@ public class HTTPResponseTest {
         OutputStream output = new FileOutputStream(log);
 
         status.setStatus(200);
-        response.addText("ContentType", "text/html");
+        response.addResponseHeader("ContentType", "text/html");
         response.writeTo(output, status);
         assertThat("HTTP/1.1 "+status.getStatus()+"\n"+"ContentType: text/html\n", is(response.getResponse()));
 
