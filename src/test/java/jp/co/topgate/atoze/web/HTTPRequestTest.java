@@ -14,7 +14,7 @@ public class HTTPRequestTest {
     @Test
     public void HTTPRequestのデータ保管するクラスのテスト()throws IOException {
         HTTPRequest request = new HTTPRequest();
-        File file = new File("Document/test.txt"); //実データに近いもの
+        File file = new File("src/test/Document/test.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(request.getRequestHeader()));
@@ -36,7 +36,7 @@ public class HTTPRequestTest {
         assertThat("localhost:8080", is(request.getHeaderParam("HOST")));
 
 
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -63,7 +63,7 @@ public class HTTPRequestTest {
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -90,7 +90,7 @@ public class HTTPRequestTest {
 
     @Test
     public void 間違ったリクエストがきた場合() throws IOException {
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -156,7 +156,7 @@ public class HTTPRequestTest {
     @Test
     public void POSTテスト() throws IOException {
         HTTPRequest request = new HTTPRequest();
-        File file = new File("Document/test_POST.txt"); //実データに近いもの
+        File file = new File("src/test/Document/test_POST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(request.getRequestHeader()));
@@ -177,6 +177,34 @@ public class HTTPRequestTest {
         assertThat("key1=value1&key2=value2", is(request.getMessageBody()));
         System.out.println(request.getRequestHeader());
         System.out.println(request.getMessageBody());
+
+    }
+
+    @Test
+    public void POSTLargeテスト() throws IOException {
+        HTTPRequest request = new HTTPRequest();
+        File file = new File("src/test/Document/test_LargePOST.txt"); //実データに近いもの
+        InputStream input = new FileInputStream(file);
+
+        assertThat(null, is(request.getRequestHeader()));
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
+
+        //データ挿入
+        try {
+            request.readRequest(input, "localhost:8080");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertThat("POST", is(request.getMethod()));
+        assertThat("/test.html", is(request.getFilePath()));
+        assertThat("1.1", is(request.getProtocolVer()));
+
+        String largePOST = new String(request.getMessageFile(), "UTF-8");
+
+        System.out.println(request.getRequestHeader());
+        System.out.println(largePOST);
 
     }
 }

@@ -27,7 +27,7 @@ class HTTPRequestLine {
     private String filePath;
     private String protocol;
 
-    private final int RequestHeaderValue = 3;
+    private final int REQUEST_HEADER_VALUE = 3;
 
     HTTPRequestLine(String line) {
         this.readRequestHeader(line);
@@ -38,7 +38,7 @@ class HTTPRequestLine {
             return;
         }
         String headerLines[] = line.split(" ");
-        if (headerLines.length == this.RequestHeaderValue) {
+        if (headerLines.length == this.REQUEST_HEADER_VALUE) {
             this.headMethod = rightMethod(headerLines[0]);
             this.filePath = headerLines[1];
             if (headerLines[2].startsWith("HTTP/")) {

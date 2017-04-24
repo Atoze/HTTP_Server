@@ -9,7 +9,7 @@ import java.util.Map;
  * @author atoze
  */
 class ContentTypeUtil {
-    private static final Map<String, String> content = new HashMap<String, String>() {
+    private static final Map<String, String> CONTENT = new HashMap<String, String>() {
         {
             put("plain", "text");
             put("html", "text");
@@ -57,11 +57,11 @@ class ContentTypeUtil {
             return null;
         }
 
-        if (content.containsKey(fileName)) {
-            return content.get(fileName) + "/" + fileName;
+        if (CONTENT.containsKey(fileName)) {
+            return CONTENT.get(fileName) + "/" + fileName;
         } else {
             //DefaultContentType
-            return content.get("plain") + "/plain";
+            return CONTENT.get("plain") + "/plain";
         }
     }
 }

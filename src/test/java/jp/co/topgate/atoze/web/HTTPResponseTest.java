@@ -19,7 +19,7 @@ public class HTTPResponseTest {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
 
-        File log = new File("Document/response.txt");
+        File log = new File("src/test/Document/response.txt");
         OutputStream output = new FileOutputStream(log);
 
         status.setStatus(200);

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -12,37 +11,27 @@ import java.net.Socket;
  *
  * @author atoze
  */
-public class Server {
-    final int PORT = 8080;
-    private final String hostName = "localhost";
+public class Server extends Thread {
+    private Socket socket;
+    int PORT;
+    private final String HOST_NAME = "localhost";
 
-    public void start() {
-        System.out.println("Starting up HTTP server...");
-        try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            while (true) {
-                this.serverProcess(serverSocket);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Server(Socket socket, int PORT) {
+        this.PORT = PORT;
+        this.socket = socket;
+        System.out.println("Connected");
     }
 
-    private void serverProcess(ServerSocket serverSocket) throws IOException {
-        Socket socket = null;
+    /**
+     * HTTPリクエストに応じた処理を行います.
+     */
+    public void run() {
         try {
-            socket = serverSocket.accept();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try
-                (
-                        InputStream in = socket.getInputStream();
-                        OutputStream out = socket.getOutputStream()
-                ) {
+            InputStream in = this.socket.getInputStream();
+            OutputStream out = this.socket.getOutputStream();
 
             HTTPRequest request = new HTTPRequest();
-            request.readRequest(in, this.hostName + ":" + this.PORT);
+            request.readRequest(in, this.HOST_NAME + ":" + this.PORT);
             System.out.println("Request incoming...");
             System.out.println(request.getRequestHeader());
 
@@ -64,15 +53,17 @@ public class Server {
             } else {
                 httpHandler.handlerError(400, out);
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                socket.close();
+                if (socket != null) {
+                    socket.close();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            System.out.println("Disconnected");
         }
     }
 
@@ -85,7 +76,7 @@ public class Server {
      */
     private int checkStatusCode(HTTPRequest request, File file) throws IOException {
         String host = request.getHeaderParam("HOST");
-        if (host == null || !host.startsWith(this.hostName + ":" + PORT)) {
+        if (host == null || !host.startsWith(this.HOST_NAME + ":" + PORT)) {
             return 400;
         }
         if (!file.exists() || !file.isFile()) {
@@ -96,5 +87,6 @@ public class Server {
         }
         return 200;
     }
+
 }
 
