@@ -179,4 +179,32 @@ public class HTTPRequestTest {
         System.out.println(request.getMessageBody());
 
     }
+
+    @Test
+    public void POSTLargeテスト() throws IOException {
+        HTTPRequest request = new HTTPRequest();
+        File file = new File("src/test/Document/test_LargePOST.txt"); //実データに近いもの
+        InputStream input = new FileInputStream(file);
+
+        assertThat(null, is(request.getRequestHeader()));
+        assertThat(null, is(request.getMethod()));
+        assertThat(null, is(request.getFilePath()));
+        assertThat(null, is(request.getProtocolVer()));
+
+        //データ挿入
+        try {
+            request.readRequest(input, "localhost:8080");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertThat("POST", is(request.getMethod()));
+        assertThat("/test.html", is(request.getFilePath()));
+        assertThat("1.1", is(request.getProtocolVer()));
+
+        String largePOST = new String(request.getMessageFile(), "UTF-8");
+
+        System.out.println(request.getRequestHeader());
+        System.out.println(largePOST);
+
+    }
 }

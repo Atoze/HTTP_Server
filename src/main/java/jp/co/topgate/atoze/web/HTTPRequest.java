@@ -215,10 +215,16 @@ class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public Object getMessageBody() {
-        if (this.requestFile != null) {
-            return this.requestFile;
-        }
+    public String getMessageBody() {
         return this.requestBody;
+    }
+
+    /**
+     * 要求するメッセージボディを返します.
+     *
+     * @return リクエストボディメッセージ
+     */
+    public byte[] getMessageFile() {
+        return this.requestFile;
     }
 }
