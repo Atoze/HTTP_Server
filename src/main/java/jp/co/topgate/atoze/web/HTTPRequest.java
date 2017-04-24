@@ -20,6 +20,8 @@ class HTTPRequest {
     private String fileQuery;
     private String protocolVer;
 
+    private final int READ_BYTE_LIMIT = 1024;
+
     Map<String, String> headerData = new HashMap<String, String>();
 
     private void addRequestData(String key, String value) {
@@ -30,12 +32,12 @@ class HTTPRequest {
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
      *
      * @param input HTTPリクエストのデータストリーム
-     * @param host HTTPホスト名
+     * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
     public void readRequest(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
-        bi.mark(1024);
+        bi.mark(this.READ_BYTE_LIMIT);
         BufferedReader br = new BufferedReader(new InputStreamReader(bi));
         String line = br.readLine();
 

@@ -1,7 +1,7 @@
 package jp.co.topgate.atoze.web;
 
 /**
- * Created by atoze on 2017/04/12.
+ * HTTPサーバーを実行します.
  */
 class Main {
 

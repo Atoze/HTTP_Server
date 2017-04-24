@@ -10,7 +10,6 @@ public class ServerTest {
 
     @Test
     public void Serverテスト () throws IOException{
-        ResponseHandler responseHandler = new ResponseHandler("localhost",8080);
         File file = new File("Document/test.txt");
         InputStream input = new FileInputStream(file);
 
@@ -19,8 +18,5 @@ public class ServerTest {
 
         HTTPRequest request = new HTTPRequest();
         request.readRequest(input, "localhost:8080");
-
-        //responseHandler.responseOutput(request,output);
-
     }
 }
