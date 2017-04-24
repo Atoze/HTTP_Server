@@ -2,7 +2,6 @@ group 'jp.co.topgate'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
-apply plugin: 'war'
 apply plugin: 'application'
 
 mainClassName = 'jp.co.topgate.atoze.web.Main'
@@ -14,5 +13,4 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    providedCompile group: 'javax', name: 'javaee-api', version: '7.0'
 }

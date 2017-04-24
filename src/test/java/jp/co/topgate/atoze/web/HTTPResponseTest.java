@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPResponseTest {
     @Test
-    public void HTTPResponseの動きを確認 () throws IOException {
+    public void HTTPResponseの動きを確認() throws IOException {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
 
@@ -25,7 +25,7 @@ public class HTTPResponseTest {
         status.setStatus(200);
         response.addResponseHeader("ContentType", "text/html");
         response.writeTo(output, status);
-        assertThat("HTTP/1.1 "+status.getStatus()+"\n"+"ContentType: text/html\n", is(response.getResponse()));
+        assertThat("HTTP/1.1 " + status.getStatus() + "\n" + "ContentType: text/html\n", is(response.getResponse()));
 
     }
 }

@@ -35,6 +35,7 @@ class HTTPRequest {
      * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
+
     public void readRequest(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
         bi.mark(this.REQUEST_HEAD_BYTE_LIMIT);
@@ -93,7 +94,7 @@ class HTTPRequest {
      * @param line
      * @param host
      */
-    private void readRequestLine(String line, String host) {
+    private void readRequestLine(String line, String host) throws IOException {
         HTTPRequestLine header = new HTTPRequestLine(line);
         this.method = header.getMethod();
         this.filePath = uriQuerySplitter(urlDivider(header.getFilePath(), host));
@@ -114,6 +115,7 @@ class HTTPRequest {
 
     /**
      * 要求するHTTPメソッドを取得します.
+     * ,
      *
      * @return メソッド名
      */

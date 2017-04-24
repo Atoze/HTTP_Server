@@ -2,8 +2,9 @@ package jp.co.topgate.atoze.web;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -11,7 +12,7 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPRequestLineTest {
     @Test
-    public void HTTPRequestのRequestLineを分けるクラスのテスト() {
+    public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
         String line = "GET / HTTP/1.1";
 
         HTTPRequestLine header = new HTTPRequestLine(line);
@@ -22,32 +23,32 @@ public class HTTPRequestLineTest {
     }
 
     @Test
-    public void nullテスト() {
+    public void nullテスト() throws IOException {
         String line = null;
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
-        assertNull(header.getMethod());
-        assertNull(header.getFilePath());
-        assertNull(header.getProtocol());
+        assertThat("", is(header.getMethod()));
+        assertThat(null, is(header.getFilePath()));
+        assertThat(null, is(header.getProtocol()));
     }
 
     @Test
-    public void エラーテスト() {
+    public void エラーテスト() throws IOException {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
         HTTPRequestLine header = new HTTPRequestLine(line);
 
-        assertNull(header.getMethod());
-        assertNull(header.getFilePath());
-        assertNull(header.getProtocol());
+        assertThat("", is(header.getMethod()));
+        assertThat(null, is(header.getFilePath()));
+        assertThat(null, is(header.getProtocol()));
 
         //二重スペース
         line = "GET  /  HTTP/1.1";
 
         header = new HTTPRequestLine(line);
-        assertThat(null, is(header.getMethod()));
+        assertThat("", is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
         assertThat(null, is(header.getProtocol()));
 

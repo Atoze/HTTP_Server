@@ -1,0 +1,38 @@
+h1{font-size:15px;
+  color:white;
+  background-color: #000000;
+  padding:10px;
+
+   box-shadow:5px 5px 0px -2px;
+}
+
+video {display:block;
+}
+
+#bg-video{
+  position:fixed;
+  right:0;
+  bottom:0;
+  min-width:100%;
+  min-height:100%;
+  width:auto;
+  height:auto;
+  z-index:-1;
+}
+
+input.btn{
+  display: inline-block;
+  width: 120px;
+  margin: 45px 40px 40px;
+  padding: 15px 10px;
+  border: 1px solid #000;
+  background: transparent;
+  color: #000;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1;
+  transition: .3s;
+}
+input.btn:hover {ß
+  box-shadow: 0 0 20px 5px rgba(255,255,255,.3) inset;
+}

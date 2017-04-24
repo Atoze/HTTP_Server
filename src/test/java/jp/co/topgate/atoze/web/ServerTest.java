@@ -1,4 +1,5 @@
 package jp.co.topgate.atoze.web;
+
 import org.junit.Test;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.io.*;
 public class ServerTest {
 
     @Test
-    public void Serverテスト () throws IOException{
+    public void Serverテスト() throws IOException {
         File file = new File("src/test/Document/test.txt");
         InputStream input = new FileInputStream(file);
 

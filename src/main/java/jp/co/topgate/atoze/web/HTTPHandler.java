@@ -27,7 +27,7 @@ public class HTTPHandler {
 
     /**
      * エラー発生時のステータスコードに合わせたページを設定、またはテンプレートを作成します.
-     * 設置したホームディレクトリの "ステータスコード".html を参照します.
+     * ページは設置したホームディレクトリの "ステータスコード".html を参照します.
      * 存在しない場合は、テンプレートを送信します.
      *
      * @param statusCode 　ステータスコード
@@ -37,7 +37,7 @@ public class HTTPHandler {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
         status.setStatus(statusCode);
-        File errorFile = new File(statusCode + ".html");
+        File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
             response.setResponseBody(errorFile);
         } else {

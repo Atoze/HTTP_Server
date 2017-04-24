@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  */
 public class HTTPRequestTest {
     @Test
-    public void HTTPRequestのデータ保管するクラスのテスト()throws IOException {
+    public void HTTPRequestのデータ保管するクラスのテスト() throws IOException {
         HTTPRequest request = new HTTPRequest();
         File file = new File("src/test/Document/test.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
@@ -101,7 +101,7 @@ public class HTTPRequestTest {
         writer.println("GET/HTTP/1.1");
         request.readRequest(input, "localhost:8080");
 
-        assertThat(null, is(request.getMethod()));
+        assertThat("", is(request.getMethod()));
         assertThat("", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
 
@@ -110,7 +110,7 @@ public class HTTPRequestTest {
         writer.println("GET https://localhost:8080/hoge.htmlHTTP/1.1");
         request.readRequest(input, "localhost:8080");
 
-        assertThat(null, is(request.getMethod()));
+        assertThat("", is(request.getMethod()));
         assertThat("", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
 
@@ -119,7 +119,7 @@ public class HTTPRequestTest {
         writer.println("GET https://localhost:8080/hoge.html HTTP/1.1 hogehoge");
         request.readRequest(input, "localhost:8080");
 
-        assertThat(null, is(request.getMethod()));
+        assertThat("", is(request.getMethod()));
         assertThat("", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
 
@@ -128,7 +128,7 @@ public class HTTPRequestTest {
         writer.println("HTTP/1.1 GET https://localhost:8080/hoge.html");
         request.readRequest(input, "localhost:8080");
 
-        assertThat(null, is(request.getMethod()));
+        assertThat("", is(request.getMethod()));
         assertThat("GET", is(request.getFilePath()));
         assertThat(null, is(request.getProtocolVer()));
 
@@ -138,7 +138,7 @@ public class HTTPRequestTest {
 
         request.readRequest(input, "localhost:8080");
 
-        assertThat(null, is(request.getMethod()));
+        assertThat("", is(request.getMethod()));
         assertThat("/hoge.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
 
@@ -174,7 +174,7 @@ public class HTTPRequestTest {
         assertThat("/test.html", is(request.getFilePath()));
         assertThat("1.1", is(request.getProtocolVer()));
 
-        assertThat("key1=value1&key2=value2", is(request.getMessageBody()));
+        assertThat("key1=value1&key2=あいうえお", is(request.getMessageBody()));
         System.out.println(request.getRequestHeader());
         System.out.println(request.getMessageBody());
 
