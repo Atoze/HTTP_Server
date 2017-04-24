@@ -48,14 +48,21 @@ public class Server {
 
             String filePath = "." + request.getFilePath();
             File file = new File(filePath);
+            HTTPHandler httpHandler = new HTTPHandler();
 
-            if ("GET".equals(request.getMethod())) {
-                int statusCode = checkStatusCode(request, file);
-                runGETResponse(statusCode, file, out);
+            int statusCode = checkStatusCode(request, file);
+            if (request.getMethod() != null) {
+                switch (request.getMethod()) {
+                    case "GET":
+                        httpHandler.handlerGET(statusCode, file, out);
+                        break;
 
-                setError(405, out);
+                    default:
+                        httpHandler.handlerError(statusCode, out);
+                        break;
+                }
             } else {
-                setError(400, out);
+                httpHandler.handlerError(400, out);
             }
 
         } catch (IOException e) {
@@ -72,8 +79,8 @@ public class Server {
     /**
      * HTTPリクエストに応じてステータスコードを設定します.
      *
-     * @param request　HTTPリクエスト
-     * @param file 要求されたファイルパス
+     * @param request 　HTTPリクエスト
+     * @param file    要求されたファイルパス
      * @return ステータスコード
      */
     private int checkStatusCode(HTTPRequest request, File file) throws IOException {
@@ -88,42 +95,6 @@ public class Server {
             return 403;
         }
         return 200;
-    }
-
-    private void runGETResponse(int statusCode, File file, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
-        Status status = new Status();
-        status.setStatus(statusCode);
-        if (statusCode == 200) {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
-            response.setResponseBody(file);
-            response.writeTo(out, status);
-            return;
-        }
-        this.setError(statusCode, out);
-    }
-
-    /**
-     * エラー発生時のステータスコードに合わせたページを設定、またはテンプレートを作成します.
-     * 設置したホームディレクトリの "ステータスコード".html を参照します.
-     * 存在しない場合は、テンプレートを送信します.
-     *
-     * @param statusCode　ステータスコード
-     * @param out 書き出し先
-     */
-    private void setError(int statusCode, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
-        Status status = new Status();
-        status.setStatus(statusCode);
-        File errorFile = new File(statusCode + ".html");
-        if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
-            response.setResponseBody(errorFile);
-        } else {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html"));
-            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
-                    status.getStatus() + "</h1></body></html>");
-        }
-        response.writeTo(out, status);
     }
 }
 
