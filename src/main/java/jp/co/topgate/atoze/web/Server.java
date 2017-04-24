@@ -35,8 +35,6 @@ public class Server {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println("Request incoming...");
         try
                 (
                         InputStream in = socket.getInputStream();
@@ -44,14 +42,28 @@ public class Server {
                 ) {
 
             HTTPRequest request = new HTTPRequest();
-            request.readRequestHeader(in, this.hostName + ":" + this.PORT);
+            request.readRequest(in, this.hostName + ":" + this.PORT);
+            System.out.println("Request incoming...");
             System.out.println(request.getRequestHeader());
 
             String filePath = "." + request.getFilePath();
             File file = new File(filePath);
 
-            int statusCode = checkStatusCode(request, file);
-            responseOutput(statusCode, file, out);
+            if (request.getMethod() != null) {
+                switch (request.getMethod()) {
+                    case "GET":
+                        int statusCode = checkStatusCode(request, file);
+                        runGETResponse(statusCode, file, out);
+                        break;
+
+                    default:
+                        setError(405, out);
+                }
+            } else {
+                setError(400, out);
+            }
+
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -68,10 +80,6 @@ public class Server {
         if (host == null || request.getMethod() == null || !host.startsWith(this.hostName + ":" + PORT)) {
             return 400;
         }
-        if (!request.getMethod().equals("GET")) {
-            return 405;
-        }
-
         if (!file.exists() || !file.isFile()) {
             return 404;
         }
@@ -81,7 +89,7 @@ public class Server {
         return 200;
     }
 
-    private void responseOutput(int statusCode, File file, OutputStream out) throws IOException {
+    private void runGETResponse(int statusCode, File file, OutputStream out) throws IOException {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
         status.setStatus(statusCode);
@@ -91,6 +99,13 @@ public class Server {
             response.writeTo(out, status);
             return;
         }
+        this.setError(statusCode, out);
+    }
+
+    private void setError(int statusCode, OutputStream out) throws IOException {
+        HTTPResponse response = new HTTPResponse();
+        Status status = new Status();
+        status.setStatus(statusCode);
         File errorFile = new File(statusCode + ".html");
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
             response.setResponseBody(errorFile);

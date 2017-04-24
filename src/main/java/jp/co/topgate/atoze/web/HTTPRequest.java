@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
  * @author atoze
  */
 class HTTPRequest {
+    private String requestBody;
+    private byte[] requestFile;
     private String requestHeader;
     private String method;
     private String filePath;
@@ -29,38 +31,62 @@ class HTTPRequest {
      *
      * @param host HTTPホスト名
      */
-    public void readRequestHeader(InputStream input, String host) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+    public void readRequest(InputStream input, String host) throws IOException {
+        BufferedInputStream bi = new BufferedInputStream(input);
+        bi.mark(1024);
+        BufferedReader br = new BufferedReader(new InputStreamReader(bi));
         String line = br.readLine();
 
         this.readRequestLine(line, host);
-
         StringBuilder text = new StringBuilder();
 
-        while (true) {
-            while (line != null && !line.isEmpty()) {
-                text.append(line).append("\n");
-                String[] headerLineData = line.split(":", 2);
-                if (headerLineData.length == 2) {
-                    this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
-                }
-                line = br.readLine();
+        while (line != null && !line.isEmpty()) {
+            text.append(line).append("\n");
+            String[] headerLineData = line.split(":", 2);
+            if (headerLineData.length == 2) {
+                this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
+            line = br.readLine();
+        }
+        this.requestHeader = text.toString();
 
-
-
-            if (!br.ready()) {
-                break;
+        //RequestBody処理
+        if (line != null) {
+            if (getHeaderParam("Content-Type") == null) {
+                return;
+            }
+            line = br.readLine();
+            String[] contentTypeKey = this.getHeaderParam("Content-Type").split("/", 2);
+            if ("text".equals(contentTypeKey[0])) {
+                StringBuilder body = new StringBuilder();
+                while (line != null && !line.isEmpty()) {
+                    body.append(line).append("\n");
+                    line = br.readLine();
+                }
+                this.requestBody = body.toString().trim();
+                return;
+            } else {
+                bi.reset();
+                int offset = 0;
+                int bytesRead = 0;
+                byte[] data = new byte[Integer.parseInt(this.getHeaderParam("Content-Length"))];
+                bi.skip(requestHeader.getBytes().length + 1);
+                while ((bytesRead = bi.read(data, offset, data.length - offset))
+                        != -1) {
+                    offset += bytesRead;
+                    if (offset >= data.length) {
+                        break;
+                    }
+                }
+                this.requestFile = data;
             }
         }
-
-        this.requestHeader = text.toString();
     }
 
     private void readRequestLine(String line, String host) {
         HTTPRequestLine header = new HTTPRequestLine(line);
         this.method = header.getMethod();
-        this.filePath = uriQuerySplitter(urlDivider(null, host));
+        this.filePath = uriQuerySplitter(urlDivider(header.getFilePath(), host));
         if (this.filePath.endsWith("/")) {
             this.filePath += "index.html";
         }
@@ -165,5 +191,17 @@ class HTTPRequest {
      */
     public String getFileQuery() {
         return this.fileQuery;
+    }
+
+    /**
+     * 要求するメッセージボディを返します.
+     *
+     * @return リクエストボディメッセージ
+     */
+    public Object getMessageBody() {
+        if (this.requestFile != null) {
+            return this.requestFile;
+        }
+        return this.requestBody;
     }
 }

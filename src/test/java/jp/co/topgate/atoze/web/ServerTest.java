@@ -18,7 +18,7 @@ public class ServerTest {
         OutputStream output = new FileOutputStream(log);
 
         HTTPRequest request = new HTTPRequest();
-        request.readRequestHeader(input, "localhost:8080");
+        request.readRequest(input, "localhost:8080");
 
         //responseHandler.responseOutput(request,output);
 
