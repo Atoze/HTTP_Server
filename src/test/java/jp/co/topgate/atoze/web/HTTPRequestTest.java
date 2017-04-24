@@ -14,7 +14,7 @@ public class HTTPRequestTest {
     @Test
     public void HTTPRequestのデータ保管するクラスのテスト()throws IOException {
         HTTPRequest request = new HTTPRequest();
-        File file = new File("Document/test.txt"); //実データに近いもの
+        File file = new File("src/test/Document/test.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(request.getRequestHeader()));
@@ -36,7 +36,7 @@ public class HTTPRequestTest {
         assertThat("localhost:8080", is(request.getHeaderParam("HOST")));
 
 
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -63,7 +63,7 @@ public class HTTPRequestTest {
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -90,7 +90,7 @@ public class HTTPRequestTest {
 
     @Test
     public void 間違ったリクエストがきた場合() throws IOException {
-        File test = new File("Document/request.txt");
+        File test = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -156,7 +156,7 @@ public class HTTPRequestTest {
     @Test
     public void POSTテスト() throws IOException {
         HTTPRequest request = new HTTPRequest();
-        File file = new File("Document/test_POST.txt"); //実データに近いもの
+        File file = new File("src/test/Document/test_POST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(request.getRequestHeader()));

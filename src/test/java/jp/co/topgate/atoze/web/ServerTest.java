@@ -10,10 +10,10 @@ public class ServerTest {
 
     @Test
     public void Serverテスト () throws IOException{
-        File file = new File("Document/test.txt");
+        File file = new File("src/test/Document/test.txt");
         InputStream input = new FileInputStream(file);
 
-        File log = new File("Document/request.txt");
+        File log = new File("src/test/Document/request.txt");
         OutputStream output = new FileOutputStream(log);
 
         HTTPRequest request = new HTTPRequest();
