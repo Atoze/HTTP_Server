@@ -10,7 +10,18 @@ Java 1.8.0
 起動方法　　
 * 1.cloneする　　
 * 2.IntelliJにて開く.　　
-* 3.`./gradlew run`を、ルートフォルダで行う.　　
+* 3.`./gradlew run`を、ルートフォルダで行う.　
+* 終了の際は、`./gradlew --stop`で強制終了させてください.
+
+##Specification
+ポート番号は Main の PORT で指定できます.
+デフォルトポート番号は '8080' です.
+
+ルートディレクトリは、Server の ROOT_DIRECTORY より変更できます.
+デフォルトルートディレクトリは、"/src/main/resources" です.
+
+HTTPエラーの際は、ルートディレクトリに入っている' "HTTPステータスコード" + .html 'を参照します.
+ファイルが存在しない場合は、簡易的なテンプレートに沿ったHTMLを返します.
 
 ## Author
 [Atoze](https://github.com/Atoze)

@@ -20,7 +20,7 @@ class HTTPRequest {
     private String fileQuery;
     private String protocolVer;
 
-    private final int READ_BYTE_LIMIT = 1024;
+    private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
 
     Map<String, String> headerData = new HashMap<String, String>();
 
@@ -37,7 +37,7 @@ class HTTPRequest {
      */
     public void readRequest(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
-        bi.mark(this.READ_BYTE_LIMIT);
+        bi.mark(this.REQUEST_HEAD_BYTE_LIMIT);
         BufferedReader br = new BufferedReader(new InputStreamReader(bi));
         String line = br.readLine();
 

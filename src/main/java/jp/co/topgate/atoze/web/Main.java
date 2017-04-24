@@ -9,6 +9,7 @@ import java.net.Socket;
  */
 class Main {
     final static int PORT = 8080;
+
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
         try {
@@ -20,12 +21,12 @@ class Main {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }finally {
-            try{
-                if(serverSocket !=null) {
+        } finally {
+            try {
+                if (serverSocket != null) {
                     serverSocket.close();
                 }
-            }catch (Throwable e){
+            } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
         }

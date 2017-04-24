@@ -46,7 +46,7 @@ class HTTPResponse {
     /**
      * 生成したHTTPレスポンスを書き込みます.
      *
-     * @param out 書き込み先データストリーム
+     * @param out    書き込み先データストリーム
      * @param status ステータスクラス
      * @throws IOException 書き込みエラー
      */

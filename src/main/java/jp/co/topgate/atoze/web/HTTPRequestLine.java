@@ -11,16 +11,16 @@ import java.util.Set;
  */
 
 class HTTPRequestLine {
-    private final static Set<String> methods = new HashSet<>();
+    private final static Set<String> METHODS = new HashSet<>();
 
     static {
-        methods.add("GET");
-        methods.add("POST");
-        methods.add("HEAD");
-        methods.add("OPTIONS");
-        methods.add("PUT");
-        methods.add("DELETE");
-        methods.add("TRACE");
+        METHODS.add("GET");
+        METHODS.add("POST");
+        METHODS.add("HEAD");
+        METHODS.add("OPTIONS");
+        METHODS.add("PUT");
+        METHODS.add("DELETE");
+        METHODS.add("TRACE");
     }
 
     private String headMethod;
@@ -46,14 +46,15 @@ class HTTPRequestLine {
             }
         }
     }
+
     /**
      * 要求したメソッド名が存在しているか確認します.
      * メソッドが存在しない場合は取得しません.
      *
      * @return メソッド名
-    */
+     */
     private String rightMethod(String method) {
-        if (methods.contains(method)) {
+        if (METHODS.contains(method)) {
             return method;
         }
         return null;
