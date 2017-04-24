@@ -1,16 +1,33 @@
 package jp.co.topgate.atoze.web;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 /**
- * HTTPサーバーを実行します.
+ * HTTPサーバーを起動します.
  */
 class Main {
-
-    public static void main(String[] args) {
+    final static int PORT = 8080;
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = null;
         try {
-            Server server = new Server();
-            server.start();
-        } catch (Throwable e) {
+            serverSocket = new ServerSocket(PORT);
+            System.out.println("Starting up HTTP server...at PORT:" + PORT);
+            while (true) {
+                Socket socket = serverSocket.accept();
+                new Server(socket, PORT).start();
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
+        }finally {
+            try{
+                if(serverSocket !=null) {
+                    serverSocket.close();
+                }
+            }catch (Throwable e){
+                throw new RuntimeException(e);
+            }
         }
     }
 }
