@@ -1,8 +1,12 @@
 package jp.co.topgate.atoze.web;
 
+import org.mozilla.universalchardet.UniversalDetector;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Created by atoze on 2017/04/24.
@@ -16,8 +20,13 @@ public class HTTPHandler {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
         status.setStatus(statusCode);
+
         if (statusCode == 200) {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
+            if (Arrays.asList("html", "txt").contains(ContentTypeUtil.getFileExtension(file.toString()))) {
+                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
+            } else {
+                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
+            }
             response.setResponseBody(file);
             response.writeTo(out, status);
         } else {
@@ -41,10 +50,28 @@ public class HTTPHandler {
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
             response.setResponseBody(errorFile);
         } else {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html"));
+            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
             response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
                     status.getStatus() + "</h1></body></html>");
         }
         response.writeTo(out, status);
+    }
+
+    private String detectFileEncoding(File file) throws IOException {
+        String result = null;
+        byte[] buf = new byte[4096];
+        FileInputStream fis = new FileInputStream(file);
+        UniversalDetector detector = new UniversalDetector(null);
+
+        int nread;
+        while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
+            detector.handleData(buf, 0, nread);
+        }
+        detector.dataEnd();
+
+        result = detector.getDetectedCharset();
+        detector.reset();
+
+        return result;
     }
 }
