@@ -12,9 +12,10 @@ import java.net.Socket;
  * @author atoze
  */
 public class Server extends Thread {
-    private Socket socket;
-    int PORT;
+    private final Socket socket;
+    final int PORT;
     private final String HOST_NAME = "localhost";
+    protected static final String ROOT_DIRECTORY = "./src/main/resources";
 
     public Server(Socket socket, int PORT) {
         this.PORT = PORT;
@@ -35,23 +36,18 @@ public class Server extends Thread {
             System.out.println("Request incoming...");
             System.out.println(request.getRequestHeader());
 
-            String filePath = "." + request.getFilePath();
-            File file = new File(filePath);
+            File file = new File(ROOT_DIRECTORY, request.getFilePath());
             HTTPHandler httpHandler = new HTTPHandler();
 
             int statusCode = checkStatusCode(request, file);
-            if (request.getMethod() != null) {
-                switch (request.getMethod()) {
-                    case "GET":
-                        httpHandler.handlerGET(statusCode, file, out);
-                        break;
+            switch (request.getMethod()) {
+                case "GET":
+                    httpHandler.handlerGET(statusCode, file, out);
+                    break;
 
-                    default:
-                        httpHandler.handlerError(statusCode, out);
-                        break;
-                }
-            } else {
-                httpHandler.handlerError(400, out);
+                default:
+                    httpHandler.handlerError(statusCode, out);
+                    break;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -76,7 +72,7 @@ public class Server extends Thread {
      */
     private int checkStatusCode(HTTPRequest request, File file) throws IOException {
         String host = request.getHeaderParam("HOST");
-        if (host == null || !host.startsWith(this.HOST_NAME + ":" + PORT)) {
+        if (request.getMethod() == null || host == null || !host.startsWith(this.HOST_NAME + ":" + PORT)) {
             return 400;
         }
         if (!file.exists() || !file.isFile()) {
@@ -89,4 +85,3 @@ public class Server extends Thread {
     }
 
 }
-

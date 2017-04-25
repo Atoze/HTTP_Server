@@ -3,8 +3,6 @@ package jp.co.topgate.atoze.web;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * HTTPリクエストデータを読み込み、整理します.
@@ -20,7 +18,7 @@ class HTTPRequest {
     private String fileQuery;
     private String protocolVer;
 
-    private final int READ_BYTE_LIMIT = 1024;
+    private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
 
     Map<String, String> headerData = new HashMap<String, String>();
 
@@ -35,9 +33,10 @@ class HTTPRequest {
      * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
+
     public void readRequest(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
-        bi.mark(this.READ_BYTE_LIMIT);
+        bi.mark(this.REQUEST_HEAD_BYTE_LIMIT);
         BufferedReader br = new BufferedReader(new InputStreamReader(bi));
         String line = br.readLine();
 
@@ -93,7 +92,7 @@ class HTTPRequest {
      * @param line
      * @param host
      */
-    private void readRequestLine(String line, String host) {
+    private void readRequestLine(String line, String host) throws IOException {
         HTTPRequestLine header = new HTTPRequestLine(line);
         this.method = header.getMethod();
         this.filePath = uriQuerySplitter(urlDivider(header.getFilePath(), host));
@@ -114,6 +113,7 @@ class HTTPRequest {
 
     /**
      * 要求するHTTPメソッドを取得します.
+     * ,
      *
      * @return メソッド名
      */
@@ -141,15 +141,8 @@ class HTTPRequest {
         if (filePath == null) {
             return "";
         }
-
-        String pattern = "http*.://";
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(filePath);
-
-        if (m.find()) {
-            if (filePath.startsWith(m.group() + host)) {
-                return filePath.substring(filePath.indexOf(host) + host.length());
-            }
+        if (filePath.startsWith("http://" + host)) {
+            return filePath.substring(filePath.indexOf(host) + host.length());
         }
         return filePath;
     }

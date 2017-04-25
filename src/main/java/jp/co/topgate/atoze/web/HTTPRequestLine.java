@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,52 +13,54 @@ import java.util.Set;
  */
 
 class HTTPRequestLine {
-    private final static Set<String> methods = new HashSet<>();
+    private final static Set<String> METHODS = new HashSet<>();
 
     static {
-        methods.add("GET");
-        methods.add("POST");
-        methods.add("HEAD");
-        methods.add("OPTIONS");
-        methods.add("PUT");
-        methods.add("DELETE");
-        methods.add("TRACE");
+        METHODS.add("GET");
+        METHODS.add("POST");
+        METHODS.add("HEAD");
+        METHODS.add("OPTIONS");
+        METHODS.add("PUT");
+        METHODS.add("DELETE");
+        METHODS.add("TRACE");
     }
 
-    private String headMethod;
+    private String headMethod = "";
     private String filePath;
     private String protocol;
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(String line) {
+    HTTPRequestLine(String line) throws IOException {
         this.readRequestHeader(line);
     }
 
-    private void readRequestHeader(String line) {
+    private void readRequestHeader(String line) throws IOException {
         if (line == null) {
             return;
         }
         String headerLines[] = line.split(" ");
         if (headerLines.length == this.REQUEST_HEADER_VALUE) {
-            this.headMethod = rightMethod(headerLines[0]);
-            this.filePath = headerLines[1];
+            if (isValidMethod(headerLines[0])) {
+                this.headMethod = headerLines[0];
+            }
+            this.filePath = URLDecoder.decode(headerLines[1], "UTF-8");
             if (headerLines[2].startsWith("HTTP/")) {
                 this.protocol = headerLines[2];
             }
         }
     }
+
     /**
      * 要求したメソッド名が存在しているか確認します.
-     * メソッドが存在しない場合は取得しません.
      *
-     * @return メソッド名
-    */
-    private String rightMethod(String method) {
-        if (methods.contains(method)) {
-            return method;
+     * @return 有効なメソッド名であるか
+     */
+    private boolean isValidMethod(String method) {
+        if (METHODS.contains(method)) {
+            return true;
         }
-        return null;
+        return false;
     }
 
     /**

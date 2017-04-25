@@ -11,13 +11,13 @@ import static org.junit.Assert.assertThat;
 public class StatusTest {
 
     @Test
-    public void Status管理をみるテスト () {
+    public void Status管理をみるテスト() {
         Status status = new Status();
         //assertNull(status.getStatus());//Null
 
         status.setStatus(200);
-        assertThat(200,is(status.getStatusCode()));
-        assertThat("OK",is(status.getStatusMessage()));
-        assertThat("200 OK",is(status.getStatus()));
+        assertThat(200, is(status.getStatusCode()));
+        assertThat("OK", is(status.getStatusMessage()));
+        assertThat("200 OK", is(status.getStatus()));
     }
 }

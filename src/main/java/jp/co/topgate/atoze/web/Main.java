@@ -9,25 +9,16 @@ import java.net.Socket;
  */
 class Main {
     final static int PORT = 8080;
+
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(PORT);
-            System.out.println("Starting up HTTP server...at PORT:" + PORT);
-            while (true) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            while (serverSocket != null) {
+                System.out.println("Starting up HTTP server...at PORT:" + PORT);
                 Socket socket = serverSocket.accept();
                 new Server(socket, PORT).start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }finally {
-            try{
-                if(serverSocket !=null) {
-                    serverSocket.close();
-                }
-            }catch (Throwable e){
-                throw new RuntimeException(e);
-            }
         }
     }
 }

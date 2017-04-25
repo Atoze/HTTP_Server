@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 /**
  * Created by atoze on 2017/04/18.
  */
@@ -17,24 +18,28 @@ public class ContentTypeUtilTest {
         String file = "test.html";
         assertThat("text/html", is(ContentTypeUtil.getContentType(file)));
 
+        //テキストファイル
+        file = "test.txt";
+        assertThat("text/plain", is(ContentTypeUtil.getContentType(file)));
+
         //拡張子がcontent Mapにない場合
-        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.hoge")));
+        assertThat("application/octet-stream", is(ContentTypeUtil.getContentType("hoge.hoge")));
 
         //拡張子がない場合
         assertThat(null, is(ContentTypeUtil.getContentType("hoge")));
 
         //'.'しか送られてこなかった場合
-        assertThat("text/plain", is(ContentTypeUtil.getContentType(".")));
+        assertThat("application/octet-stream", is(ContentTypeUtil.getContentType(".")));
 
         //二重に'.'がある場合
         assertThat("text/html", is(ContentTypeUtil.getContentType("hoge..html")));
 
         //終わりに拡張子がない場合
-        assertThat("text/plain", is(ContentTypeUtil.getContentType("hoge.")));
+        assertThat("application/octet-stream", is(ContentTypeUtil.getContentType("hoge.")));
     }
 
     @Test
-    public void ファイル拡張子を確認する(){
+    public void ファイル拡張子を確認する() {
         //NULL
         assertThat(null, is(ContentTypeUtil.getFileExtension(null)));
 

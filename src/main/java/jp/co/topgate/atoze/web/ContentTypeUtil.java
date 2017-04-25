@@ -11,8 +11,10 @@ import java.util.Map;
 class ContentTypeUtil {
     private static final Map<String, String> CONTENT = new HashMap<String, String>() {
         {
+            put("octet-stream", "application");
             put("plain", "text");
             put("html", "text");
+            put("htm", "text");
             put("css", "text");
             put("xml", "text");
 
@@ -60,8 +62,11 @@ class ContentTypeUtil {
         if (CONTENT.containsKey(fileName)) {
             return CONTENT.get(fileName) + "/" + fileName;
         } else {
+            if ("txt".equals(fileName)) {
+                return CONTENT.get("plain") + "/plain";
+            }
             //DefaultContentType
-            return CONTENT.get("plain") + "/plain";
+            return CONTENT.get("octet-stream") + "/octet-stream";
         }
     }
 }

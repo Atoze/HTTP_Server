@@ -10,10 +10,10 @@ import java.util.Map;
  * @author atoze
  */
 class HTTPResponse {
-    private String bodyText;
-    private File bodyFile;
+    private String requestBodyText;
+    private File requestBodyFile;
     private StringBuilder response = new StringBuilder();
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> responseHeaders = new HashMap<>();
 
     /**
      * HTTPレスポンスボディを設定します.
@@ -21,7 +21,7 @@ class HTTPResponse {
      * @param text テキスト
      */
     public void setResponseBody(String text) {
-        this.bodyText = text;
+        this.requestBodyText = text;
     }
 
     /**
@@ -30,7 +30,7 @@ class HTTPResponse {
      * @param file ファイル
      */
     public void setResponseBody(File file) {
-        this.bodyFile = file;
+        this.requestBodyFile = file;
     }
 
     /**
@@ -40,13 +40,13 @@ class HTTPResponse {
      * @param value 値
      */
     public void addResponseHeader(String type, String value) {
-        this.headers.put(type, value);
+        this.responseHeaders.put(type, value);
     }
 
     /**
      * 生成したHTTPレスポンスを書き込みます.
      *
-     * @param out 書き込み先データストリーム
+     * @param out    書き込み先データストリーム
      * @param status ステータスクラス
      * @throws IOException 書き込みエラー
      */
@@ -55,18 +55,18 @@ class HTTPResponse {
 
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
-        this.headers.forEach((key, value) -> {
+        this.responseHeaders.forEach((key, value) -> {
             this.response.append(key + ": " + value + "\n");
         });
 
-        if (this.bodyText != null) {
-            this.response.append("\n").append(this.bodyText + "\n");
+        if (this.requestBodyText != null) {
+            this.response.append("\n").append(this.requestBodyText + "\n");
         }
         writer.println(this.response.toString());
 
-        if (this.bodyFile != null) {
+        if (this.requestBodyFile != null) {
             BufferedInputStream bi
-                    = new BufferedInputStream(new FileInputStream(this.bodyFile));
+                    = new BufferedInputStream(new FileInputStream(this.requestBodyFile));
             try {
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
                     out.write(c);
