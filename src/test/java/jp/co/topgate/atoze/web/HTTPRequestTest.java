@@ -72,12 +72,6 @@ public class HTTPRequestTest {
         InputStream input = new FileInputStream(test);
         request.readRequest(input, "localhost:8080");
 
-        //https指定
-        writer.println("GET https://localhost:8080/hoge.html HTTP/1.1");
-
-        request.readRequest(input, "localhost:8080");
-        assertThat("/hoge.html", is(request.getFilePath()));
-
         //間違ったローカルホスト指定 そのまま返して来る
         writer.flush();
         writer.println("GET http://hogehoge/hoge.html HTTP/1.1");
@@ -134,7 +128,7 @@ public class HTTPRequestTest {
 
         //Methodが間違っている場合
         writer.flush();
-        writer.println("Foo: https://localhost:8080/hoge.html HTTP/1.1");
+        writer.println("Foo: http://localhost:8080/hoge.html HTTP/1.1");
 
         request.readRequest(input, "localhost:8080");
 

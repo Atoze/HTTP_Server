@@ -1,0 +1,1 @@
+GET http://hogehoge/hoge.html HTTP/1.1
