@@ -3,8 +3,6 @@ package jp.co.topgate.atoze.web;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * HTTPリクエストデータを読み込み、整理します.
@@ -143,15 +141,8 @@ class HTTPRequest {
         if (filePath == null) {
             return "";
         }
-
-        String pattern = "http*.://";
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(filePath);
-
-        if (m.find()) {
-            if (filePath.startsWith(m.group() + host)) {
-                return filePath.substring(filePath.indexOf(host) + host.length());
-            }
+        if (filePath.startsWith("http://" + host)) {
+            return filePath.substring(filePath.indexOf(host) + host.length());
         }
         return filePath;
     }
