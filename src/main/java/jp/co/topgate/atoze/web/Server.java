@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -13,16 +12,15 @@ import java.net.Socket;
  * @author atoze
  */
 public class Server extends Thread {
-    //private final Socket socket;
-    private ServerSocket serverSocket = null;
-    private Socket socket = new Socket();
+    private final Socket socket;
     final int PORT;
     private final String HOST_NAME = "localhost";
     protected static final String ROOT_DIRECTORY = "./src/main/resources";
 
-    public Server(int PORT) throws IOException {
+    public Server(Socket socket, int PORT) {
         this.PORT = PORT;
-        serverSocket = new ServerSocket(PORT);
+        this.socket = socket;
+        System.out.println("Connected");
     }
 
     /**
@@ -30,57 +28,39 @@ public class Server extends Thread {
      */
     public void run() {
         try {
-            while (true) {
-                socket = serverSocket.accept();
-                InputStream in = this.socket.getInputStream();
-                OutputStream out = this.socket.getOutputStream();
+            InputStream in = this.socket.getInputStream();
+            OutputStream out = this.socket.getOutputStream();
 
-                HTTPRequest request = new HTTPRequest();
-                request.readRequest(in, this.HOST_NAME + ":" + this.PORT);
-                System.out.println("Request incoming...");
-                //System.out.println(request.getRequestHeader());
+            HTTPRequest request = new HTTPRequest();
+            request.readRequest(in, this.HOST_NAME + ":" + this.PORT);
+            System.out.println("Request incoming...");
+            System.out.println(request.getRequestHeader());
 
-                File file = new File(ROOT_DIRECTORY, request.getFilePath());
-                HTTPHandler httpHandler = new HTTPHandler();
+            File file = new File(ROOT_DIRECTORY, request.getFilePath());
+            HTTPHandler httpHandler = new HTTPHandler();
 
-                int statusCode = checkStatusCode(request, file);
-                switch (request.getMethod()) {
-                    case "GET":
-                        httpHandler.handlerGET(statusCode, file, out);
-                        break;
+            int statusCode = checkStatusCode(request, file);
+            switch (request.getMethod()) {
+                case "GET":
+                    httpHandler.handlerGET(statusCode, file, out);
+                    break;
 
-                    default:
-                        httpHandler.handlerError(statusCode, out);
-                        break;
-                }
-                if (socket != null) {
-                    socket.close();
-                    System.out.println("Disconnected");
-                }
+                default:
+                    httpHandler.handlerError(statusCode, out);
+                    break;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Disconnected");
         }
-    }
-
-    public void startServer() {
-        this.start();
-    }
-
-    public boolean stopServer() throws IOException {
-        boolean result = false;
-        if (socket == null || socket.isClosed()) {
-            serverSocket.close();
-            result = true;
-        }
-        return result;
-    }
-
-    public void endServer() throws IOException {
-        if (socket != null) {
-            socket.close();
-        }
-        serverSocket.close();
     }
 
     /**
@@ -105,4 +85,3 @@ public class Server extends Thread {
     }
 
 }
-

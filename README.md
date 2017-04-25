@@ -11,7 +11,7 @@ Java 1.8.0
 * 1.cloneする　　
 * 2.IntelliJにて開く.　
 * 3.`./gradlew run`を、ルートフォルダで行う.　
-* 終了の際は、`./gradlew --stop`で強制終了させてください.
+* 終了の際は、強制終了させてください.
 
 ## Specification
 ポート番号は Main.java の `PORT` で指定できます.<br>

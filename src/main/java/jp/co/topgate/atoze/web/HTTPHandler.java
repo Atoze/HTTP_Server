@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
- * Created by atoze on 2017/04/24.
+ * HTTPリクエストを元に、レスポンスを生成する.
  */
-public class HTTPHandler {
+class HTTPHandler {
 
     HTTPHandler() {
     }
@@ -48,9 +48,10 @@ public class HTTPHandler {
         status.setStatus(statusCode);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
+            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
             response.setResponseBody(errorFile);
         } else {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
+            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=UTF-8");
             response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
                     status.getStatus() + "</h1></body></html>");
         }
