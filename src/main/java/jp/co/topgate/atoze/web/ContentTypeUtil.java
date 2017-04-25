@@ -11,22 +11,24 @@ import java.util.Map;
 class ContentTypeUtil {
     private static final Map<String, String> CONTENT = new HashMap<String, String>() {
         {
-            put("octet-stream", "application");
-            put("plain", "text");
-            put("html", "text");
-            put("htm", "text");
-            put("css", "text");
-            put("xml", "text");
+            put("octet-stream", "application/octet-stream");
+            put("plain", "text/plain");
+            put("text", "text/plain");
+            put("txt", "text/plain");
+            put("html", "text/html");
+            put("htm", "text/html");
+            put("css", "text/css");
+            put("xml", "text/xml");
 
-            put("js", "application");
-            put("json", "application");
+            put("js", "application/javascript");
+            put("json", "application/json");
 
-            put("jpeg", "image");
-            put("jpg", "image");
-            put("png", "image");
-            put("gif", "image");
+            put("jpeg", "image/jpeg");
+            put("jpg", "image/jpeg");
+            put("png", "image/png");
+            put("gif", "image/mp4");
 
-            put("mp4", "video");
+            put("mp4", "video/mp4");
         }
     };
 
@@ -60,13 +62,10 @@ class ContentTypeUtil {
         }
 
         if (CONTENT.containsKey(fileName)) {
-            return CONTENT.get(fileName) + "/" + fileName;
+            return CONTENT.get(fileName);
         } else {
-            if ("txt".equals(fileName)) {
-                return CONTENT.get("plain") + "/plain";
-            }
             //DefaultContentType
-            return CONTENT.get("octet-stream") + "/octet-stream";
+            return CONTENT.get("octet-stream");
         }
     }
 }

@@ -40,7 +40,18 @@ input.btn:hover {
     padding-right:50px;
 }
 
+.marquee #follow{
+    position: relative;
+    width:100px;
+}
+.marquee #text{
+    position: absolute;
+    right:75px;
+    bottom:40px;
+}
+
 .marquee p {
+    position:relative;
     margin:0;
     padding-left:100%;
     display:inline-block;
