@@ -20,7 +20,6 @@ public class Server extends Thread {
     public Server(Socket socket, int PORT) {
         this.PORT = PORT;
         this.socket = socket;
-        System.out.println("Connected");
     }
 
     /**
@@ -33,7 +32,7 @@ public class Server extends Thread {
 
             HTTPRequest request = new HTTPRequest();
             request.readRequest(in, this.HOST_NAME + ":" + this.PORT);
-            System.out.println("Request incoming...");
+            System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
             System.out.println(request.getRequestHeader());
 
             File file = new File(ROOT_DIRECTORY, request.getFilePath());
@@ -59,7 +58,7 @@ public class Server extends Thread {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Disconnected");
+            System.out.println("Disconnected" + Thread.currentThread().getName());
         }
     }
 
