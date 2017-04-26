@@ -10,9 +10,9 @@ import java.net.Socket;
 class Main {
     final static int PORT = 8080;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            while (serverSocket != null) {
+            while (true) {
                 System.out.println("Starting up HTTP server...at PORT:" + PORT);
                 Socket socket = serverSocket.accept();
                 new Server(socket, PORT).start();
