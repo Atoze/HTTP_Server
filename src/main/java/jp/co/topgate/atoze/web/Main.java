@@ -12,8 +12,8 @@ class Main {
 
     public static void main(String[] args){
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Starting up HTTP server...at PORT:" + PORT);
             while (true) {
-                System.out.println("Starting up HTTP server...at PORT:" + PORT);
                 Socket socket = serverSocket.accept();
                 new Server(socket, PORT).start();
             }
