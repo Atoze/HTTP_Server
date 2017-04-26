@@ -65,7 +65,7 @@ class HTTPResponse {
         writer.println(this.response.toString());
 
         if (this.requestBodyFile != null) {
-            InputStream bi
+            BufferedInputStream bi
                     = new BufferedInputStream(new FileInputStream(this.requestBodyFile));
             try {
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
