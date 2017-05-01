@@ -1,9 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -29,23 +26,16 @@ public class Server extends Thread {
         try {
             InputStream in = this.socket.getInputStream();
             OutputStream out = this.socket.getOutputStream();
-
-            HTTPRequest request = new HTTPRequest();
-            request.readRequest(in, this.HOST_NAME + ":" + this.PORT);
-            System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
-            System.out.println(request.getRequestHeader());
-
-            File file = new File(ROOT_DIRECTORY, request.getFilePath());
-            HTTPHandler httpHandler = new HTTPHandler();
-
-            int statusCode = checkStatusCode(request, file);
-            switch (request.getMethod()) {
+            HTTPRequestLine request = new HTTPRequestLine(in, HOST_NAME + ":" + PORT);
+            //System.out.print(request.getFilePath());
+            switch ("GET") {
                 case "GET":
-                    httpHandler.handlerGET(statusCode, file, out);
+                    StaticHandler request2 = new StaticHandler(request.getFilePath());
+                    request2.request(in, HOST_NAME + ":" + PORT);
+                    request2.response(out);
                     break;
 
                 default:
-                    httpHandler.handlerError(statusCode, out);
                     break;
             }
         } catch (IOException e) {
@@ -61,26 +51,4 @@ public class Server extends Thread {
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }
     }
-
-    /**
-     * HTTPリクエストに応じてステータスコードを設定します.
-     *
-     * @param request 　HTTPリクエスト
-     * @param file    要求されたファイルパス
-     * @return ステータスコード
-     */
-    private int checkStatusCode(HTTPRequest request, File file) throws IOException {
-        String host = request.getHeaderParam("HOST");
-        if (request.getMethod() == null || host == null || !host.startsWith(this.HOST_NAME + ":" + PORT)) {
-            return 400;
-        }
-        if (!file.exists() || !file.isFile()) {
-            return 404;
-        }
-        if (!file.canRead()) {
-            return 403;
-        }
-        return 200;
-    }
-
 }

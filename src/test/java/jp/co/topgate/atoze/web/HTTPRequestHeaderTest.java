@@ -10,12 +10,12 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by atoze on 2017/04/17.
  */
-public class HTTPRequestLineTest {
+public class HTTPRequestHeaderTest {
     @Test
     public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
         String line = "GET / HTTP/1.1";
 
-        HTTPRequestLine header = new HTTPRequestLine(line);
+        HTTPRequestHeader header = new HTTPRequestHeader(line);
 
         assertThat("GET", is(header.getMethod()));
         assertThat("/", is(header.getFilePath()));
@@ -26,7 +26,7 @@ public class HTTPRequestLineTest {
     public void nullテスト() throws IOException {
         String line = null;
 
-        HTTPRequestLine header = new HTTPRequestLine(line);
+        HTTPRequestHeader header = new HTTPRequestHeader(line);
 
         assertThat("", is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
@@ -38,7 +38,7 @@ public class HTTPRequestLineTest {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
-        HTTPRequestLine header = new HTTPRequestLine(line);
+        HTTPRequestHeader header = new HTTPRequestHeader(line);
 
         assertThat("", is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
@@ -47,7 +47,7 @@ public class HTTPRequestLineTest {
         //二重スペース
         line = "GET  /  HTTP/1.1";
 
-        header = new HTTPRequestLine(line);
+        header = new HTTPRequestHeader(line);
         assertThat("", is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
         assertThat(null, is(header.getProtocol()));
@@ -55,7 +55,7 @@ public class HTTPRequestLineTest {
         //URI指定忘れ
         line = "GET  HTTP/1.1";
 
-        header = new HTTPRequestLine(line);
+        header = new HTTPRequestHeader(line);
 
         assertThat("GET", is(header.getMethod()));
         assertThat("", is(header.getFilePath()));

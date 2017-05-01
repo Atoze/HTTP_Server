@@ -8,16 +8,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-/**
- * HTTPリクエストを元に、レスポンスを生成する.
- */
-class HTTPHandler {
+import static jp.co.topgate.atoze.web.Server.ROOT_DIRECTORY;
 
-    HTTPHandler() {
+/**
+ * Created by atoze on 2017/05/01.
+ */
+public class StaticHandler extends Handler {
+
+    File file;
+
+    private int statusCode;
+    private String filePath;
+
+    StaticHandler(String filePath) throws IOException {
+        this.filePath = filePath;
     }
 
-    public void handlerGET(int statusCode, File file, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
+    public void response(OutputStream out) throws IOException {
+        this.file = new File(ROOT_DIRECTORY, this.filePath);
+        statusCode = checkStatusCode(request, this.file);
+
         Status status = new Status();
         status.setStatus(statusCode);
 
@@ -28,24 +38,18 @@ class HTTPHandler {
                 response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
             }
             response.setResponseBody(file);
-            response.writeTo(out, status);
+            response.writeTo(out, statusCode);
         } else {
-            this.handlerError(statusCode, out);
+            this.handlerError(out);
         }
+        System.out.println(response.getResponse());
+
     }
 
-    /**
-     * エラー発生時のステータスコードに合わせたページを設定、またはテンプレートを作成します.
-     * ページは設置したホームディレクトリの "ステータスコード".html を参照します.
-     * 存在しない場合は、テンプレートを送信します.
-     *
-     * @param statusCode 　ステータスコード
-     * @param out        書き出し先
-     */
-    public void handlerError(int statusCode, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
+    public void handlerError(OutputStream out) throws IOException {
         Status status = new Status();
         status.setStatus(statusCode);
+
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
             response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
@@ -55,7 +59,7 @@ class HTTPHandler {
             response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
                     status.getStatus() + "</h1></body></html>");
         }
-        response.writeTo(out, status);
+        response.writeTo(out, statusCode);
     }
 
     private String detectFileEncoding(File file) throws IOException {
@@ -75,4 +79,26 @@ class HTTPHandler {
 
         return result;
     }
+
+    /**
+     * HTTPリクエストに応じてステータスコードを設定します.
+     *
+     * @param request 　HTTPリクエスト
+     * @param file    要求されたファイルパス
+     * @return ステータスコード
+     */
+    private int checkStatusCode(HTTPRequest request, File file) throws IOException {
+        String host = request.getHeaderParam("HOST");
+        if (host == null || !host.startsWith(this.HOST)) {
+            return 400;
+        }
+        if (!file.exists() || !file.isFile()) {
+            return 404;
+        }
+        if (!file.canRead()) {
+            return 403;
+        }
+        return 200;
+    }
+
 }

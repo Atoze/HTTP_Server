@@ -46,12 +46,13 @@ class HTTPResponse {
     /**
      * 生成したHTTPレスポンスを書き込みます.
      *
-     * @param out    書き込み先データストリーム
-     * @param status ステータスクラス
+     * @param out 書き込み先データストリーム
      * @throws IOException 書き込みエラー
      */
-    public void writeTo(OutputStream out, Status status) throws IOException {
+    public void writeTo(OutputStream out, int statusCode) throws IOException {
         PrintWriter writer = new PrintWriter(out, true);
+        Status status = new Status();
+        status.setStatus(statusCode);
 
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
