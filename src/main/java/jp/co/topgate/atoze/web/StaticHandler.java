@@ -19,8 +19,10 @@ public class StaticHandler extends Handler {
 
     private int statusCode;
     private String filePath;
+    private String HOST;
 
-    StaticHandler(String filePath) throws IOException {
+    StaticHandler(String filePath, String host) throws IOException {
+        this.HOST = host;
         this.filePath = filePath;
     }
 
@@ -43,10 +45,9 @@ public class StaticHandler extends Handler {
             this.handlerError(out);
         }
         System.out.println(response.getResponse());
-
     }
 
-    public void handlerError(OutputStream out) throws IOException {
+    private void handlerError(OutputStream out) throws IOException {
         Status status = new Status();
         status.setStatus(statusCode);
 
@@ -89,7 +90,7 @@ public class StaticHandler extends Handler {
      */
     private int checkStatusCode(HTTPRequest request, File file) throws IOException {
         String host = request.getHeaderParam("HOST");
-        if (host == null || !host.startsWith(this.HOST)) {
+        if (host == null || !host.startsWith(HOST)) {
             return 400;
         }
         if (!file.exists() || !file.isFile()) {

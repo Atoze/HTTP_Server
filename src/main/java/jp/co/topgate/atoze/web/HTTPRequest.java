@@ -16,7 +16,9 @@ class HTTPRequest {
 
     private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
 
+    HTTPRequestLine request;
     Map<String, String> headerData = new HashMap<String, String>();
+    Map<String, String> queryData = new HashMap<String, String>();
 
     private void addRequestData(String key, String value) {
         this.headerData.put(key, value);
@@ -31,14 +33,14 @@ class HTTPRequest {
      * @throws IOException ストリームデータ取得エラー
      */
 
-    public void readRequest(InputStream is) throws IOException {
+    public void readRequest(InputStream is, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(is);
         bi.mark(REQUEST_HEAD_BYTE_LIMIT);
         BufferedReader br = new BufferedReader(new InputStreamReader(bi));
 
         StringBuilder text = new StringBuilder();
         String line = br.readLine();
-        text.append(line);
+        request = new HTTPRequestLine(line, host);
 
         while (line != null && !line.isEmpty()) {
             text.append(line);
@@ -47,41 +49,40 @@ class HTTPRequest {
                 this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
             line = br.readLine();
-            System.out.print(line);
         }
         this.requestHeader = text.toString();
 
         //RequestBody処理
-        if (line != null) {
-            if (getHeaderParam("Content-Type") == null) {
-                return;
-            }
-            line = br.readLine();
-            String[] contentTypeKey = this.getHeaderParam("Content-Type").split("/", 2);
-            if ("text".equals(contentTypeKey[0])) {
-                StringBuilder body = new StringBuilder();
-                while (line != null && !line.isEmpty()) {
-                    body.append(line);
-                    line = br.readLine();
+        if (line == null || this.getHeaderParam("Content-Type") == null) {
+            return;
+        }
+        if ("application/x-www-form-urlencoded".equals(this.getHeaderParam("Content-Type"))) {
+            int num = Integer.parseInt(this.getHeaderParam("Content-Length"));
+            char[] bodyText = new char[num];
+            br.read(bodyText, 0, num);
+            String[] queryData = String.valueOf(bodyText).split("&");
+            System.out.println(queryData.length);
+            for (int i = 0; i <= queryData.length - 1; i++) {
+                String[] queryValue = queryData[i].split("=", 2);
+                if (queryValue.length >= 2) {
+                    this.queryData.put(queryValue[0], queryValue[1]);
                 }
-                this.requestBody = body.toString().trim();
-                return;
-            } else {
-                bi.reset();
-                int offset = 0;
-                int bytesRead = 0;
-                byte[] data = new byte[Integer.parseInt(this.getHeaderParam("Content-Length"))];
-                bi.skip(requestHeader.getBytes().length + 1);
-
-                while ((bytesRead = bi.read(data, offset, data.length - offset))
-                        != -1) {
-                    offset += bytesRead;
-                    if (offset >= data.length) {
-                        break;
-                    }
-                }
-                this.requestFile = data;
             }
+            this.requestBody = String.valueOf(bodyText).trim();
+        } else {
+            bi.reset();
+            int offset = 0;
+            int bytesRead = 0;
+            byte[] data = new byte[Integer.parseInt(this.getHeaderParam("Content-Length"))];
+            bi.skip(requestHeader.getBytes().length + 1);
+            while ((bytesRead = bi.read(data, offset, data.length - offset))
+                    != -1) {
+                offset += bytesRead;
+                if (offset >= data.length) {
+                    break;
+                }
+            }
+            this.requestFile = data;
         }
     }
 
@@ -120,5 +121,9 @@ class HTTPRequest {
      */
     public byte[] getMessageFile() {
         return this.requestFile;
+    }
+
+    public String getParameter(String key) {
+        return queryData.getOrDefault(key, null);
     }
 }

@@ -49,7 +49,6 @@ class HTTPRequestHeader {
             this.filePath = URLDecoder.decode(headerLines[1], "UTF-8");
             //this.filePath = uriQuerySplitter(urlDivider(this.filePath, host));
 
-
             if (headerLines[2].startsWith("HTTP/")) {
                 this.protocol = headerLines[2];
             }

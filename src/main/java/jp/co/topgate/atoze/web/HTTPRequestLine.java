@@ -1,11 +1,8 @@
 package jp.co.topgate.atoze.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,31 +28,7 @@ public class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(InputStream input, String host) throws IOException {
-        List<Byte> list = new ArrayList<>();
-        while (true) {
-            byte b = (byte) input.read();
-            if (b == -1) {
-                break;
-            }
-            list.add(b);
-
-            int size = list.size();
-            if (2 <= size) {
-                char cr = (char) list.get(size - 2).byteValue();
-                char lf = (char) list.get(size - 1).byteValue();
-                if (cr == '\r' || lf == '\n') {
-                    break;
-                }
-            }
-        }
-
-        byte[] buffer = new byte[list.size()]; // CRLF の分減らす
-        for (int i = 0; i < list.size(); i++) {
-            buffer[i] = list.get(i);
-        }
-        String line = new String(buffer, "UTF-8");
-        System.out.println(line);
+    HTTPRequestLine(String line, String host) throws IOException {
         this.readRequestLine(line, host);
     }
 
@@ -139,13 +112,11 @@ public class HTTPRequestLine {
     }
 
     private String ProtocolVer(String protocol) {
-        //if("HTTP/".startsWith(protocol)){
         if (protocol != null) {
             return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
         } else {
             return null;
         }
-        //}
     }
 
     /**
@@ -167,9 +138,6 @@ public class HTTPRequestLine {
                 this.method = headerLines[0];
             }
             this.filePath = URLDecoder.decode(headerLines[1], "UTF-8");
-            //this.filePath = uriQuerySplitter(urlDivider(this.filePath, host));
-
-
             if (headerLines[2].startsWith("HTTP/")) {
                 this.protocolVer = headerLines[2];
             }

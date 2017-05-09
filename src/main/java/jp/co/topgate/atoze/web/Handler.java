@@ -1,7 +1,6 @@
 package jp.co.topgate.atoze.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -9,19 +8,16 @@ import java.io.OutputStream;
  */
 public abstract class Handler {
 
-    HTTPRequest request = new HTTPRequest();
+    HTTPRequest request;
     HTTPResponse response = new HTTPResponse();
 
-    String HOST;
-
-    public void request(InputStream input, String host) throws IOException {
-        request.readRequest(input);
-        HOST = host;
-        //filePath=request.getFilePath();
-
+    public void request(HTTPRequest request) throws IOException {
         System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
-        System.out.println(request.getRequestHeader());
-        System.out.println(request.getMessageBody());
+        this.request = request;
+        //request.readRequest(input);
+        //filePath=request.getFilePath();
+        //System.out.println(request.getRequestHeader());
+        //System.out.println(request.getMessageBody());
     }
 
     public void response(OutputStream out) throws IOException {

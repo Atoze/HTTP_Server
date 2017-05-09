@@ -2,6 +2,8 @@ package jp.co.topgate.atoze.web;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.Arrays;
 
 /**
  * HTTPリクエストに応じた処理を行います.
@@ -26,17 +28,32 @@ public class Server extends Thread {
         try {
             InputStream in = this.socket.getInputStream();
             OutputStream out = this.socket.getOutputStream();
-            HTTPRequestLine request = new HTTPRequestLine(in, HOST_NAME + ":" + PORT);
-            //System.out.print(request.getFilePath());
-            switch ("GET") {
-                case "GET":
-                    StaticHandler request2 = new StaticHandler(request.getFilePath());
-                    request2.request(in, HOST_NAME + ":" + PORT);
-                    request2.response(out);
-                    break;
 
-                default:
-                    break;
+            HTTPRequest httpRequest = new HTTPRequest();
+            httpRequest.readRequest(in, "localhost:" + PORT);
+            System.out.println(httpRequest.request.getFilePath());
+
+            if (httpRequest.request.getFilePath().startsWith("/program/board/")) {
+                System.out.println("DynamicMode");
+                ForumAppHandler request3 = new ForumAppHandler();
+                request3.request(httpRequest);
+                if (httpRequest.request.getMethod().equals("POST")) {
+                    if ("削除".equals(URLDecoder.decode(httpRequest.getParameter("button"), "UTF-8"))){
+                        request3.deleteThread(1);
+                        request3.response(out);
+                    }else{
+                    request3.newThread();
+                    System.out.println(request3.request.getMessageBody());
+                    System.out.println(Arrays.toString(request3.request.getMessageFile()));
+                    request3.response(out);}
+                } else {
+                    request3.response(out);
+                }
+
+            } else {
+                StaticHandler request2 = new StaticHandler(httpRequest.request.getFilePath(), HOST_NAME + ":" + PORT);
+                request2.request(httpRequest);
+                request2.response(out);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
