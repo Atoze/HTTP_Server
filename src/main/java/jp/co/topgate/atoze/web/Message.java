@@ -47,7 +47,6 @@ public class Message {
     }
 
 
-
     private void readCSV() throws IOException {
         File file = new File("");
         if (!file.exists()) {
@@ -73,7 +72,6 @@ public class Message {
         }
         return null;
     }
-
 
 
     private List readLastId(List list) throws IOException {

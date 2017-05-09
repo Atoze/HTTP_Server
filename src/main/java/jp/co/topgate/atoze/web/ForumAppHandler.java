@@ -9,14 +9,16 @@ import java.util.*;
  */
 public class ForumAppHandler extends Handler {
     static final String FORUM_TITLE = "簡易掲示板のテスト";
-    private User user = new User();
+    //private User user = new User();
     static final String CSV_FILEPATH = "./src/main/resources/program/";
     static final String CSV_FILENAME = "save.csv";
 
-    ForumData data = new ForumData();
+    ForumData data;
 
     ForumAppHandler() throws IOException {
+        data = new ForumData();
     }
+
     private String indexHTML(List list) throws IOException {
         StringBuffer builder = new StringBuffer();
         builder.append("<html>");
@@ -65,9 +67,9 @@ public class ForumAppHandler extends Handler {
 
     public void newThread() throws IOException {
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
-        //data.readCSV(file);
-        data.addList(addNewThread(request));
-        data.saveData(addNewThread(request),file);
+        String newThread = addNewThread(request);
+        data.addList(newThread);
+        data.saveData(newThread, file);
     }
 
     public void editThread() {

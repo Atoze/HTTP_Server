@@ -38,14 +38,15 @@ public class Server extends Thread {
                 ForumAppHandler request3 = new ForumAppHandler();
                 request3.request(httpRequest);
                 if (httpRequest.request.getMethod().equals("POST")) {
-                    if ("削除".equals(URLDecoder.decode(httpRequest.getParameter("button"), "UTF-8"))){
+                    if ("削除".equals(URLDecoder.decode(httpRequest.getParameter("button"), "UTF-8"))) {
                         request3.deleteThread(1);
                         request3.response(out);
-                    }else{
-                    request3.newThread();
-                    System.out.println(request3.request.getMessageBody());
-                    System.out.println(Arrays.toString(request3.request.getMessageFile()));
-                    request3.response(out);}
+                    } else {
+                        request3.newThread();
+                        System.out.println(request3.request.getMessageBody());
+                        System.out.println(Arrays.toString(request3.request.getMessageFile()));
+                        request3.response(out);
+                    }
                 } else {
                     request3.response(out);
                 }
