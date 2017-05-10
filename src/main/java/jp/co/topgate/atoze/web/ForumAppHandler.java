@@ -7,11 +7,13 @@ import java.util.*;
 /**
  * Created by atoze on 2017/05/02.
  */
-public class ForumAppHandler extends Handler {
-    static final String FORUM_TITLE = "簡易掲示板のテスト";
+public class ForumAppHandler extends HTTPHandler {
+    private static final String FORUM_TITLE = "簡易掲示板のテスト";
     //private User user = new User();
-    static final String CSV_FILEPATH = "./src/main/resources/program/";
-    static final String CSV_FILENAME = "save.csv";
+    private static final String CSV_FILEPATH = "./src/main/resources/program/";
+    private static final String CSV_FILENAME = "save.csv";
+
+    private List<String> mainData = new ArrayList<>();
 
     ForumData data;
 
@@ -70,6 +72,11 @@ public class ForumAppHandler extends Handler {
         String newThread = addNewThread(request);
         data.addList(newThread);
         data.saveData(newThread, file);
+        mainData = data.getData();
+    }
+
+    public void findThread(String name) throws IOException {
+        mainData= findUserThread(data.getData(), name);
     }
 
     public void editThread() {
@@ -77,7 +84,6 @@ public class ForumAppHandler extends Handler {
     }
 
     public void deleteThread(int id) throws IOException {
-        //File file = new File("./src/main/resources/program/save.csv");
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
 
         if (!file.exists()) {
@@ -105,6 +111,7 @@ public class ForumAppHandler extends Handler {
 
     private String addNewThread(HTTPRequest request) throws IOException {
         StringBuffer sb = new StringBuffer();
+        sb.append("id:");
         sb.append(data.getNewId(data.getData()));
         sb.append(",name:");
         sb.append(request.getParameter("name"));
@@ -121,12 +128,25 @@ public class ForumAppHandler extends Handler {
         return sb.toString();
     }
 
+    public void GETThread(){
+        mainData = data.getData();
+    }
+
+
+    public List<String> findUserThread(List<String> list, String name) throws UnsupportedEncodingException {
+        List<String> data = new ArrayList<>();
+        for (int i = 0; i <= list.size() - 1; i++) {
+            if (name.equals(this.data.getCsvData(list, i, "name"))) {
+                data.add(list.get(i));
+            }
+        }
+        return data;
+    }
 
     private void generateResponse() throws IOException {
         File file = new File("./src/main/resources/program", "index.html");
         response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
-        //response.setResponseBody(editHTML());
-        response.setResponseBody(indexHTML(data.getData()));
+        response.setResponseBody(indexHTML(mainData));
         //response.setResponseBody(file);
     }
 

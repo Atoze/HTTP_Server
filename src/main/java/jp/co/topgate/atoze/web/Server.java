@@ -1,6 +1,8 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -32,24 +34,27 @@ public class Server extends Thread {
             HTTPRequest httpRequest = new HTTPRequest();
             httpRequest.readRequest(in, "localhost:" + PORT);
             System.out.println(httpRequest.request.getFilePath());
+            System.out.println(httpRequest.getRequestHeader());
 
-            if (httpRequest.request.getFilePath().startsWith("/program/board/")) {
+            String filePath = httpRequest.request.getFilePath();
+            if (filePath.startsWith("/program/board/")) {
                 System.out.println("DynamicMode");
                 ForumAppHandler request3 = new ForumAppHandler();
                 request3.request(httpRequest);
                 if (httpRequest.request.getMethod().equals("POST")) {
-                    if ("削除".equals(URLDecoder.decode(httpRequest.getParameter("button"), "UTF-8"))) {
+                    if (filePath.endsWith("search")) {
+                        request3.findThread(URLDecoder.decode(httpRequest.getParameter("search"), "UTF-8"));
+                    } else if (filePath.endsWith("delete")) {
                         request3.deleteThread(1);
-                        request3.response(out);
                     } else {
                         request3.newThread();
                         System.out.println(request3.request.getMessageBody());
                         System.out.println(Arrays.toString(request3.request.getMessageFile()));
-                        request3.response(out);
                     }
                 } else {
-                    request3.response(out);
+                    request3.GETThread();
                 }
+                request3.response(out);
 
             } else {
                 StaticHandler request2 = new StaticHandler(httpRequest.request.getFilePath(), HOST_NAME + ":" + PORT);

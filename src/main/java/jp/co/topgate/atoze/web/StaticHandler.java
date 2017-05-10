@@ -13,7 +13,7 @@ import static jp.co.topgate.atoze.web.Server.ROOT_DIRECTORY;
 /**
  * Created by atoze on 2017/05/01.
  */
-public class StaticHandler extends Handler {
+public class StaticHandler extends HTTPHandler {
 
     File file;
 

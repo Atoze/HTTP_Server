@@ -1,7 +1,6 @@
 package jp.co.topgate.atoze.web;
 
 import java.io.*;
-import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -9,7 +8,7 @@ import java.util.*;
  */
 
 public class ForumData {
-    private List list = new ArrayList<String>();
+    private List<String> list = new ArrayList<String>();
     private static final String CSV_FILEPATH = "./src/main/resources/program/";
     private static final String CSV_FILENAME = "save.csv";
     private boolean endsLineFeed = false;
@@ -22,7 +21,7 @@ public class ForumData {
         this.list.add(data);
     }
 
-    public List getData() {
+    public List<String> getData() {
         return this.list;
     }
 
@@ -49,11 +48,11 @@ public class ForumData {
         }
     }
 
-    private List checkData(List list) {
+    private List<String> checkData(List<String> list) throws UnsupportedEncodingException {
         return checkData(list, 0, list.size() - 1);
     }
 
-    private List checkData(List list, int start, int end) {
+    private List<String> checkData(List<String> list, int start, int end) throws UnsupportedEncodingException {
         if (start > end) {
             start ^= end;
             end ^= start;
@@ -63,28 +62,33 @@ public class ForumData {
             end = list.size() - 1;
         }
         for (int i = start; i <= end; i++) {
-            String[] data = list.get(i).toString().split(",", 0);
-            if (!isNumber(data[0])) {
+            getCsvData(list, i, "id");
+            //String[] data = list.get(i).split(",", 0);
+            if (!isNumber(getCsvData(list, i, "id"))) {
                 list.remove(i);
-                if (i == 0) {
+                if (list.size() <= 0) {
                     list.add("0");
                     return list;
                 }
-                i = i - 1;
                 end = end - 1;
+                i = i - 1;
             }
         }
         return list;
     }
 
-    private int readLastId(List list) throws IOException {
+    private int readLastId(List<String> list) throws IOException {
         int index = list.size() - 1;
-        String last = list.get(index).toString();
+        System.out.println(Integer.parseInt(getCsvData(list, index, "id")));
+        return Integer.parseInt(getCsvData(list, index, "id"));
+        /*
+        String last = list.get(index);
         String[] data = last.split(",", 0);
         return Integer.parseInt(data[0]);
+        */
     }
 
-    public int getNewId(List list) throws IOException {
+    public int getNewId(List<String> list) throws IOException {
         return readLastId(list) + 1;
     }
 
@@ -93,21 +97,27 @@ public class ForumData {
         return date.toString();
     }
 
-    private String getCsvData(int id, String key) throws UnsupportedEncodingException {
-        String[] datas = this.list.get(id).toString().split(",");
-        for (String data1 : datas) {
-            String[] values = data1.split(":", 2);
+    public String getCsvData(List<String> list, int id, String key) throws UnsupportedEncodingException {
+        String[] datas = list.get(id).split(",");
+        Map<String, String> data = new HashMap<>();
+        String[] name = datas[0].split(":", 2);
+        if (name.length >= 2) {
+            data.put(name[0], name[1]);
+        } else {
+            data.put("id", name[0]);
+        }
+
+        for (int i = 1; i < datas.length; i++) {
+            String[] values = datas[i].split(":", 2);
             if (values.length >= 2) {
-                Map<String, String> data = new HashMap<>();
                 data.put(values[0], values[1]);
-                return URLDecoder.decode(data.get(key), "UTF-8");
             }
         }
-        return null;
+        return data.getOrDefault(key, null);
     }
 
-    private List readCSV(File file) throws IOException {
-        List<String> list = new ArrayList<String>();
+    private List<String> readCSV(File file) throws IOException {
+        List<String> list = new ArrayList<>();
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -126,8 +136,8 @@ public class ForumData {
         return list;
     }
 
-    private List readCSV(File file, int start, int end) throws IOException {
-        List<String> list = new ArrayList<String>();
+    private List<String> readCSV(File file, int start, int end) throws IOException {
+        List<String> list = new ArrayList<>();
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -135,6 +145,7 @@ public class ForumData {
         String line = readLine(br);
         if (line == null) {
             list.add("0");
+            return list;
         }
         for (int i = start; i <= end && line != null; i++) {
             list.add(line);
@@ -146,7 +157,7 @@ public class ForumData {
         return list;
     }
 
-    public String readLine(InputStream input) throws IOException {
+    private String readLine(InputStream input) throws IOException {
         int num = 0;
         StringBuffer sb = new StringBuffer();
         try {

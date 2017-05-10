@@ -124,6 +124,6 @@ class HTTPRequest {
     }
 
     public String getParameter(String key) {
-        return queryData.getOrDefault(key, null);
+        return queryData.getOrDefault(key, "");
     }
 }
