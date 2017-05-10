@@ -45,7 +45,8 @@ public class Server extends Thread {
                     if (filePath.endsWith("search")) {
                         request3.findThread(URLDecoder.decode(httpRequest.getParameter("search"), "UTF-8"));
                     } else if (filePath.endsWith("delete")) {
-                        request3.deleteThread(1);
+                        int id = Integer.parseInt(httpRequest.getParameter("threadID"));
+                        request3.deleteThread(id);
                     } else {
                         request3.newThread();
                         System.out.println(request3.request.getMessageBody());

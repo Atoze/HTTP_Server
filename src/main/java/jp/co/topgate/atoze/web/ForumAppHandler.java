@@ -51,6 +51,11 @@ public class ForumAppHandler extends HTTPHandler {
                 }
                 builder.append("</td>");
             }
+            builder.append("<td><form method=\"post\" action=\"/program/board/delete\"><br/>");
+            builder.append("<button type='submit' name='threadID' value='");
+            builder.append(i);
+            builder.append("'>削除</button>");
+            builder.append("</form></td>");
             builder.append("</tr>");
         }
         builder.append("</table>");
@@ -69,14 +74,14 @@ public class ForumAppHandler extends HTTPHandler {
 
     public void newThread() throws IOException {
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
-        String newThread = addNewThread(request);
-        data.addList(newThread);
-        data.saveData(newThread, file);
+        String text= addNewThread(request);
+        data.addList(text);
+        data.saveData(text, file);
         mainData = data.getData();
     }
 
     public void findThread(String name) throws IOException {
-        mainData= findUserThread(data.getData(), name);
+        mainData = findUserThread(data.getData(), name);
     }
 
     public void editThread() {
@@ -84,28 +89,10 @@ public class ForumAppHandler extends HTTPHandler {
     }
 
     public void deleteThread(int id) throws IOException {
-        File file = new File(CSV_FILEPATH, CSV_FILENAME);
-
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        FileOutputStream output = new FileOutputStream(file);
-        PrintWriter writer = new PrintWriter(output, true);
-        StringBuffer sb = new StringBuffer();
-        String line = br.readLine();
-
-        for (int i = 0; i < id; i++) {
-            //writer.println(line);
-            sb.append(line);
-            line = br.readLine();
-        }
-        sb.append("");
-        br.readLine();
-
-        System.out.println(sb.toString());
-        writer.close();
-        output.close();
+        List<String> list = data.getData();
+        list.remove(id);
+        mainData = list;
+        data.saveData(list, new File(CSV_FILEPATH, CSV_FILENAME));
     }
 
 
@@ -128,7 +115,7 @@ public class ForumAppHandler extends HTTPHandler {
         return sb.toString();
     }
 
-    public void GETThread(){
+    public void GETThread() {
         mainData = data.getData();
     }
 
@@ -136,7 +123,7 @@ public class ForumAppHandler extends HTTPHandler {
     public List<String> findUserThread(List<String> list, String name) throws UnsupportedEncodingException {
         List<String> data = new ArrayList<>();
         for (int i = 0; i <= list.size() - 1; i++) {
-            if (name.equals(this.data.getCsvData(list, i, "name"))) {
+            if (name.equals(this.data.getParameter(list, i, "name"))) {
                 data.add(list.get(i));
             }
         }
