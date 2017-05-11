@@ -16,7 +16,9 @@ class HTTPRequest {
 
     private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
 
-    HTTPRequestLine request;
+    private String host;
+
+    HTTPRequestLine httpRequestLine;
     Map<String, String> headerData = new HashMap<String, String>();
     Map<String, String> queryData = new HashMap<String, String>();
 
@@ -34,13 +36,14 @@ class HTTPRequest {
      */
 
     public void readRequest(InputStream is, String host) throws IOException {
+        this.host = host;
         BufferedInputStream bi = new BufferedInputStream(is);
         bi.mark(REQUEST_HEAD_BYTE_LIMIT);
         BufferedReader br = new BufferedReader(new InputStreamReader(bi));
 
         StringBuilder text = new StringBuilder();
         String line = br.readLine();
-        request = new HTTPRequestLine(line, host);
+        httpRequestLine = new HTTPRequestLine(line, host);
 
         while (line != null && !line.isEmpty()) {
             text.append(line);
@@ -61,7 +64,6 @@ class HTTPRequest {
             char[] bodyText = new char[num];
             br.read(bodyText, 0, num);
             String[] queryData = String.valueOf(bodyText).split("&");
-            System.out.println(queryData.length);
             for (int i = 0; i <= queryData.length - 1; i++) {
                 String[] queryValue = queryData[i].split("=", 2);
                 if (queryValue.length >= 2) {
@@ -125,5 +127,9 @@ class HTTPRequest {
 
     public String getParameter(String key) {
         return queryData.getOrDefault(key, "");
+    }
+
+    public String getHost() {
+        return host;
     }
 }

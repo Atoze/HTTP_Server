@@ -14,10 +14,10 @@ public class ServerTest {
         File file = new File("src/test/Document/test.txt");
         InputStream input = new FileInputStream(file);
 
-        File log = new File("src/test/Document/request.txt");
+        File log = new File("src/test/Document/httpRequestLine.txt");
         OutputStream output = new FileOutputStream(log);
 
         HTTPRequest request = new HTTPRequest();
-        request.readRequest(input);
+        request.readRequest(input, "localhost:8080");
     }
 }

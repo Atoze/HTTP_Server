@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.util.Arrays;
 
 /**
  * HTTPリクエストに応じた処理を行います.
@@ -14,8 +12,8 @@ import java.util.Arrays;
  */
 public class Server extends Thread {
     private final Socket socket;
-    final int PORT;
-    private final String HOST_NAME = "localhost";
+    protected final int PORT;
+    protected static final String HOST_NAME = "localhost";
     protected static final String ROOT_DIRECTORY = "./src/main/resources";
 
     public Server(Socket socket, int PORT) {
@@ -33,32 +31,18 @@ public class Server extends Thread {
 
             HTTPRequest httpRequest = new HTTPRequest();
             httpRequest.readRequest(in, "localhost:" + PORT);
-            System.out.println(httpRequest.request.getFilePath());
             System.out.println(httpRequest.getRequestHeader());
-
-            String filePath = httpRequest.request.getFilePath();
+            System.out.println(httpRequest.getMessageFile());
+            System.out.println(httpRequest.getMessageBody());
+            String filePath = httpRequest.httpRequestLine.getFilePath();
             if (filePath.startsWith("/program/board/")) {
-                System.out.println("DynamicMode");
                 ForumAppHandler request3 = new ForumAppHandler();
                 request3.request(httpRequest);
-                if (httpRequest.request.getMethod().equals("POST")) {
-                    if (filePath.endsWith("search")) {
-                        request3.findThread(URLDecoder.decode(httpRequest.getParameter("search"), "UTF-8"));
-                    } else if (filePath.endsWith("delete")) {
-                        int id = Integer.parseInt(httpRequest.getParameter("threadID"));
-                        request3.deleteThread(id);
-                    } else {
-                        request3.newThread();
-                        System.out.println(request3.request.getMessageBody());
-                        System.out.println(Arrays.toString(request3.request.getMessageFile()));
-                    }
-                } else {
-                    request3.GETThread();
-                }
+                request3.handle();
                 request3.response(out);
 
             } else {
-                StaticHandler request2 = new StaticHandler(httpRequest.request.getFilePath(), HOST_NAME + ":" + PORT);
+                StaticHandler request2 = new StaticHandler(httpRequest.httpRequestLine.getFilePath(), HOST_NAME + ":" + PORT);
                 request2.request(httpRequest);
                 request2.response(out);
             }
@@ -74,5 +58,17 @@ public class Server extends Thread {
             }
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }
+    }
+
+    public int getPORT() {
+        return PORT;
+    }
+
+    public static String getHOST_NAME() {
+        return HOST_NAME;
+    }
+
+    public static String getRootDirectory() {
+        return ROOT_DIRECTORY;
     }
 }

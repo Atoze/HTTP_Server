@@ -10,8 +10,8 @@ import java.util.Map;
  * @author atoze
  */
 class HTTPResponse {
-    private String requestBodyText;
-    private File requestBodyFile;
+    private String responseBodyText;
+    private File responseBodyFile;
     private StringBuilder response = new StringBuilder();
     private Map<String, String> responseHeaders = new HashMap<>();
 
@@ -21,7 +21,7 @@ class HTTPResponse {
      * @param text テキスト
      */
     public void setResponseBody(String text) {
-        this.requestBodyText = text;
+        this.responseBodyText = text;
     }
 
     /**
@@ -30,7 +30,7 @@ class HTTPResponse {
      * @param file ファイル
      */
     public void setResponseBody(File file) {
-        this.requestBodyFile = file;
+        this.responseBodyFile = file;
     }
 
     /**
@@ -60,14 +60,14 @@ class HTTPResponse {
             this.response.append(key + ": " + value + "\n");
         });
 
-        if (this.requestBodyText != null) {
-            this.response.append("\n").append(this.requestBodyText + "\n");
+        if (this.responseBodyText != null) {
+            this.response.append("\n").append(this.responseBodyText + "\n");
         }
         writer.println(this.response.toString());
 
-        if (this.requestBodyFile != null) {
+        if (this.responseBodyFile != null) {
             BufferedInputStream bi
-                    = new BufferedInputStream(new FileInputStream(this.requestBodyFile));
+                    = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
             try {
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
                     out.write(c);

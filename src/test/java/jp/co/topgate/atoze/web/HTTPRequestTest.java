@@ -7,30 +7,30 @@ public class HTTPRequestTest {
     /*
     @Test
     public void HTTPRequestのデータ保管するクラスのテスト() throws IOException {
-        HTTPRequest request = new HTTPRequest();
+        HTTPRequest httpRequestLine = new HTTPRequest();
         File file = new File("src/test/Document/test.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        assertThat(null, is(request.getRequestHeader()));
-        assertThat(null, is(request.getMethod()));
-        assertThat(null, is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat(null, is(httpRequestLine.getRequestHeader()));
+        assertThat(null, is(httpRequestLine.getMethod()));
+        assertThat(null, is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //データ挿入
         try {
-            request.readRequest(input, "localhost:8080");
+            httpRequestLine.readRequest(input, "localhost:8080");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        assertThat("GET", is(request.getMethod()));
-        assertThat("/public/index.html", is(request.getFilePath()));
-        assertThat("1.1", is(request.getProtocolVer()));
+        assertThat("GET", is(httpRequestLine.getMethod()));
+        assertThat("/public/index.html", is(httpRequestLine.getFilePath()));
+        assertThat("1.1", is(httpRequestLine.getProtocolVer()));
 
-        assertThat("localhost:8080", is(request.getHeaderParam("HOST")));
+        assertThat("localhost:8080", is(httpRequestLine.getHeaderParam("HOST")));
 
 
-        File test = new File("src/test/Document/request.txt");
+        File test = new File("src/test/Document/httpRequestLine.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -42,156 +42,156 @@ public class HTTPRequestTest {
         writer.println("hoge:hoge");
 
         input = new FileInputStream(test);
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("GET", is(request.getMethod()));
-        assertThat("/hoge.html", is(request.getFilePath()));
-        assertThat("1.1", is(request.getProtocolVer()));
+        assertThat("GET", is(httpRequestLine.getMethod()));
+        assertThat("/hoge.html", is(httpRequestLine.getFilePath()));
+        assertThat("1.1", is(httpRequestLine.getProtocolVer()));
 
-        assertThat("localhost:8080", is(request.getHeaderParam("HOST")));
-        assertThat("hogehoge", is(request.getHeaderParam("TEST")));
-        assertThat("hoge: hoge: hoge", is(request.getHeaderParam("MANYCOLLON")));
-        assertThat("hoge", is(request.getHeaderParam("HOGE")));
-        assertThat(null, is(request.getHeaderParam("FOO")));
+        assertThat("localhost:8080", is(httpRequestLine.getHeaderParam("HOST")));
+        assertThat("hogehoge", is(httpRequestLine.getHeaderParam("TEST")));
+        assertThat("hoge: hoge: hoge", is(httpRequestLine.getHeaderParam("MANYCOLLON")));
+        assertThat("hoge", is(httpRequestLine.getHeaderParam("HOGE")));
+        assertThat(null, is(httpRequestLine.getHeaderParam("FOO")));
     }
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("src/test/Document/request.txt");
+        File test = new File("src/test/Document/httpRequestLine.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
-        HTTPRequest request = new HTTPRequest();
+        HTTPRequest httpRequestLine = new HTTPRequest();
 
         InputStream input = new FileInputStream(test);
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
         //間違ったローカルホスト指定 そのまま返して来る
         writer.flush();
         writer.println("GET http://hogehoge/hoge.html HTTP/1.1");
 
-        request.readRequest(input, "localhost:8080");
-        assertThat("http://hogehoge/hoge.html", is(request.getFilePath()));
+        httpRequestLine.readRequest(input, "localhost:8080");
+        assertThat("http://hogehoge/hoge.html", is(httpRequestLine.getFilePath()));
 
 
     }
 
     @Test
     public void 間違ったリクエストがきた場合() throws IOException {
-        File test = new File("src/test/Document/request.txt");
+        File test = new File("src/test/Document/httpRequestLine.txt");
         OutputStream output = new FileOutputStream(test);
         PrintWriter writer = new PrintWriter(output, true);
 
-        HTTPRequest request = new HTTPRequest();
+        HTTPRequest httpRequestLine = new HTTPRequest();
         InputStream input = new FileInputStream(test);
 
         //スペースがない場合
         writer.println("GET/HTTP/1.1");
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("", is(request.getMethod()));
-        assertThat("", is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat("", is(httpRequestLine.getMethod()));
+        assertThat("", is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //スペースが2つだけの場合
         writer.flush();
         writer.println("GET https://localhost:8080/hoge.htmlHTTP/1.1");
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("", is(request.getMethod()));
-        assertThat("", is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat("", is(httpRequestLine.getMethod()));
+        assertThat("", is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //スペースが４つ以上の場合
         writer.flush();
         writer.println("GET https://localhost:8080/hoge.html HTTP/1.1 hogehoge");
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("", is(request.getMethod()));
-        assertThat("", is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat("", is(httpRequestLine.getMethod()));
+        assertThat("", is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //順番がバラバラの場合
         writer.flush();
         writer.println("HTTP/1.1 GET https://localhost:8080/hoge.html");
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("", is(request.getMethod()));
-        assertThat("GET", is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat("", is(httpRequestLine.getMethod()));
+        assertThat("GET", is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //Methodが間違っている場合
         writer.flush();
         writer.println("Foo: http://localhost:8080/hoge.html HTTP/1.1");
 
-        request.readRequest(input, "localhost:8080");
+        httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("", is(request.getMethod()));
-        assertThat("/hoge.html", is(request.getFilePath()));
-        assertThat("1.1", is(request.getProtocolVer()));
+        assertThat("", is(httpRequestLine.getMethod()));
+        assertThat("/hoge.html", is(httpRequestLine.getFilePath()));
+        assertThat("1.1", is(httpRequestLine.getProtocolVer()));
 
         //URL指定忘れ & HTTP指定が間違っている場合
         writer.flush();
         writer.println("GET  HTTPhoge");
 
-        //request.readRequest(input, "localhost:8080");
+        //httpRequestLine.readRequest(input, "localhost:8080");
 
-        assertThat("GET", is(request.getMethod()));
-        assertThat("", is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat("GET", is(httpRequestLine.getMethod()));
+        assertThat("", is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
     }
 
     @Test
     public void POSTテスト() throws IOException {
-        HTTPRequest request = new HTTPRequest();
+        HTTPRequest httpRequestLine = new HTTPRequest();
         File file = new File("src/test/Document/test_POST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        assertThat(null, is(request.getRequestHeader()));
-        //assertThat(null, is(request.getMethod()));
-        //assertThat(null, is(request.getFilePath()));
-        //assertThat(null, is(request.getProtocolVer()));
+        assertThat(null, is(httpRequestLine.getRequestHeader()));
+        //assertThat(null, is(httpRequestLine.getMethod()));
+        //assertThat(null, is(httpRequestLine.getFilePath()));
+        //assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //データ挿入
         try {
-            //request.readRequest(input, "localhost:8080");
+            //httpRequestLine.readRequest(input, "localhost:8080");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //assertThat("POST", is(request.getMethod()));
-        //assertThat("/test.html", is(request.getFilePath()));
-        //assertThat("1.1", is(request.getProtocolVer()));
+        //assertThat("POST", is(httpRequestLine.getMethod()));
+        //assertThat("/test.html", is(httpRequestLine.getFilePath()));
+        //assertThat("1.1", is(httpRequestLine.getProtocolVer()));
 
-        assertThat("key1=value1&key2=あいうえお", is(request.getMessageBody()));
-        System.out.println(request.getRequestHeader());
-        System.out.println(request.getMessageBody());
+        assertThat("key1=value1&key2=あいうえお", is(httpRequestLine.getMessageBody()));
+        System.out.println(httpRequestLine.getRequestHeader());
+        System.out.println(httpRequestLine.getMessageBody());
 
     }
 
     @Test
     public void POSTLargeテスト() throws IOException {
-        HTTPRequest request = new HTTPRequest();
+        HTTPRequest httpRequestLine = new HTTPRequest();
         File file = new File("src/test/Document/test_LargePOST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        assertThat(null, is(request.getRequestHeader()));
-        assertThat(null, is(request.getMethod()));
-        assertThat(null, is(request.getFilePath()));
-        assertThat(null, is(request.getProtocolVer()));
+        assertThat(null, is(httpRequestLine.getRequestHeader()));
+        assertThat(null, is(httpRequestLine.getMethod()));
+        assertThat(null, is(httpRequestLine.getFilePath()));
+        assertThat(null, is(httpRequestLine.getProtocolVer()));
 
         //データ挿入
         try {
-            request.readRequest(input, "localhost:8080");
+            httpRequestLine.readRequest(input, "localhost:8080");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        assertThat("POST", is(request.getMethod()));
-        assertThat("/test.html", is(request.getFilePath()));
-        assertThat("1.1", is(request.getProtocolVer()));
+        assertThat("POST", is(httpRequestLine.getMethod()));
+        assertThat("/test.html", is(httpRequestLine.getFilePath()));
+        assertThat("1.1", is(httpRequestLine.getProtocolVer()));
 
-        String largePOST = new String(request.getMessageFile(), "UTF-8");
+        String largePOST = new String(httpRequestLine.getMessageFile(), "UTF-8");
 
-        System.out.println(request.getRequestHeader());
+        System.out.println(httpRequestLine.getRequestHeader());
         System.out.println(largePOST);
 
     }*/

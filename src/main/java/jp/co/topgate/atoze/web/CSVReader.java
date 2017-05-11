@@ -5,11 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/10.
+ * CSVファイルを読み書きを行います.
+ *
+ * @author atoze
  */
 public class CSVReader {
     private boolean endsLineFeed = false;
 
+    /**
+     * CSVファイルに保存します.
+     *
+     * @author atoze
+     */
     public void saveData(String text, File file) throws IOException {
         if (!file.exists()) {
             file.createNewFile();
@@ -30,11 +37,9 @@ public class CSVReader {
         }
         FileOutputStream output = new FileOutputStream(file);
         PrintWriter writer = new PrintWriter(output, true);
-
         for (int i = 0; i <= text.size() - 1; i++) {
-            writer.println(text.get(i));
+            writer.print(text.get(i));
         }
-        //writer.println(text);
         writer.close();
         output.close();
     }
@@ -47,7 +52,7 @@ public class CSVReader {
         BufferedInputStream br = new BufferedInputStream(new FileInputStream(file));
         String line = readLine(br);
         if (line == null) {
-            return null;
+            return list;
         }
         while (line != null) {
             list.add(line);
@@ -67,7 +72,6 @@ public class CSVReader {
         BufferedInputStream br = new BufferedInputStream(new FileInputStream(file));
         String line = readLine(br);
         if (line == null) {
-            list.add("0");
             return list;
         }
         for (int i = start; i <= end && line != null; i++) {
