@@ -37,6 +37,9 @@ public class CSVReader {
         }
         FileOutputStream output = new FileOutputStream(file);
         PrintWriter writer = new PrintWriter(output, true);
+        if (!endsLineFeed) {
+            writer.print(System.getProperty("line.separator"));
+        }
         for (int i = 0; i <= text.size() - 1; i++) {
             writer.print(text.get(i));
         }

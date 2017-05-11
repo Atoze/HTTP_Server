@@ -1,30 +1,36 @@
 package jp.co.topgate.atoze.web;
 
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 /**
  * Created by atoze on 2017/04/17.
  */
 public class HTTPRequestHeaderTest {
-    /*
     @Test
     public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
         String line = "GET / HTTP/1.1";
 
-        HTTPRequestHeader header = new HTTPRequestHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
-        assertThat("/", is(header.getFilePath()));
-        assertThat("HTTP/1.1", is(header.getProtocol()));
+        assertThat("/index.html", is(header.getFilePath()));
+        assertThat("1.1", is(header.getProtocolVer()));
     }
 
     @Test
     public void nullテスト() throws IOException {
         String line = null;
 
-        HTTPRequestHeader header = new HTTPRequestHeader(line);
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
 
-        assertThat("", is(header.getMethod()));
-        assertThat(null, is(header.getFilePath()));
-        assertThat(null, is(header.getProtocol()));
+        assertThat(null, is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocolVer()));
     }
 
     @Test
@@ -32,28 +38,27 @@ public class HTTPRequestHeaderTest {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
-        HTTPRequestLine header = new HTTPRequestLine(line);
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
 
-        assertThat("", is(header.httpRequestLine.getMethod()));
-        assertThat(null, is(header.httpRequestLine.getFilePath()));
-        assertThat(null, is(header.httpRequestLine.getProtocolVer()));
+        assertThat(null, is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocolVer()));
 
         //二重スペース
         line = "GET  /  HTTP/1.1";
 
-        header = new HTTPRequest();
-        assertThat("", is(header.httpRequestLine.getMethod()));
-        assertThat(null, is(header.httpRequestLine.getFilePath()));
-        assertThat(null, is(header.httpRequestLine.getProtocolVer()));
+        header = new HTTPRequestLine(line, "localhost:8080");
+        assertThat(null, is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocolVer()));
 
         //URI指定忘れ
         line = "GET  HTTP/1.1";
 
-        header = new HTTPRequestHeader(line);
+        header = new HTTPRequestLine(line, "localhost:8080");
 
-        assertThat("GET", is(header.httpRequestLine.getMethod()));
-        assertThat("", is(header.httpRequestLine.getFilePath()));
-        assertThat("HTTP/1.1", is(header.httpRequestLine.getProtocolVer()));
-    }*/
-
+        assertThat("GET", is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat("1.1", is(header.getProtocolVer()));
+    }
 }

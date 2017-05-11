@@ -16,7 +16,7 @@ public class ContentTypeUtilTest {
 
         //通常ファイル
         String file = "test.html";
-        //assertThat("text/html", is(ContentTypeUtil.getContentType(file)));
+        assertThat("text/html", is(ContentTypeUtil.getContentType(file)));
 
         //テキストファイル
         file = "test.txt";
