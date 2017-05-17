@@ -6,36 +6,28 @@ import java.util.*;
 /**
  * Created by atoze on 2017/05/08.
  */
-public class UserData {
+class UserData {
     private int id;
     private String name;
     private String title;
     private String text;
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
     private static final String CSV_FILENAME = "user.csv";
-    private CSVReader reader = new CSVReader();
+    private CSVFile reader = new CSVFile();
     private boolean endsLineFeed = false;
-    List<String> list = new ArrayList<>();
+    List<String[]> list = new ArrayList<>();
 
     UserData() throws IOException {
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
-        list = reader.readCSV(file);
+        list = reader.readCSVWithParse(file);
     }
 
-    public void addList(String data) {
-        this.list.add(data);
-    }
-
-    public List<String> getData() throws UnsupportedEncodingException {
+    public List<String[]> getData() throws UnsupportedEncodingException {
         return checkData(this.list);
     }
 
     public void saveData(String text) throws IOException {
-        reader.saveData(text, new File(CSV_FILEPATH, CSV_FILENAME));
-    }
-
-    public void saveData(List<String> text, File file) throws IOException {
-        reader.saveData(text, file);
+        reader.writeData(text, new File(CSV_FILEPATH, CSV_FILENAME));
     }
 
     public String getTitle() {
@@ -46,11 +38,11 @@ public class UserData {
         return text;
     }
 
-    private List<String> checkData(List<String> list) throws UnsupportedEncodingException {
+    private List<String[]> checkData(List<String[]> list) throws UnsupportedEncodingException {
         return checkData(list, 0, list.size() - 1);
     }
 
-    private List<String> checkData(List<String> list, int start, int end) throws UnsupportedEncodingException {
+    private List<String[]> checkData(List<String[]> list, int start, int end) throws UnsupportedEncodingException {
         if (start > end) {
             start ^= end;
             end ^= start;
@@ -82,8 +74,8 @@ public class UserData {
         }
     }
 
-    public String getParameter(List<String> list, int id, String key) throws UnsupportedEncodingException {
-        String[] datas = list.get(id).split(",");
+    public String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+        String[] datas = list.get(id);
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);
         if (name.length >= 2) {
@@ -102,7 +94,7 @@ public class UserData {
     }
 
     public String getParameter(int id, String key) throws UnsupportedEncodingException {
-        String[] datas = list.get(id).split(",");
+        String[] datas = list.get(id);
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);
         if (name.length >= 2) {

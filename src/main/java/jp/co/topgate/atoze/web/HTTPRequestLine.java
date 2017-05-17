@@ -1,17 +1,14 @@
 package jp.co.topgate.atoze.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Created by atoze on 2017/05/01.
  */
-public class HTTPRequestLine {
+class HTTPRequestLine {
     private String method;
     private String filePath;
     private String fileQuery;
@@ -35,33 +32,6 @@ public class HTTPRequestLine {
         this.readRequestLine(line, host);
     }
 
-    HTTPRequestLine(InputStream input, String host) throws IOException {
-        List<Byte> list = new ArrayList<>();
-        while (true) {
-            byte b = (byte) input.read();
-            if (b == -1) {
-                break;
-            }
-            list.add(b);
-
-            int size = list.size();
-            if (2 <= size) {
-                char cr = (char) list.get(size - 2).byteValue();
-                char lf = (char) list.get(size - 1).byteValue();
-                if (cr == '\r' || lf == '\n') {
-                    break;
-                }
-            }
-        }
-
-        byte[] buffer = new byte[list.size()]; // CRLF の分減らす
-        for (int i = 0; i < list.size(); i++) {
-            buffer[i] = list.get(i);
-        }
-        String line = new String(buffer, "UTF-8");
-        this.readRequestLine(line, host);
-    }
-
     /**
      * HTTPジェネラルヘッダを読み込み、整理します.
      *
@@ -69,6 +39,9 @@ public class HTTPRequestLine {
      * @param host
      */
     private void readRequestLine(String line, String host) throws IOException {
+        if (line == null) {
+            return;
+        }
         this.readRequestHeader(line);
 
         this.filePath = uriQuerySplitter(urlDivider(this.filePath, host));

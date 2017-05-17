@@ -7,7 +7,7 @@ import java.io.*;
 /**
  * Created by atoze on 2017/05/01.
  */
-public abstract class HTTPHandler {
+abstract class HTTPHandler {
 
     HTTPRequest request;
     HTTPResponse response = new HTTPResponse();
@@ -29,8 +29,10 @@ public abstract class HTTPHandler {
             response.setResponseBody(errorFile);
         } else {
             response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=UTF-8");
-            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
-                    status.getStatus() + "</h1></body></html>");
+            HTML5Generator html = new HTML5Generator();
+            html.setTitle(status.getStatus());
+            html.setBody("<h1>" + status.getStatus() + "</h1>");
+            response.setResponseBody(html.getHTML());
         }
     }
 

@@ -1,6 +1,8 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,22 +11,21 @@ import java.util.Map;
  *
  * @author atoze
  */
-class HTTPRequest {
-    private String requestBody;
+public class HTTPRequest {
+    //private String requestBody;
     private byte[] requestFile;
+    private String requestText;
     private String requestHeader;
 
-    private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
+    private String method;
+    private String filePath;
+    private String protocolVer;
 
     private String host;
 
-    HTTPRequestLine httpRequestLine;
-    Map<String, String> headerData = new HashMap<String, String>();
-    Map<String, String> queryData = new HashMap<String, String>();
-
-    private void addRequestData(String key, String value) {
-        this.headerData.put(key, value);
-    }
+    private Map<String, String> headerData = new HashMap<>();
+    private Map<String, String> queryData = new HashMap<>();
+    private final static String lineFeed = System.getProperty("line.separator");
 
     /**
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
@@ -38,54 +39,34 @@ class HTTPRequest {
     public void readRequest(InputStream is, String host) throws IOException {
         this.host = host;
         BufferedInputStream bi = new BufferedInputStream(is);
-        bi.mark(REQUEST_HEAD_BYTE_LIMIT);
-        BufferedReader br = new BufferedReader(new InputStreamReader(bi));
-
         StringBuilder text = new StringBuilder();
-        String line = br.readLine();
-        httpRequestLine = new HTTPRequestLine(line, host);
+        String line = readLine(bi);
+        HTTPRequestLine httpRequestLine = new HTTPRequestLine(line, host);
+        method = httpRequestLine.getMethod();
+        filePath = httpRequestLine.getFilePath();
+        protocolVer = httpRequestLine.getProtocolVer();
 
         while (line != null && !line.isEmpty()) {
-            text.append(line);
+            text.append(line).append(lineFeed);
             String[] headerLineData = line.split(":", 2);
             if (headerLineData.length == 2) {
-                this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
+                this.headerData.put(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
-            line = br.readLine();
+            line = readLine(bi);
         }
         this.requestHeader = text.toString();
 
         //RequestBody処理
-        if (line == null || this.getHeaderParam("Content-Type") == null) {
+        String contentType = getHeaderParam("Content-Type");
+        if (line == null || contentType == null) {
             return;
         }
-        if ("application/x-www-form-urlencoded".equals(this.getHeaderParam("Content-Type"))) {
-            int num = Integer.parseInt(this.getHeaderParam("Content-Length"));
-            char[] bodyText = new char[num];
-            br.read(bodyText, 0, num);
-            String[] queryData = String.valueOf(bodyText).split("&");
-            for (int i = 0; i <= queryData.length - 1; i++) {
-                String[] queryValue = queryData[i].split("=", 2);
-                if (queryValue.length >= 2) {
-                    this.queryData.put(queryValue[0], queryValue[1]);
-                }
-            }
-            this.requestBody = String.valueOf(bodyText).trim();
-        } else {
-            bi.reset();
-            int offset = 0;
-            int bytesRead = 0;
-            byte[] data = new byte[Integer.parseInt(this.getHeaderParam("Content-Length"))];
-            bi.skip(requestHeader.getBytes().length + 1);
-            while ((bytesRead = bi.read(data, offset, data.length - offset))
-                    != -1) {
-                offset += bytesRead;
-                if (offset >= data.length) {
-                    break;
-                }
-            }
-            this.requestFile = data;
-        }
+        int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
+        HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
+        requestText = requestBody.getBodyText();
+        queryData = requestBody.getQueryData();
+
+        requestFile = requestBody.getBodyFile();
     }
 
     /**
@@ -112,8 +93,8 @@ class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public String getMessageBody() {
-        return this.requestBody;
+    public String getRequestText() {
+        return this.requestText;
     }
 
     /**
@@ -121,7 +102,7 @@ class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public byte[] getMessageFile() {
+    public byte[] getRequestFile() {
         return this.requestFile;
     }
 
@@ -129,7 +110,52 @@ class HTTPRequest {
         return queryData.getOrDefault(key, "");
     }
 
+    public String getMethod() {
+        return this.method;
+    }
+
+    public String getFilePath() {
+        return this.filePath;
+    }
+
     public String getHost() {
-        return host;
+        return this.host;
+    }
+
+    public String getProtocolVer() {
+        return this.protocolVer;
+    }
+
+    //TODO 改行コードが"\r"のみの対応
+    private String readLine(InputStream input) throws IOException {
+        int num = 0;
+        StringBuffer sb = new StringBuffer();
+        boolean r = false;
+        try {
+            while ((num = input.read()) >= 0) {
+                sb.append((char) num);
+                String line = sb.toString();
+                switch ((char) num) {
+                    case '\r':
+                        r = true;
+                        break;
+                    case '\n':
+                        if (r) {
+                            line = line.replace("\r", "");
+                        }
+                        line = line.replace("\n", "");
+                        return line;
+                    default:
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (sb.length() == 0) {
+            return null;
+        } else {
+            return sb.toString();
+        }
     }
 }

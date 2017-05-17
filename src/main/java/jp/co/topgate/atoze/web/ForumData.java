@@ -8,31 +8,32 @@ import java.util.*;
  */
 
 public class ForumData {
-    private List<String> list = new ArrayList<>();
-    private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
-    private static final String CSV_FILENAME = "save.csv";
-    private CSVReader reader = new CSVReader();
+    private List<String[]> list = new ArrayList<>();
+    private CSVFile reader = new CSVFile();
 
-    ForumData() throws IOException {
-        if (reader.readCSV(new File(CSV_FILEPATH, CSV_FILENAME)) != null) {
-            this.list = checkData(reader.readCSV(new File(CSV_FILEPATH, CSV_FILENAME)));
+    ForumData(File file) throws IOException {
+        if (reader.readCSVWithParse(file) != null) {
+            this.list = checkData(reader.readCSVWithParse(file));
         }
     }
 
-    public void addList(String data) {
-        this.list.add(data);
-    }
-
-    public List<String> getData() {
+    public List<String[]> getData() {
         return this.list;
     }
 
     public void saveData(String text, File file) throws IOException {
-        reader.saveData(text, file);
+        reader.writeData(text, file);
     }
 
-    public void saveData(List<String> text, File file) throws IOException {
-        reader.saveData(text, file);
+    public void saveData(List<String[]> list, File file) throws IOException {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            String[] text = list.get(i);
+            for (String str : text) {
+                sb.append(str).append(",");
+            }
+        }
+        saveData(sb.toString(), file);
     }
 
     public boolean isNumber(String text) {
@@ -44,11 +45,14 @@ public class ForumData {
         }
     }
 
-    private List<String> checkData(List<String> list) throws UnsupportedEncodingException {
+    private List<String[]> checkData(List<String[]> list) throws UnsupportedEncodingException {
         return checkData(list, 0, list.size() - 1);
     }
 
-    private List<String> checkData(List<String> list, int start, int end) throws UnsupportedEncodingException {
+    private List<String[]> checkData(List<String[]> list, int start, int end) throws UnsupportedEncodingException {
+        if (list.size() == 0) {
+            return list;
+        }
         if (start > end) {
             start ^= end;
             end ^= start;
@@ -58,8 +62,7 @@ public class ForumData {
             end = list.size() - 1;
         }
         for (int i = start; i <= end; i++) {
-            getParameter(list, i, "id");
-            if (!isNumber(getParameter(list, i, "id"))) {
+            if (!isNumber(getParameter(list, i, "ID"))) {
                 list.remove(i);
                 if (list.size() <= 0) {
                     return list;
@@ -71,11 +74,11 @@ public class ForumData {
         return list;
     }
 
-    public int getNewId(List<String> list) throws IOException {
+    public int getNewId(List<String[]> list) throws IOException {
         if (list == null || list.size() == 0) {
             return 0;
         }
-        return Integer.parseInt(getParameter(list, list.size() - 1, "id")) + 1;
+        return Integer.parseInt(getParameter(list, list.size() - 1, "ID")) + 1;
     }
 
     public String getDate() {
@@ -83,41 +86,49 @@ public class ForumData {
         return date.toString();
     }
 
-    public String getParameter(List<String> list, int id, String key) throws UnsupportedEncodingException {
-        String[] datas = list.get(id).split(",");
-        Map<String, String> data = new HashMap<>();
+    public static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+        String[] datas = list.get(id);
+        if(datas.length<=0){
+            return null;
+        }
+
         String[] name = datas[0].split(":", 2);
+        Map<String, String> data = new HashMap<>();
         if (name.length >= 2) {
             data.put(name[0], name[1]);
         } else {
-            data.put("id", name[0]);
+            data.put("ID", name[0]);
         }
 
         for (int i = 1; i < datas.length; i++) {
             String[] values = datas[i].split(":", 2);
-            if (values.length >= 2) {
+            if (values.length == 2) {
                 data.put(values[0], values[1]);
+            } else if (values.length == 1) {
+                data.put(String.valueOf(i), values[0]);
             }
         }
-        return data.getOrDefault(key, null);
+        return data.getOrDefault(key.toUpperCase(), "");
     }
 
-    public String getParameter(int id, String key) throws UnsupportedEncodingException {
-        String[] datas = this.list.get(id).split(",");
+    public static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
+        String[] datas = line;
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);
         if (name.length >= 2) {
             data.put(name[0], name[1]);
         } else {
-            data.put("id", name[0]);
+            data.put("ID", name[0]);
         }
 
         for (int i = 1; i < datas.length; i++) {
             String[] values = datas[i].split(":", 2);
-            if (values.length >= 2) {
+            if (values.length == 2) {
                 data.put(values[0], values[1]);
+            } else if (values.length == 1) {
+                data.put(String.valueOf(i), values[0]);
             }
         }
-        return data.getOrDefault(key, null);
+        return data.getOrDefault(key.toUpperCase(), "");
     }
 }

@@ -5,50 +5,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CSVファイルを読み書きを行います.
+ * CSVファイルの読み書きを行います.
  *
  * @author atoze
  */
-public class CSVReader {
+public class CSVFile {
     private boolean endsLineFeed = false;
+    private final static String lineFeed = System.getProperty("line.separator");
 
     /**
-     * CSVファイルに保存します.
+     * CSVファイルに書き込んで保存します.
+     * 指定されたファイルがない場合は、新しく作成します.
      *
+     * @param text
+     * @param file
      * @author atoze
      */
-    public void saveData(String text, File file) throws IOException {
+    public void writeData(String text, File file) throws IOException {
         if (!file.exists()) {
             file.createNewFile();
         }
         FileOutputStream output = new FileOutputStream(file, true);
         PrintWriter writer = new PrintWriter(output, true);
         if (!endsLineFeed) {
-            text = System.getProperty("line.separator") + text;
+            text = lineFeed + text;
         }
-        writer.println(text);
+        writer.print(text);
         writer.close();
         output.close();
     }
 
-    public void saveData(List<String> text, File file) throws IOException {
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        FileOutputStream output = new FileOutputStream(file);
-        PrintWriter writer = new PrintWriter(output, true);
-        if (!endsLineFeed) {
-            writer.print(System.getProperty("line.separator"));
-        }
-        for (int i = 0; i <= text.size() - 1; i++) {
-            writer.print(text.get(i));
-        }
-        writer.close();
-        output.close();
-    }
-
-    public List<String> readCSV(File file) throws IOException {
-        List<String> list = new ArrayList<>();
+    public List<String[]> readCSVWithParse(File file, int elementNum) throws IOException {
+        List<String[]> list = new ArrayList<>();
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -58,17 +46,20 @@ public class CSVReader {
             return list;
         }
         while (line != null) {
-            list.add(line);
+            String[] data = line.split(",", elementNum);
+            if (data.length == elementNum)
+                list.add(data);
             line = readLine(br);
         }
-        if (list.get(list.size() - 1).endsWith(System.getProperty("line.separator"))) {
+        String[] last = list.get(list.size() - 1);
+        if (last.length > elementNum && last[elementNum - 1].endsWith(lineFeed)) {
             endsLineFeed = true;
         }
         return list;
     }
 
-    public List<String> readCSV(File file, int start, int end) throws IOException {
-        List<String> list = new ArrayList<>();
+    public List<String[]> readCSVWithParse(File file) throws IOException {
+        List<String[]> list = new ArrayList<>();
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -77,11 +68,13 @@ public class CSVReader {
         if (line == null) {
             return list;
         }
-        for (int i = start; i <= end && line != null; i++) {
-            list.add(line);
+        while (line != null) {
+            String[] data = line.split(",");
+            list.add(data);
             line = readLine(br);
         }
-        if (list.get(list.size() - 1).endsWith(System.getProperty("line.separator"))) {
+        String[] last = list.get(list.size() - 1);
+        if (last.length > 0 && last[last.length - 1].endsWith(lineFeed)) {
             endsLineFeed = true;
         }
         return list;

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Created by atoze on 2017/05/01.
+ * リクエストが静的コンテンツの場合のサーバーの挙動を制御します.
  */
 public class StaticHandler extends HTTPHandler {
     private String filePath;

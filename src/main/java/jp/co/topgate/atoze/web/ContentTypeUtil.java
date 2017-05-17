@@ -1,5 +1,8 @@
 package jp.co.topgate.atoze.web;
 
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +11,7 @@ import java.util.Map;
  *
  * @author atoze
  */
-class ContentTypeUtil {
+public class ContentTypeUtil {
     private static final Map<String, String> CONTENT = new HashMap<String, String>() {
         {
             put("octet-stream", "application/octet-stream");
@@ -31,6 +34,14 @@ class ContentTypeUtil {
             put("mp4", "video/mp4");
         }
     };
+
+    public static String getKey(String value) {
+        BidiMap<String, String> bidiMap = new DualHashBidiMap<>(CONTENT);
+        if (value == null) {
+            return null;
+        }
+        return bidiMap.getOrDefault(value, null);
+    }
 
     /**
      * ファイルの拡張子を返します.

@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @author atoze
  */
-class HTTPResponse {
+public class HTTPResponse {
     private String responseBodyText;
     private File responseBodyFile;
     private StringBuilder response = new StringBuilder();

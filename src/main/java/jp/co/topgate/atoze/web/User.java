@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by atoze on 2017/05/11.
  */
-public class User {
+class User {
 
     UserData userData;
 
@@ -16,7 +16,7 @@ public class User {
     }
 
     boolean exists(String name) throws UnsupportedEncodingException {
-        List<String> list = userData.getData();
+        List<String[]> list = userData.getData();
         if (list == null || list.size() == 0) {
             return false;
         }
@@ -54,7 +54,7 @@ public class User {
         return sb.toString();
     }
 
-    public int getNewId(List<String> list) throws IOException {
+    public int getNewId(List<String[]> list) throws IOException {
         if (list == null || list.size() == 0) {
             return 0;
         }
