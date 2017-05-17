@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.Util;
 
 import java.util.HashMap;
 
@@ -7,7 +7,7 @@ import java.util.HashMap;
  *
  * @author atoze
  */
-class Status {
+public class Status {
     private int statusCode;
     private String status;
     private String statusMessage;

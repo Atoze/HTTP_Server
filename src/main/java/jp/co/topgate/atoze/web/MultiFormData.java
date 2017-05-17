@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.Util.ContentType;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +45,7 @@ public class MultiFormData {
     }
 
     public void getRequestFile(String value) {
-        ContentTypeUtil.getKey(value);
+        ContentType.getKey(value);
 
         for (int i = 0; i < this.contentData.size(); i++) {
             //Map<String, String> valueData=;

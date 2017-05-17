@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.app.forum.ForumAppHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

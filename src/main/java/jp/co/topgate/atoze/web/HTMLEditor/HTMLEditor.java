@@ -1,11 +1,11 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.HTMLEditor;
 
 import java.io.*;
 
 /**
  * Created by atoze on 2017/05/15.
  */
-abstract class HTMLGenerator {
+abstract class HTMLEditor {
     String doctype;
     String html;
     String title;

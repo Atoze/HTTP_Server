@@ -1,4 +1,6 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.HTMLEditor;
+
+import jp.co.topgate.atoze.web.Util.ContentType;
 
 import java.util.*;
 
@@ -6,7 +8,7 @@ import java.util.*;
  * Created by atoze on 2017/05/14.
  */
 
-class HTML5Generator extends HTMLGenerator {
+public class HTML5Editor extends HTMLEditor {
     private String title = "";
     private String bodyText = "";
     private String charset = "UTF-8";
@@ -16,17 +18,17 @@ class HTML5Generator extends HTMLGenerator {
     private Map<String, String[]> metaData = new HashMap<>();
     private List<String[]> stylesheet = new ArrayList<>();
 
-    HTML5Generator() {
+    public HTML5Editor() {
         doctype = "html";
         setMeta("charset", charset);
     }
 
-    HTML5Generator(String body) {
+    public HTML5Editor(String body) {
         this();
         this.bodyText = body;
     }
 
-    HTML5Generator(String title, String body) {
+    public HTML5Editor(String title, String body) {
         this(body);
         this.title = title;
     }
@@ -92,6 +94,6 @@ class HTML5Generator extends HTMLGenerator {
     }
 
     public void setStylesheet(String fileName) {
-        stylesheet.add(new String[]{fileName, ContentTypeUtil.getContentType(fileName)});
+        stylesheet.add(new String[]{fileName, ContentType.getContentType(fileName)});
     }
 }

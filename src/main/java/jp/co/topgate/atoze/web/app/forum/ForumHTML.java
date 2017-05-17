@@ -1,4 +1,6 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
+
+import jp.co.topgate.atoze.web.HTMLEditor.HTML5Editor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,12 +15,12 @@ class ForumHTML {
     private String host;
     private static final String CSS_FILENAME = "/css/board.css";
 
-    ForumHTML(String host) {
+    public ForumHTML(String host) {
         this.host = host;
     }
 
     String indexHTML(List list) throws IOException {
-        HTML5Generator html = new HTML5Generator();
+        HTML5Editor html = new HTML5Editor();
         html.setLanguage("ja");
         html.setTitle(FORUM_TITLE);
         html.setStylesheet(host + CSS_FILENAME);

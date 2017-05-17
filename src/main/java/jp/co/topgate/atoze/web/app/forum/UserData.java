@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +19,7 @@ class UserData {
 
     UserData() throws IOException {
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
-        list = reader.readCSVWithParse(file);
+        list = reader.readCSV(file);
     }
 
     public List<String[]> getData() throws UnsupportedEncodingException {
@@ -43,6 +43,9 @@ class UserData {
     }
 
     private List<String[]> checkData(List<String[]> list, int start, int end) throws UnsupportedEncodingException {
+        if (list.size() <= 0) {
+            return new ArrayList<>();
+        }
         if (start > end) {
             start ^= end;
             end ^= start;

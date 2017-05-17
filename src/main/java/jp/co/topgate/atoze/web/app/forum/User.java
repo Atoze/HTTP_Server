@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

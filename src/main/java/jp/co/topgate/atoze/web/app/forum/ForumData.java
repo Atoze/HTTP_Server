@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
 
 import java.io.*;
 import java.util.*;
@@ -7,28 +7,27 @@ import java.util.*;
  * Created by atoze on 2017/05/09.
  */
 
-public class ForumData {
+class ForumData {
     private List<String[]> list = new ArrayList<>();
     private CSVFile reader = new CSVFile();
 
     ForumData(File file) throws IOException {
-        if (reader.readCSVWithParse(file) != null) {
-            this.list = checkData(reader.readCSVWithParse(file));
+        if (reader.readCSV(file) != null) {
+            this.list = checkData(reader.readCSV(file));
         }
     }
 
-    public List<String[]> getData() {
+    List<String[]> getData() {
         return this.list;
     }
 
-    public void saveData(String text, File file) throws IOException {
+    void saveData(String text, File file) throws IOException {
         reader.writeData(text, file);
     }
 
-    public void saveData(List<String[]> list, File file) throws IOException {
+    void saveData(List<String[]> list, File file) throws IOException {
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < list.size(); i++) {
-            String[] text = list.get(i);
+        for (String[] text : list) {
             for (String str : text) {
                 sb.append(str).append(",");
             }
@@ -36,7 +35,7 @@ public class ForumData {
         saveData(sb.toString(), file);
     }
 
-    public boolean isNumber(String text) {
+    boolean isNumber(String text) {
         try {
             Integer.parseInt(text);
             return true;
@@ -74,19 +73,19 @@ public class ForumData {
         return list;
     }
 
-    public int getNewId(List<String[]> list) throws IOException {
+    int getNewId(List<String[]> list) throws IOException {
         if (list == null || list.size() == 0) {
             return 0;
         }
         return Integer.parseInt(getParameter(list, list.size() - 1, "ID")) + 1;
     }
 
-    public String getDate() {
+    String getDate() {
         Date date = new Date();
         return date.toString();
     }
 
-    public static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String[] datas = list.get(id);
         if(datas.length<=0){
             return null;
@@ -111,7 +110,7 @@ public class ForumData {
         return data.getOrDefault(key.toUpperCase(), "");
     }
 
-    public static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
+   static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
         String[] datas = line;
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);

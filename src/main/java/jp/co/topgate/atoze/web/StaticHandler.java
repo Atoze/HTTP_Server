@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.Util.ContentType;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,14 +18,14 @@ public class StaticHandler extends HTTPHandler {
         this.filePath = filePath;
     }
 
-    void generateResponse(){
+    public void generateResponse(){
         File file = new File(Server.ROOT_DIRECTORY, filePath);
         statusCode = checkStatusCode(request, file);
         if (statusCode == 200) {
-            if (Arrays.asList("html", "txt").contains(ContentTypeUtil.getFileExtension(file.toString()))) {
-                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
+            if (Arrays.asList("html", "txt").contains(ContentType.getFileExtension(file.toString()))) {
+                response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
             } else {
-                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
+                response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()));
             }
             response.setResponseBody(file);
 

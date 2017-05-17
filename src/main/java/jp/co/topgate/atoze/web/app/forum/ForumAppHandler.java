@@ -1,4 +1,6 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
+
+import jp.co.topgate.atoze.web.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,12 +57,12 @@ public class ForumAppHandler extends HTTPHandler {
     private String html;
 
 
-    ForumAppHandler() throws IOException {
+    public ForumAppHandler() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         mainData = forumData.getData();
     }
 
-    void handle() throws IOException {
+    public void handle() throws IOException {
         String method = request.getMethod();
         switch (method) {
             case "GET":
@@ -97,7 +99,7 @@ public class ForumAppHandler extends HTTPHandler {
         newThread();
     }
 
-    public void newThread() throws IOException {
+    private void newThread() throws IOException {
         List<String[]> list = mainData;//forumData.getData();
         User user = new User();
         String name = request.getParameter("name");
@@ -173,7 +175,7 @@ public class ForumAppHandler extends HTTPHandler {
         mainData = forumData.getData();
     }
 
-    void generateResponse() {
+    public void generateResponse() {
         response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
 
         if (statusCode == 0 || statusCode == 200) {

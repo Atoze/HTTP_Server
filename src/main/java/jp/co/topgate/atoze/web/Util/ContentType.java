@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.Util;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author atoze
  */
-public class ContentTypeUtil {
+public class ContentType {
     private static final Map<String, String> CONTENT = new HashMap<String, String>() {
         {
             put("octet-stream", "application/octet-stream");
