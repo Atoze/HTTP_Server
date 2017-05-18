@@ -21,9 +21,9 @@ public class HTTPRequestTest {
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(httpRequest.getRequestHeader()));
-//        assertThat(null, is(httpRequest.getMethod()));
-//        assertThat(null, is(httpRequest.getFilePath()));
-        //       assertThat(null, is(httpRequest.getProtocolVer()));
+        assertThat(null, is(httpRequest.getMethod()));
+        assertThat(null, is(httpRequest.getFilePath()));
+        assertThat(null, is(httpRequest.getProtocolVer()));
 
         //データ挿入
         try {
@@ -150,28 +150,28 @@ public class HTTPRequestTest {
 
     @Test
     public void POSTテスト() throws IOException {
-        HTTPRequest httpRequestLine = new HTTPRequest();
+        HTTPRequest httpRequest = new HTTPRequest();
         File file = new File("src/test/Document/test_POST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        assertThat(null, is(httpRequestLine.getRequestHeader()));
-        //assertThat(null, is(httpRequestLine.getMethod()));
-        //assertThat(null, is(httpRequestLine.getFilePath()));
-        //assertThat(null, is(httpRequestLine.getProtocolVer()));
+        assertThat(null, is(httpRequest.getRequestHeader()));
+        assertThat(null, is(httpRequest.getMethod()));
+        assertThat(null, is(httpRequest.getFilePath()));
+        assertThat(null, is(httpRequest.getProtocolVer()));
 
         //データ挿入
         try {
-            httpRequestLine.readRequest(input, "localhost:8080");
+            httpRequest.readRequest(input, "localhost:8080");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //assertThat("POST", is(httpRequestLine.getMethod()));
-        //assertThat("/test.html", is(httpRequestLine.getFilePath()));
-        //assertThat("1.1", is(httpRequestLine.getProtocolVer()));
+        assertThat("POST", is(httpRequest.getMethod()));
+        assertThat("/test.html", is(httpRequest.getFilePath()));
+        assertThat("1.1", is(httpRequest.getProtocolVer()));
 
-        assertThat("key1=value1&key2=あいうえお", is(httpRequestLine.getRequestText()));
-        System.out.println(httpRequestLine.getRequestHeader());
-        System.out.println(httpRequestLine.getRequestText());
+        assertThat("key1=value1&key2=あいうえお", is(httpRequest.getRequestText()));
+        System.out.println(httpRequest.getRequestHeader());
+        System.out.println(httpRequest.getRequestText());
 
     }
 
@@ -182,9 +182,9 @@ public class HTTPRequestTest {
         InputStream input = new FileInputStream(file);
 
         assertThat(null, is(httpRequest.getRequestHeader()));
-//        assertThat(null, is(httpRequest.httpRequestLine.getMethod()));
-//        assertThat(null, is(httpRequestLine.httpRequestLine.getFilePath()));
-//        assertThat(null, is(httpRequestLine.httpRequestLine.getProtocolVer()));
+        assertThat(null, is(httpRequest.getMethod()));
+        assertThat(null, is(httpRequest.getFilePath()));
+        assertThat(null, is(httpRequest.getProtocolVer()));
 
         //データ挿入
         try {

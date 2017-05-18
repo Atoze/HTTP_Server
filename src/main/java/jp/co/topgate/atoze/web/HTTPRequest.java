@@ -18,6 +18,7 @@ public class HTTPRequest {
     private String requestHeader;
 
     private String method;
+    private String headQuery;
     private String filePath;
     private String protocolVer;
 
@@ -25,6 +26,11 @@ public class HTTPRequest {
 
     private Map<String, String> headerData = new HashMap<>();
     private Map<String, String> queryData = new HashMap<>();
+
+    private String headerQuery;
+    private String query;
+    private String bodyQuery;
+
     private final static String lineFeed = System.getProperty("line.separator");
 
     /**
@@ -43,6 +49,8 @@ public class HTTPRequest {
         String line = readLine(bi);
         HTTPRequestLine httpRequestLine = new HTTPRequestLine(line, host);
         method = httpRequestLine.getMethod();
+        //headQuery = httpRequestLine.getHeadQuery();
+        headerQuery = httpRequestLine.getHeadQuery();//TODO
         filePath = httpRequestLine.getFilePath();
         protocolVer = httpRequestLine.getProtocolVer();
 
@@ -64,7 +72,8 @@ public class HTTPRequest {
         int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
         HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
         requestText = requestBody.getBodyText();
-        queryData = requestBody.getQueryData();
+        //bodyQuery = requestBody.getQuery();
+        //queryData = requestBody.getQueryData();
 
         requestFile = requestBody.getBodyFile();
     }
@@ -107,7 +116,11 @@ public class HTTPRequest {
     }
 
     public String getParameter(String key) {
-        return queryData.getOrDefault(key, "");
+        String body = "";
+        if ("GET".equals(method))body=headerQuery;
+        if ("POST".equals(method))body=requestText;
+
+        return readQueryData(body).getOrDefault(key, "");
     }
 
     public String getMethod() {
@@ -125,6 +138,23 @@ public class HTTPRequest {
     public String getProtocolVer() {
         return this.protocolVer;
     }
+
+    public String getHeadQuery() {
+        return this.headQuery;
+    }
+
+    private Map<String, String> readQueryData(String body) {
+        Map<String, String> queryData = new HashMap<>();
+        String[] data = body.split("&");
+        for (int i = 0; i <= data.length - 1; i++) {
+            String[] queryValue = data[i].split("=", 2);
+            if (queryValue.length >= 2) {
+                queryData.put(queryValue[0], queryValue[1]);
+            }
+        }
+        return queryData;
+    }
+
 
     //TODO 改行コードが"\r"のみの対応
     private String readLine(InputStream input) throws IOException {

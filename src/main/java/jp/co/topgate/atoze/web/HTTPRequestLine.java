@@ -11,7 +11,7 @@ import java.util.Set;
 class HTTPRequestLine {
     private String method;
     private String filePath;
-    private String fileQuery;
+    private String headQuery;
     private String protocolVer;
 
     private final static Set<String> METHODS = new HashSet<>();
@@ -57,7 +57,7 @@ class HTTPRequestLine {
      *
      * @return メソッド名
      */
-    public String getMethod() {
+    String getMethod() {
         return this.method;
     }
 
@@ -66,7 +66,7 @@ class HTTPRequestLine {
      *
      * @return ファイルパス
      */
-    public String getFilePath() {
+    String getFilePath() {
         return this.filePath;
     }
 
@@ -100,7 +100,7 @@ class HTTPRequestLine {
 
         String urlQuery[] = filePath.split("\\?", 2);
         if (urlQuery[0] != filePath) {
-            this.fileQuery = urlQuery[1];
+            this.headQuery = urlQuery[1];
         }
         return urlQuery[0];
     }
@@ -110,7 +110,7 @@ class HTTPRequestLine {
      *
      * @return HTTPプロトコルバージョンの値
      */
-    public String getProtocolVer() {
+    String getProtocolVer() {
         return this.protocolVer;
     }
 
@@ -127,8 +127,8 @@ class HTTPRequestLine {
      *
      * @return クエリ値
      */
-    public String getFileQuery() {
-        return this.fileQuery;
+    public String getHeadQuery() {
+        return this.headQuery;
     }
 
     private void readRequestHeader(String line) throws IOException {

@@ -29,7 +29,7 @@ public class HTTPRequestHeaderTest {
         HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
 
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getFilePath()));
         assertThat(null, is(header.getProtocolVer()));
     }
 

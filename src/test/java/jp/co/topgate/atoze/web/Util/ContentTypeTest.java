@@ -1,6 +1,5 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.Util;
 
-import jp.co.topgate.atoze.web.Util.ContentType;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

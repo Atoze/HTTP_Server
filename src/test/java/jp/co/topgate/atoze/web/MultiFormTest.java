@@ -5,6 +5,12 @@ import org.junit.Test;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by atoze on 2017/04/18.
@@ -25,8 +31,8 @@ public class MultiFormTest {
         sb.append("Content-Type: image/plain").append(lineFeed).append(lineFeed);
         byte[] header = (lineFeed + sb.toString()).getBytes();
 
-        File img = new File("src/test/Document/loading.gif");
-        BufferedImage originalImage = ImageIO.read(img);
+        String img = "src/test/Document/loading.gif";
+        BufferedImage originalImage = ImageIO.read(new File(img));
         byte[] imgByte = getBytesFromImage(originalImage, "gif");
 
         File file = new File("src/test/Document/test_imagePOST.txt");
@@ -57,7 +63,14 @@ public class MultiFormTest {
 
         // 出力バイト
         BufferedImage outputImage = getImageFromBytes(test);
-        ImageIO.write(outputImage, "gif", new File("src/test/Document/loading2.gif"));
+        String rendered = "src/test/Document/loading2.gif";
+        ImageIO.write(outputImage, "gif", new File(rendered));
+
+        assertThat(true, is(fileCompare(img, rendered)));
+    }
+
+    public boolean fileCompare(String fileA, String fileB) throws IOException {
+        return Arrays.equals(Files.readAllBytes(Paths.get(fileA)), Files.readAllBytes(Paths.get(fileB)));
     }
 
     public static byte[] getBytesFromImage(BufferedImage img, String format) throws IOException {

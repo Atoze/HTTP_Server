@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/02.
+ *
  */
 public class ForumAppHandler extends HTTPHandler {
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
@@ -27,35 +27,8 @@ public class ForumAppHandler extends HTTPHandler {
             "ICON"
     );
 
-    enum KEY {
-        ID(0, "id"),
-        NAME(1, "name"),
-        TITLE(2, "title"),
-        TEXT(3, "text"),
-        PASSWORD(4, "password"),
-        DATE(5, "date"),
-        ICON(6, "icon");
-
-        public final int id;
-        public final String key;
-
-        KEY(int id, String key) {
-            this.id = id;
-            this.key = key;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getKey() {
-            return key;
-        }
-    }
-
     private List<String[]> mainData = new ArrayList<>();
     private String html;
-
 
     public ForumAppHandler() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
@@ -72,18 +45,20 @@ public class ForumAppHandler extends HTTPHandler {
                 postHandler();
                 break;
         }
-        System.out.println(request.getHost());
         setHTML(new ForumHTML(request.getHost()).indexHTML(mainData));
     }
 
-    void getHandler() {
+    void getHandler() throws IOException {
+        if (request.getFilePath().endsWith("search")) {
+            findThread(request.getParameter("search"));
+            return;
+        }
         GETThread();
     }
 
     void postHandler() throws IOException {
         if (request.getFilePath().endsWith("search")) {
             findThread(request.getParameter("search"));
-
             return;
         }
         if (request.getParameter("_method").equals("DELETE")) {

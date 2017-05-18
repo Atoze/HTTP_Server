@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.HTMLEditor.HTML5Editor;
+import jp.co.topgate.atoze.web.HTMLEditor.HTMLEditor;
 import jp.co.topgate.atoze.web.Util.ContentType;
 import jp.co.topgate.atoze.web.Util.Status;
 import org.mozilla.universalchardet.UniversalDetector;
@@ -32,8 +32,8 @@ public abstract class HTTPHandler {
             response.setResponseBody(errorFile);
         } else {
             response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=UTF-8");
-            HTML5Editor html = new HTML5Editor();
-            html.setTitle(status.getStatus());
+            HTMLEditor html = new HTMLEditor();
+            //html.setTitle(status.getStatus());
             html.setBody("<h1>" + status.getStatus() + "</h1>");
             response.setResponseBody(html.getHTML());
         }
