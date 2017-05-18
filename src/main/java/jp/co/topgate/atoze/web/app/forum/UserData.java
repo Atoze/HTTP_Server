@@ -23,7 +23,7 @@ class UserData {
     }
 
     public List<String[]> getData() throws UnsupportedEncodingException {
-        return checkData(this.list);
+        return checkData(list);
     }
 
     public void saveData(String text) throws IOException {

@@ -46,7 +46,7 @@ class User {
     String oldUser(String name, int id) throws IOException {
         StringBuffer sb = new StringBuffer();
         sb.append("id:");
-        //sb.append(userData.getParameter());
+        //sb.append(userData.getQueryParam());
         sb.append("name:");
         sb.append(name);
         sb.append("MessageID:");

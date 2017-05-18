@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.Util.ContentType;
+import jp.co.topgate.atoze.web.util.ContentType;
 
 import java.io.File;
 import java.io.IOException;

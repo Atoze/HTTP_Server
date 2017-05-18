@@ -1,6 +1,7 @@
-package jp.co.topgate.atoze.web.Util;
+package jp.co.topgate.atoze.web.util;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ステータスコードを受け取り、それに対応したステータスメッセージを返します.
@@ -12,31 +13,32 @@ public class Status {
     private String status;
     private String statusMessage;
 
-    private String StatusParameter(int status) {
-        final HashMap<Integer, String> content = new HashMap<Integer, String>() {
-            {
-                put(200, "OK");
+    private static final Map<Integer, String> STATUS = new HashMap<Integer, String>() {
+        {
+            put(200, "OK");
 
-                put(304, "NotModified");
+            put(304, "NotModified");
 
-                put(400, "Bad Request");
-                put(403, "Forbidden");
-                put(404, "Not Found");
-                put(405, "Method Not Allowed");
-                put(408, "Request Timeout");
-                put(411, "Length Required");
+            put(400, "Bad Request");
+            put(403, "Forbidden");
+            put(404, "Not Found");
+            put(405, "Method Not Allowed");
+            put(408, "Request Timeout");
+            put(411, "Length Required");
 
-                put(500, "Internal Server Error");
-                put(503, "Service Unavailable");
-                put(504, "Gateway Timeout");
-                put(505, "HTTP Version Not Supported");
-            }
-        };
-        if (content.containsKey(status)) {
-            statusMessage = content.get(status);
-            return status + " " + content.get(status);
+            put(500, "Internal Server Error");
+            put(503, "Service Unavailable");
+            put(504, "Gateway Timeout");
+            put(505, "HTTP Version Not Supported");
+        }
+    };
+
+    private String getStatusParameter(int statusCode) {
+        if (STATUS.containsKey(statusCode)) {
+            statusMessage = STATUS.get(statusCode);
+            return statusCode + " " + STATUS.get(statusCode);
         } else {
-            return this.status + "Unknown Status";
+            return this.statusCode + " Unknown Status";
         }
     }
 
@@ -47,7 +49,7 @@ public class Status {
      */
     public void setStatus(int i) {
         this.statusCode = i;
-        this.status = StatusParameter(i);
+        this.status = getStatusParameter(i);
     }
 
     /**

@@ -4,21 +4,21 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by atoze on 2017/05/09.
+ *
  */
 
 class ForumData {
-    private List<String[]> list = new ArrayList<>();
+    private List<String[]> data = new ArrayList<>();
     private CSVFile reader = new CSVFile();
 
     ForumData(File file) throws IOException {
         if (reader.readCSV(file) != null) {
-            this.list = checkData(reader.readCSV(file));
+            data = checkData(reader.readCSV(file));
         }
     }
 
     List<String[]> getData() {
-        return this.list;
+        return data;
     }
 
     void saveData(String text, File file) throws IOException {

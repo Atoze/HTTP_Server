@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.Util.Status;
+import jp.co.topgate.atoze.web.util.Status;
 import org.junit.Test;
 
 import java.io.File;

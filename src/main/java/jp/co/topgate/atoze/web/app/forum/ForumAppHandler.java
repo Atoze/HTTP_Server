@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * 掲示板の挙動を制御します.
  */
 public class ForumAppHandler extends HTTPHandler {
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
@@ -50,7 +50,7 @@ public class ForumAppHandler extends HTTPHandler {
 
     void getHandler() throws IOException {
         if (request.getFilePath().endsWith("search")) {
-            findThread(request.getParameter("search"));
+            findThread(request.getQueryParam("search"));
             return;
         }
         GETThread();
@@ -58,12 +58,12 @@ public class ForumAppHandler extends HTTPHandler {
 
     void postHandler() throws IOException {
         if (request.getFilePath().endsWith("search")) {
-            findThread(request.getParameter("search"));
+            findThread(request.getQueryParam("search"));
             return;
         }
-        if (request.getParameter("_method").equals("DELETE")) {
-            if (forumData.isNumber(request.getParameter("threadID"))) {
-                int id = Integer.parseInt(request.getParameter("threadID"));
+        if (request.getQueryParam("_method").equals("DELETE")) {
+            if (forumData.isNumber(request.getQueryParam("threadID"))) {
+                int id = Integer.parseInt(request.getQueryParam("threadID"));
                 if (id <= mainData.size() - 1) {
                     deleteThread(id);
                     return;
@@ -75,9 +75,9 @@ public class ForumAppHandler extends HTTPHandler {
     }
 
     private void newThread() throws IOException {
-        List<String[]> list = mainData;//forumData.getData();
+        List<String[]> list = mainData;
         User user = new User();
-        String name = request.getParameter("name");
+        String name = request.getQueryParam("name");
         if (!user.exists(name)) {
             user.saveData(user.newUser(name, forumData.getNewId(forumData.getData())));
         }
@@ -110,7 +110,7 @@ public class ForumAppHandler extends HTTPHandler {
         if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
             return;
         }
-        if (request.getParameter("password").equals(ForumData.getParameter(list, id, "PASSWORD"))) {
+        if (request.getQueryParam("password").equals(ForumData.getParameter(list, id, "PASSWORD"))) {
             list.remove(id);
             mainData = list;
             forumData.saveData(list, new File(CSV_FILEPATH, CSV_FILENAME));
@@ -119,6 +119,9 @@ public class ForumAppHandler extends HTTPHandler {
         System.out.println("パスワードが合っていません");
     }
 
+    /**
+     * 掲示板の挙動を制御します.
+     */
     private String[] addNewThread(HTTPRequest request) throws IOException {
         List<String> saveData = new ArrayList<>();
         for (int i = 0; i < key.size(); i++) {
@@ -135,7 +138,7 @@ public class ForumAppHandler extends HTTPHandler {
                     break;
 
                 default:
-                    saveData.add(key + ":" + request.getParameter(key.toLowerCase()));
+                    saveData.add(key + ":" + request.getQueryParam(key.toLowerCase()));
             }
         }
         return saveData.toArray(new String[0]);
@@ -154,7 +157,7 @@ public class ForumAppHandler extends HTTPHandler {
         response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
 
         if (statusCode == 0 || statusCode == 200) {
-            response.setResponseBody(this.html);
+            response.setResponseBody(html);
         } else {
             generateErrorPage(statusCode);
         }

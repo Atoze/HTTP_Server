@@ -1,6 +1,6 @@
-package jp.co.topgate.atoze.web.HTMLEditor;
+package jp.co.topgate.atoze.web.htmlEditor;
 
-import jp.co.topgate.atoze.web.Util.ContentType;
+import jp.co.topgate.atoze.web.util.ContentType;
 
 import java.util.*;
 
@@ -45,28 +45,28 @@ public class HTMLEditor {
         headData.clear();
     }
 
-    public void setHead(String headData) {
+    public void setHead(String head) {
         initHeader();
-        this.headData.add(headData);
+        headData.add(head);
     }
 
-    public void addHead(String header) {
-        this.headData.add(header);
+    public void addHead(String head) {
+        headData.add(head);
     }
 
-    public void setBody(String bodyData) {
+    public void setBody(String body) {
         initBody();
-        this.bodyData.add(bodyData);
+        bodyData.add(body);
     }
 
     public void addBody(String body) {
-        this.bodyData.add(body);
+        bodyData.add(body);
     }
 
     private void generateHead() {
         String head = "";
-        for (String HeadData : this.headData) {
-            head += HeadData + LINE_FEED;
+        for (String headData : this.headData) {
+            head += headData + LINE_FEED;
         }
         this.head = head + generateMetaDataField() + generateLinkField();
     }
@@ -78,8 +78,8 @@ public class HTMLEditor {
 
     private void generateBody() {
         String body = "";
-        for (String BodyData : this.bodyData) {
-            body += BodyData + LINE_FEED;
+        for (String bodyData : this.bodyData) {
+            body += bodyData + LINE_FEED;
         }
         this.body = body;
     }
@@ -104,7 +104,7 @@ public class HTMLEditor {
         generateBody();
         String bodyField = generateMainField("body", body, getAttribute("body")) + LINE_FEED;
         String content = headField + bodyField;
-        this.html = doctypeField + generateMainField("html", content, getAttribute("html"));
+        html = doctypeField + generateMainField("html", content, getAttribute("html"));
     }
 
     private String generateMainField(String tag, String content, List<String[]> attribute) {

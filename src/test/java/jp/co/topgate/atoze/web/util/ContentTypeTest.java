@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web.Util;
+package jp.co.topgate.atoze.web.util;
 
 import org.junit.Test;
 

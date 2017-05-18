@@ -18,7 +18,6 @@ public class HTTPRequest {
     private String requestHeader;
 
     private String method;
-    private String headQuery;
     private String filePath;
     private String protocolVer;
 
@@ -28,8 +27,6 @@ public class HTTPRequest {
     private Map<String, String> queryData = new HashMap<>();
 
     private String headerQuery;
-    private String query;
-    private String bodyQuery;
 
     private final static String lineFeed = System.getProperty("line.separator");
 
@@ -47,10 +44,12 @@ public class HTTPRequest {
         BufferedInputStream bi = new BufferedInputStream(is);
         StringBuilder text = new StringBuilder();
         String line = readLine(bi);
-        HTTPRequestLine httpRequestLine = new HTTPRequestLine(line, host);
+
+        HTTPRequestLine httpRequestLine = new HTTPRequestLine();
+        httpRequestLine.readRequestLine(line, host);
+
         method = httpRequestLine.getMethod();
-        //headQuery = httpRequestLine.getHeadQuery();
-        headerQuery = httpRequestLine.getHeadQuery();//TODO
+        headerQuery = httpRequestLine.getHeadQuery();
         filePath = httpRequestLine.getFilePath();
         protocolVer = httpRequestLine.getProtocolVer();
 
@@ -72,10 +71,9 @@ public class HTTPRequest {
         int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
         HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
         requestText = requestBody.getBodyText();
-        //bodyQuery = requestBody.getQuery();
-        //queryData = requestBody.getQueryData();
-
         requestFile = requestBody.getBodyFile();
+
+        this.queryData = generateQueryMap();
     }
 
     /**
@@ -115,12 +113,8 @@ public class HTTPRequest {
         return this.requestFile;
     }
 
-    public String getParameter(String key) {
-        String body = "";
-        if ("GET".equals(method))body=headerQuery;
-        if ("POST".equals(method))body=requestText;
-
-        return readQueryData(body).getOrDefault(key, "");
+    public String getQueryParam(String key) {
+        return queryData.getOrDefault(key, "");
     }
 
     public String getMethod() {
@@ -139,11 +133,12 @@ public class HTTPRequest {
         return this.protocolVer;
     }
 
-    public String getHeadQuery() {
-        return this.headQuery;
-    }
 
-    private Map<String, String> readQueryData(String body) {
+    private Map<String, String> generateQueryMap() {
+        String body;
+        if ("GET".equals(method)) body = headerQuery;
+        else body = requestText;
+
         Map<String, String> queryData = new HashMap<>();
         String[] data = body.split("&");
         for (int i = 0; i <= data.length - 1; i++) {
@@ -154,7 +149,6 @@ public class HTTPRequest {
         }
         return queryData;
     }
-
 
     //TODO 改行コードが"\r"のみの対応
     private String readLine(InputStream input) throws IOException {

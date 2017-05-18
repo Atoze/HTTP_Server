@@ -1,8 +1,8 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.HTMLEditor.HTMLEditor;
-import jp.co.topgate.atoze.web.Util.ContentType;
-import jp.co.topgate.atoze.web.Util.Status;
+import jp.co.topgate.atoze.web.htmlEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.util.ContentType;
+import jp.co.topgate.atoze.web.util.Status;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.*;
@@ -17,7 +17,6 @@ public abstract class HTTPHandler {
     protected int statusCode;
 
     public void request(HTTPRequest request) throws IOException {
-        System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
         this.request = request;
     }
 
@@ -66,7 +65,7 @@ public abstract class HTTPHandler {
         return result;
     }
 
-    public void response(OutputStream out) throws IOException {
+    public void response(OutputStream out) {
         generateResponse();
         response.writeTo(out, statusCode);
     }

@@ -14,7 +14,15 @@ class HTTPRequestBody {
     private byte[] bodyFile;
     private Map<String, String> queryData = new HashMap<>();
 
+    private int length;
+
+
     HTTPRequestBody(InputStream input, String contentType, int length) throws IOException {
+        this.length = length;
+        handler(input, contentType);
+    }
+
+    private void handler(InputStream input, String contentType) throws IOException{
         String[] contentTypeValue = contentType.split(";");
         switch (contentTypeValue[0]) {
             case "application/x-www-form-urlencoded":
@@ -23,14 +31,17 @@ class HTTPRequestBody {
                 break;
 
             case "multipart/form-data":
+                /* //TODO完成させる
                 String[] boundary = contentTypeValue[1].split("=", 2);
                 MultiFormData multiFormData = new MultiFormData(input,length);
                 bodyFile = multiFormData.getByteData(0);
                 break;
+                */
 
             default:
                 bodyFile = readBodyFile(input, length);
         }
+
     }
 
     private String readBodyText(InputStream input, int length) throws IOException {

@@ -1,7 +1,4 @@
-package jp.co.topgate.atoze.web.Util;
-
-import org.apache.commons.collections4.BidiMap;
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+package jp.co.topgate.atoze.web.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +9,7 @@ import java.util.Map;
  * @author atoze
  */
 public class ContentType {
-    private static final Map<String, String> CONTENT = new HashMap<String, String>() {
+    private static final Map<String, String> CONTENT_TYPE_LIST = new HashMap<String, String>() {
         {
             put("octet-stream", "application/octet-stream");
             put("plain", "text/plain");
@@ -35,14 +32,15 @@ public class ContentType {
         }
     };
 
-    public static String getKey(String value) {
-        BidiMap<String, String> bidiMap = new DualHashBidiMap<>(CONTENT);
+    /*
+    public static String getExtension(String value) {
+        BidiMap<String, String> bidiMap = new DualHashBidiMap<>(CONTENT_TYPE_LIST);
         if (value == null) {
             return null;
         }
         return bidiMap.getOrDefault(value, null);
     }
-
+*/
     /**
      * ファイルの拡張子を返します.
      *
@@ -61,22 +59,22 @@ public class ContentType {
     }
 
     /**
-     * Content-Typeを返します.
+     * ファイルからContent-Typeを返します.
      *
      * @param fileName ファイル名
      * @return Content-Type
      */
     public static String getContentType(String fileName) {
-        fileName = getFileExtension(fileName);
+        String extension = getFileExtension(fileName);
         if (fileName == null) {
             return null;
         }
 
-        if (CONTENT.containsKey(fileName)) {
-            return CONTENT.get(fileName);
+        if (CONTENT_TYPE_LIST.containsKey(extension)) {
+            return CONTENT_TYPE_LIST.get(fileName);
         } else {
             //DefaultContentType
-            return CONTENT.get("octet-stream");
+            return CONTENT_TYPE_LIST.get("octet-stream");
         }
     }
 }

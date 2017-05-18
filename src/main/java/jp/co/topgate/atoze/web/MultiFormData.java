@@ -1,7 +1,5 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.Util.ContentType;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +11,7 @@ import java.util.Map;
 /**
  * Created by atoze on 2017/05/16.
  */
-public class MultiFormData {
+class MultiFormData {
 
     private List<Map<String, String>> contentData = new ArrayList<>();
     private List<byte[]> fileByte = new ArrayList<>();
@@ -43,6 +41,7 @@ public class MultiFormData {
             readLine(bi);
         }
     }
+    /*
 
     public void getRequestFile(String value) {
         ContentType.getKey(value);
@@ -52,7 +51,7 @@ public class MultiFormData {
         }
         this.contentData.size();
 
-    }
+    }*/
 
     public byte[] getByteData(int id) {
         return fileByte.get(id);
