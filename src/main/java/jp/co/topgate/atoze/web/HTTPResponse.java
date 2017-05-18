@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.Util.Status;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +11,9 @@ import java.util.Map;
  *
  * @author atoze
  */
-class HTTPResponse {
-    private String requestBodyText;
-    private File requestBodyFile;
+public class HTTPResponse {
+    private String responseBodyText;
+    private File responseBodyFile;
     private StringBuilder response = new StringBuilder();
     private Map<String, String> responseHeaders = new HashMap<>();
 
@@ -21,7 +23,7 @@ class HTTPResponse {
      * @param text テキスト
      */
     public void setResponseBody(String text) {
-        this.requestBodyText = text;
+        this.responseBodyText = text;
     }
 
     /**
@@ -30,7 +32,7 @@ class HTTPResponse {
      * @param file ファイル
      */
     public void setResponseBody(File file) {
-        this.requestBodyFile = file;
+        this.responseBodyFile = file;
     }
 
     /**
@@ -46,12 +48,13 @@ class HTTPResponse {
     /**
      * 生成したHTTPレスポンスを書き込みます.
      *
-     * @param out    書き込み先データストリーム
-     * @param status ステータスクラス
+     * @param out 書き込み先データストリーム
      * @throws IOException 書き込みエラー
      */
-    public void writeTo(OutputStream out, Status status) throws IOException {
+    public void writeTo(OutputStream out, int statusCode) throws IOException {
         PrintWriter writer = new PrintWriter(out, true);
+        Status status = new Status();
+        status.setStatus(statusCode);
 
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
@@ -59,14 +62,14 @@ class HTTPResponse {
             this.response.append(key + ": " + value + "\n");
         });
 
-        if (this.requestBodyText != null) {
-            this.response.append("\n").append(this.requestBodyText + "\n");
+        if (this.responseBodyText != null) {
+            this.response.append("\n").append(this.responseBodyText + "\n");
         }
         writer.println(this.response.toString());
 
-        if (this.requestBodyFile != null) {
+        if (this.responseBodyFile != null) {
             BufferedInputStream bi
-                    = new BufferedInputStream(new FileInputStream(this.requestBodyFile));
+                    = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
             try {
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
                     out.write(c);

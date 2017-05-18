@@ -7,10 +7,10 @@ import java.net.Socket;
 /**
  * HTTPサーバーを起動します.
  */
-class Main {
+public class Main {
     final static int PORT = 8080;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Starting up HTTP server...at PORT:" + PORT);
             while (true) {

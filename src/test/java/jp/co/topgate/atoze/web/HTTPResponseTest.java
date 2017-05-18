@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.Util.Status;
 import org.junit.Test;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.io.OutputStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
 /**
  * Created by atoze on 2017/04/18.
  */
@@ -24,7 +24,7 @@ public class HTTPResponseTest {
 
         status.setStatus(200);
         response.addResponseHeader("ContentType", "text/html");
-        response.writeTo(output, status);
+        response.writeTo(output, 200);
         assertThat("HTTP/1.1 " + status.getStatus() + "\n" + "ContentType: text/html\n", is(response.getResponse()));
 
     }

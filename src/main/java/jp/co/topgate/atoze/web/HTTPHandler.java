@@ -1,72 +1,62 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.HTMLEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.Util.ContentType;
+import jp.co.topgate.atoze.web.Util.Status;
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
+import java.io.*;
 
 /**
- * HTTPリクエストを元に、レスポンスを生成する.
+ * Created by atoze on 2017/05/01.
  */
-class HTTPHandler {
+public abstract class HTTPHandler {
 
-    HTTPHandler() {
+    protected HTTPRequest request;
+    protected HTTPResponse response = new HTTPResponse();
+    protected int statusCode;
+
+    public void request(HTTPRequest request) throws IOException {
+        System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
+        this.request = request;
     }
 
-    public void handlerGET(int statusCode, File file, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
-        Status status = new Status();
-        status.setStatus(statusCode);
+    public abstract void generateResponse();
 
-        if (statusCode == 200) {
-            if (Arrays.asList("html", "txt").contains(ContentTypeUtil.getFileExtension(file.toString()))) {
-                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
-            } else {
-                response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(file.toString()));
-            }
-            response.setResponseBody(file);
-            response.writeTo(out, status);
-        } else {
-            this.handlerError(statusCode, out);
-        }
-    }
-
-    /**
-     * エラー発生時のステータスコードに合わせたページを設定、またはテンプレートを作成します.
-     * ページは設置したホームディレクトリの "ステータスコード".html を参照します.
-     * 存在しない場合は、テンプレートを送信します.
-     *
-     * @param statusCode 　ステータスコード
-     * @param out        書き出し先
-     */
-    public void handlerError(int statusCode, OutputStream out) throws IOException {
-        HTTPResponse response = new HTTPResponse();
+    protected void generateErrorPage(int statusCode) {
         Status status = new Status();
         status.setStatus(statusCode);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
+            response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
             response.setResponseBody(errorFile);
         } else {
-            response.addResponseHeader("Content-Type", ContentTypeUtil.getContentType(".html") + "; charset=UTF-8");
-            response.setResponseBody("<html><head><title>" + status.getStatus() + "</title></head><body><h1>" +
-                    status.getStatus() + "</h1></body></html>");
+            response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=UTF-8");
+            HTMLEditor html = new HTMLEditor();
+            //html.setTitle(status.getStatus());
+            html.setBody("<h1>" + status.getStatus() + "</h1>");
+            response.setResponseBody(html.getHTML());
         }
-        response.writeTo(out, status);
     }
 
-    private String detectFileEncoding(File file) throws IOException {
+    protected static String detectFileEncoding(File file) {
         String result = null;
         byte[] buf = new byte[4096];
-        FileInputStream fis = new FileInputStream(file);
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         UniversalDetector detector = new UniversalDetector(null);
 
         int nread;
-        while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
-            detector.handleData(buf, 0, nread);
+        try {
+            while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
+                detector.handleData(buf, 0, nread);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         detector.dataEnd();
 
@@ -75,4 +65,10 @@ class HTTPHandler {
 
         return result;
     }
+
+    public void response(OutputStream out) throws IOException {
+        generateResponse();
+        response.writeTo(out, statusCode);
+    }
+
 }

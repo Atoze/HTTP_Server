@@ -1,6 +1,8 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,97 +11,71 @@ import java.util.Map;
  *
  * @author atoze
  */
-class HTTPRequest {
-    private String requestBody;
+public class HTTPRequest {
+    //private String requestBody;
     private byte[] requestFile;
+    private String requestText;
     private String requestHeader;
+
     private String method;
+    private String headQuery;
     private String filePath;
-    private String fileQuery;
     private String protocolVer;
 
-    private final int REQUEST_HEAD_BYTE_LIMIT = 1024;
+    private String host;
 
-    Map<String, String> headerData = new HashMap<String, String>();
+    private Map<String, String> headerData = new HashMap<>();
+    private Map<String, String> queryData = new HashMap<>();
 
-    private void addRequestData(String key, String value) {
-        this.headerData.put(key, value);
-    }
+    private String headerQuery;
+    private String query;
+    private String bodyQuery;
+
+    private final static String lineFeed = System.getProperty("line.separator");
 
     /**
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
+     * <p>
+     * //* @param input HTTPリクエストのデータストリーム
+     * //* @param host  HTTPホスト名
      *
-     * @param input HTTPリクエストのデータストリーム
-     * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
 
-    public void readRequest(InputStream input, String host) throws IOException {
-        BufferedInputStream bi = new BufferedInputStream(input);
-        bi.mark(this.REQUEST_HEAD_BYTE_LIMIT);
-        BufferedReader br = new BufferedReader(new InputStreamReader(bi));
-        String line = br.readLine();
-
-        this.readRequestLine(line, host);
+    public void readRequest(InputStream is, String host) throws IOException {
+        this.host = host;
+        BufferedInputStream bi = new BufferedInputStream(is);
         StringBuilder text = new StringBuilder();
+        String line = readLine(bi);
+        HTTPRequestLine httpRequestLine = new HTTPRequestLine(line, host);
+        method = httpRequestLine.getMethod();
+        //headQuery = httpRequestLine.getHeadQuery();
+        headerQuery = httpRequestLine.getHeadQuery();//TODO
+        filePath = httpRequestLine.getFilePath();
+        protocolVer = httpRequestLine.getProtocolVer();
 
         while (line != null && !line.isEmpty()) {
-            text.append(line).append("\n");
+            text.append(line).append(lineFeed);
             String[] headerLineData = line.split(":", 2);
             if (headerLineData.length == 2) {
-                this.addRequestData(headerLineData[0].toUpperCase(), headerLineData[1].trim());
+                this.headerData.put(headerLineData[0].toUpperCase(), headerLineData[1].trim());
             }
-            line = br.readLine();
+            line = readLine(bi);
         }
         this.requestHeader = text.toString();
 
         //RequestBody処理
-        if (line != null) {
-            if (getHeaderParam("Content-Type") == null) {
-                return;
-            }
-            line = br.readLine();
-            String[] contentTypeKey = this.getHeaderParam("Content-Type").split("/", 2);
-            if ("text".equals(contentTypeKey[0])) {
-                StringBuilder body = new StringBuilder();
-                while (line != null && !line.isEmpty()) {
-                    body.append(line).append("\n");
-                    line = br.readLine();
-                }
-                this.requestBody = body.toString().trim();
-                return;
-            } else {
-                bi.reset();
-                int offset = 0;
-                int bytesRead = 0;
-                byte[] data = new byte[Integer.parseInt(this.getHeaderParam("Content-Length"))];
-                bi.skip(requestHeader.getBytes().length + 1);
-                while ((bytesRead = bi.read(data, offset, data.length - offset))
-                        != -1) {
-                    offset += bytesRead;
-                    if (offset >= data.length) {
-                        break;
-                    }
-                }
-                this.requestFile = data;
-            }
+        String contentType = getHeaderParam("Content-Type");
+        if (line == null || contentType == null) {
+            return;
         }
-    }
+        int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
+        HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
+        requestText = requestBody.getBodyText();
+        //bodyQuery = requestBody.getQuery();
+        //queryData = requestBody.getQueryData();
 
-    /**
-     * HTTPジェネラルヘッダを読み込み、整理します.
-     *
-     * @param line
-     * @param host
-     */
-    private void readRequestLine(String line, String host) throws IOException {
-        HTTPRequestLine header = new HTTPRequestLine(line);
-        this.method = header.getMethod();
-        this.filePath = uriQuerySplitter(urlDivider(header.getFilePath(), host));
-        if (this.filePath.endsWith("/")) {
-            this.filePath += "index.html";
-        }
-        this.protocolVer = ProtocolVer(header.getProtocol());
+        requestFile = requestBody.getBodyFile();
     }
 
     /**
@@ -109,60 +85,6 @@ class HTTPRequest {
      */
     public String getRequestHeader() {
         return this.requestHeader;
-    }
-
-    /**
-     * 要求するHTTPメソッドを取得します.
-     * ,
-     *
-     * @return メソッド名
-     */
-    public String getMethod() {
-        return this.method;
-    }
-
-    /**
-     * 要求するリソースのローカルパスを取得します.
-     *
-     * @return ファイルパス
-     */
-    public String getFilePath() {
-        return this.filePath;
-    }
-
-    /**
-     * 絶対パスからホスト名を抜き、相対パスにします.
-     *
-     * @param filePath
-     * @param host
-     * @return ファイルパス
-     */
-    private String urlDivider(String filePath, String host) {
-        if (filePath == null) {
-            return "";
-        }
-        if (filePath.startsWith("http://" + host)) {
-            return filePath.substring(filePath.indexOf(host) + host.length());
-        }
-        return filePath;
-    }
-
-    /**
-     * ファイルパスとクエリデータを分割します.
-     *
-     * @param filePath
-     * @return ファイルパス
-     */
-    private String uriQuerySplitter(String filePath) {
-        if (filePath == null) {
-            return "";
-        }
-
-        String urlQuery[] = filePath.split("\\?", 2);
-        if (urlQuery[0] != filePath) {
-            this.fileQuery = urlQuery[1];
-        }
-        return urlQuery[0];
     }
 
     /**
@@ -176,48 +98,94 @@ class HTTPRequest {
     }
 
     /**
-     * HTTPプロトコルのバージョンの値を取得します.
+     * 要求するメッセージボディを返します.
      *
-     * @return HTTPプロトコルバージョンの値
+     * @return リクエストボディメッセージ
      */
+    public String getRequestText() {
+        return this.requestText;
+    }
+
+    /**
+     * 要求するメッセージボディを返します.
+     *
+     * @return リクエストボディメッセージ
+     */
+    public byte[] getRequestFile() {
+        return this.requestFile;
+    }
+
+    public String getParameter(String key) {
+        String body = "";
+        if ("GET".equals(method))body=headerQuery;
+        if ("POST".equals(method))body=requestText;
+
+        return readQueryData(body).getOrDefault(key, "");
+    }
+
+    public String getMethod() {
+        return this.method;
+    }
+
+    public String getFilePath() {
+        return this.filePath;
+    }
+
+    public String getHost() {
+        return this.host;
+    }
+
     public String getProtocolVer() {
         return this.protocolVer;
     }
 
-    private String ProtocolVer(String protocol) {
-        //if("HTTP/".startsWith(protocol)){
-        if (protocol != null) {
-            return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
-        } else {
-            return null;
+    public String getHeadQuery() {
+        return this.headQuery;
+    }
+
+    private Map<String, String> readQueryData(String body) {
+        Map<String, String> queryData = new HashMap<>();
+        String[] data = body.split("&");
+        for (int i = 0; i <= data.length - 1; i++) {
+            String[] queryValue = data[i].split("=", 2);
+            if (queryValue.length >= 2) {
+                queryData.put(queryValue[0], queryValue[1]);
+            }
         }
-        //}
+        return queryData;
     }
 
-    /**
-     * 要求するクエリ値を取得します.
-     *
-     * @return クエリ値
-     */
-    public String getFileQuery() {
-        return this.fileQuery;
-    }
 
-    /**
-     * 要求するメッセージボディを返します.
-     *
-     * @return リクエストボディメッセージ
-     */
-    public String getMessageBody() {
-        return this.requestBody;
-    }
-
-    /**
-     * 要求するメッセージボディを返します.
-     *
-     * @return リクエストボディメッセージ
-     */
-    public byte[] getMessageFile() {
-        return this.requestFile;
+    //TODO 改行コードが"\r"のみの対応
+    private String readLine(InputStream input) throws IOException {
+        int num = 0;
+        StringBuffer sb = new StringBuffer();
+        boolean r = false;
+        try {
+            while ((num = input.read()) >= 0) {
+                sb.append((char) num);
+                String line = sb.toString();
+                switch ((char) num) {
+                    case '\r':
+                        r = true;
+                        break;
+                    case '\n':
+                        if (r) {
+                            line = line.replace("\r", "");
+                        }
+                        line = line.replace("\n", "");
+                        return line;
+                    default:
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (sb.length() == 0) {
+            return null;
+        } else {
+            return sb.toString();
+        }
     }
 }
