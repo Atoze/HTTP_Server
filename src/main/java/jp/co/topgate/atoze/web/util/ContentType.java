@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web.util;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,21 +34,14 @@ public class ContentType {
         }
     };
 
-    /*
-    public static String getExtension(String value) {
-        BidiMap<String, String> bidiMap = new DualHashBidiMap<>(CONTENT_TYPE_LIST);
-        if (value == null) {
-            return null;
-        }
-        return bidiMap.getOrDefault(value, null);
-    }
-*/
     /**
      * ファイルの拡張子を返します.
      *
      * @param fileName ファイル名
      * @return ファイル拡張子
      */
+
+    @Contract(pure = true, value = "null -> null")
     public static String getFileExtension(String fileName) {
         if (fileName == null) {
             return null;
@@ -64,14 +59,16 @@ public class ContentType {
      * @param fileName ファイル名
      * @return Content-Type
      */
+
+    @Contract(pure = true, value = "null -> null")
     public static String getContentType(String fileName) {
         String extension = getFileExtension(fileName);
-        if (fileName == null) {
+        if (fileName == null || extension == null) {
             return null;
         }
 
         if (CONTENT_TYPE_LIST.containsKey(extension)) {
-            return CONTENT_TYPE_LIST.get(fileName);
+            return CONTENT_TYPE_LIST.get(extension);
         } else {
             //DefaultContentType
             return CONTENT_TYPE_LIST.get("octet-stream");

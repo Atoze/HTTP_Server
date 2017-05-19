@@ -12,12 +12,16 @@ import java.io.*;
  */
 public abstract class HTTPHandler {
 
-    protected HTTPRequest request;
+    //protected HTTPRequest request;
     protected HTTPResponse response = new HTTPResponse();
     protected int statusCode;
 
-    public void request(HTTPRequest request) throws IOException {
-        this.request = request;
+    public HTTPHandler() {
+    }
+
+    public void setRequest(HTTPRequest request) throws IOException {
+        System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
+        //this.request = request;
     }
 
     public abstract void generateResponse();

@@ -1,12 +1,11 @@
 package jp.co.topgate.atoze.web.app.forum;
 
 import jp.co.topgate.atoze.web.*;
+import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 掲示板の挙動を制御します.
@@ -15,9 +14,15 @@ public class ForumAppHandler extends HTTPHandler {
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
     private static final String CSV_FILENAME = "save.csv";
 
-    private ForumData forumData;
+    private Map<String, String> query;
 
-    private final static List<String> key = Arrays.asList(
+    //private String method;
+    private String filePath;
+    private String HOST;
+
+    private static ForumData forumData;
+
+    private final List<String> KEY = Arrays.asList(
             "ID",
             "NAME",
             "TITLE",
@@ -31,12 +36,26 @@ public class ForumAppHandler extends HTTPHandler {
     private String html;
 
     public ForumAppHandler() throws IOException {
+        super();
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
+        //forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         mainData = forumData.getData();
     }
 
-    public void handle() throws IOException {
-        String method = request.getMethod();
+    @Override
+    public void setRequest(HTTPRequest request) {
+        //method = request.getMethod();
+        filePath = request.getFilePath();
+        HOST = request.getHost();
+        query = request.getQuery();
+    }
+
+    /**
+     * 掲示板の挙動を制御します.
+     */
+
+    public void handle(String method) throws IOException {
+        //String method = method;
         switch (method) {
             case "GET":
                 getHandler();
@@ -45,25 +64,25 @@ public class ForumAppHandler extends HTTPHandler {
                 postHandler();
                 break;
         }
-        setHTML(new ForumHTML(request.getHost()).indexHTML(mainData));
+        setHTML(new ForumHTML(HOST).getIndexHTML(mainData));
     }
 
     void getHandler() throws IOException {
-        if (request.getFilePath().endsWith("search")) {
-            findThread(request.getQueryParam("search"));
+        if (filePath.endsWith("search")) {
+            findThread(getQueryParam("search"));
             return;
         }
         GETThread();
     }
 
     void postHandler() throws IOException {
-        if (request.getFilePath().endsWith("search")) {
-            findThread(request.getQueryParam("search"));
+        if (filePath.endsWith("search")) {
+            findThread(getQueryParam("search"));
             return;
         }
-        if (request.getQueryParam("_method").equals("DELETE")) {
-            if (forumData.isNumber(request.getQueryParam("threadID"))) {
-                int id = Integer.parseInt(request.getQueryParam("threadID"));
+        if (getQueryParam("_method").equals("DELETE")) {
+            if (forumData.isNumber(getQueryParam("threadID"))) {
+                int id = Integer.parseInt(getQueryParam("threadID"));
                 if (id <= mainData.size() - 1) {
                     deleteThread(id);
                     return;
@@ -77,13 +96,13 @@ public class ForumAppHandler extends HTTPHandler {
     private void newThread() throws IOException {
         List<String[]> list = mainData;
         User user = new User();
-        String name = request.getQueryParam("name");
+        String name = getQueryParam("name");
         if (!user.exists(name)) {
-            user.saveData(user.newUser(name, forumData.getNewId(forumData.getData())));
+            user.saveData(user.newUser(name, getNewId(forumData.getData())));
         }
 
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
-        String text[] = addNewThread(request);
+        String text[] = addNewThread();
         list.add(text);
         forumData.saveData(String.join(",", text), file);
         mainData = list;
@@ -101,19 +120,15 @@ public class ForumAppHandler extends HTTPHandler {
         mainData = data;
     }
 
-    public void editThread() {
-
-    }
-
     public void deleteThread(int id) throws IOException {
         List<String[]> list = forumData.getData();
         if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
             return;
         }
-        if (request.getQueryParam("password").equals(ForumData.getParameter(list, id, "PASSWORD"))) {
+        if (getQueryParam("password").equals(ForumData.getParameter(list, id, "PASSWORD"))) {
             list.remove(id);
             mainData = list;
-            forumData.saveData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+            forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
             return;
         }
         System.out.println("パスワードが合っていません");
@@ -122,23 +137,23 @@ public class ForumAppHandler extends HTTPHandler {
     /**
      * 掲示板の挙動を制御します.
      */
-    private String[] addNewThread(HTTPRequest request) throws IOException {
+    private String[] addNewThread() throws IOException {
         List<String> saveData = new ArrayList<>();
-        for (int i = 0; i < key.size(); i++) {
-            String key = this.key.get(i);
+        for (int i = 0; i < KEY.size(); i++) {
+            String key = this.KEY.get(i);
             switch (key) {
                 case "ID":
-                    saveData.add(key + ":" + forumData.getNewId(forumData.getData()));
+                    saveData.add(key + ":" + getNewId(forumData.getData()));
                     break;
                 case "ICON":
                     saveData.add(key + ":" + "blank");
                     break;
                 case "DATE":
-                    saveData.add(key + ":" + forumData.getDate());
+                    saveData.add(key + ":" + getDate());
                     break;
 
                 default:
-                    saveData.add(key + ":" + request.getQueryParam(key.toLowerCase()));
+                    saveData.add(key + ":" + getQueryParam(key.toLowerCase()));
             }
         }
         return saveData.toArray(new String[0]);
@@ -153,6 +168,7 @@ public class ForumAppHandler extends HTTPHandler {
         mainData = forumData.getData();
     }
 
+    @Override
     public void generateResponse() {
         response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
 
@@ -162,4 +178,22 @@ public class ForumAppHandler extends HTTPHandler {
             generateErrorPage(statusCode);
         }
     }
+
+    @Contract(pure = true)
+    int getNewId(List<String[]> list) throws IOException {
+        if (list.size() == 0) {
+            return 0;
+        }
+        return Integer.parseInt(forumData.getParameter(list, list.size() - 1, "ID")) + 1;
+    }
+
+    public String getQueryParam(String key) {
+        return query.getOrDefault(key, "");
+    }
+
+    String getDate() {
+        Date date = new Date();
+        return date.toString();
+    }
+
 }

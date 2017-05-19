@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/11.
+ * NOT USED
  */
 class User {
 

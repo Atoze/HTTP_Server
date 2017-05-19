@@ -27,7 +27,7 @@ class UserData {
     }
 
     public void saveData(String text) throws IOException {
-        reader.writeData(text, new File(CSV_FILEPATH, CSV_FILENAME));
+        reader.writeData(text, new File(CSV_FILEPATH, CSV_FILENAME), false);
     }
 
     public String getTitle() {

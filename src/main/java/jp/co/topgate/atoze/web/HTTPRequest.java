@@ -13,10 +13,11 @@ import java.util.Map;
  */
 public class HTTPRequest {
     //private String requestBody;
-    private byte[] requestFile;
-    private String requestText;
-    private String requestHeader;
+    private byte[] requestBodyFile;
+    private String requestBodyQuery;
 
+    private String requestHeader;
+    private String requestHeaderQuery;
     private String method;
     private String filePath;
     private String protocolVer;
@@ -26,22 +27,20 @@ public class HTTPRequest {
     private Map<String, String> headerData = new HashMap<>();
     private Map<String, String> queryData = new HashMap<>();
 
-    private String headerQuery;
 
     private final static String lineFeed = System.getProperty("line.separator");
 
     /**
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
-     * <p>
-     * //* @param input HTTPリクエストのデータストリーム
-     * //* @param host  HTTPホスト名
      *
+     * @param input HTTPリクエストのデータストリーム
+     * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
 
-    public void readRequest(InputStream is, String host) throws IOException {
+    public void readRequest(InputStream input, String host) throws IOException {
         this.host = host;
-        BufferedInputStream bi = new BufferedInputStream(is);
+        BufferedInputStream bi = new BufferedInputStream(input);
         StringBuilder text = new StringBuilder();
         String line = readLine(bi);
 
@@ -49,7 +48,7 @@ public class HTTPRequest {
         httpRequestLine.readRequestLine(line, host);
 
         method = httpRequestLine.getMethod();
-        headerQuery = httpRequestLine.getHeadQuery();
+        requestHeaderQuery = httpRequestLine.getHeadQuery();
         filePath = httpRequestLine.getFilePath();
         protocolVer = httpRequestLine.getProtocolVer();
 
@@ -70,8 +69,8 @@ public class HTTPRequest {
         }
         int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
         HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
-        requestText = requestBody.getBodyText();
-        requestFile = requestBody.getBodyFile();
+        requestBodyQuery = requestBody.getBodyText();
+        requestBodyFile = requestBody.getBodyFile();
 
         this.queryData = generateQueryMap();
     }
@@ -95,13 +94,15 @@ public class HTTPRequest {
         return headerData.getOrDefault(key.toUpperCase(), null);
     }
 
+
     /**
      * 要求するメッセージボディを返します.
      *
      * @return リクエストボディメッセージ
      */
+
     public String getRequestText() {
-        return this.requestText;
+        return this.requestBodyQuery;
     }
 
     /**
@@ -109,12 +110,17 @@ public class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public byte[] getRequestFile() {
-        return this.requestFile;
+    public byte[] getRequestBodyFile() {
+        return this.requestBodyFile;
     }
+
 
     public String getQueryParam(String key) {
         return queryData.getOrDefault(key, "");
+    }
+
+    public Map<String, String> getQuery() {
+        return queryData;
     }
 
     public String getMethod() {
@@ -136,8 +142,8 @@ public class HTTPRequest {
 
     private Map<String, String> generateQueryMap() {
         String body;
-        if ("GET".equals(method)) body = headerQuery;
-        else body = requestText;
+        if (method.equals("GET")) body = requestHeaderQuery;
+        else body = requestBodyQuery;
 
         Map<String, String> queryData = new HashMap<>();
         String[] data = body.split("&");

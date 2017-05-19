@@ -8,7 +8,7 @@ import java.net.URLDecoder;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/15.
+ * 掲示板用のHTMLを作成します.
  */
 class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
@@ -19,7 +19,7 @@ class ForumHTML {
         this.host = host;
     }
 
-    String indexHTML(List list) throws IOException {
+    String getIndexHTML(List list) throws IOException {
         HTMLEditor html = new HTMLEditor();
 
         html.setLanguage("ja");

@@ -43,7 +43,7 @@ class MultiFormData {
     }
     /*
 
-    public void getRequestFile(String value) {
+    public void getRequestBodyFile(String value) {
         ContentType.getKey(value);
 
         for (int i = 0; i < this.contentData.size(); i++) {

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by atoze on 2017/05/16.
+ *
  */
 class HTTPRequestBody {
     private String bodyText;
