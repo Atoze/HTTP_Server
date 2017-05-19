@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by atoze on 2017/05/08.
+ * NOT USED
  */
 class UserData {
     private int id;

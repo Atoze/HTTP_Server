@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ *　HTTPリクエストボディを処理するクラス.
  */
 class HTTPRequestBody {
     private String bodyText;
@@ -63,7 +63,7 @@ class HTTPRequestBody {
         return queryData;
     }
 
-    public byte[] readBodyFile(InputStream input, int length) throws IOException {
+    private byte[] readBodyFile(InputStream input, int length) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         byte[] buffer = new byte[length];
         while (true) {
@@ -76,7 +76,7 @@ class HTTPRequestBody {
         return bout.toByteArray();
     }
 
-    public String getBodyText() {
+    String getBodyText() {
         if (bodyText == null) {
             return new String(bodyFile);
             //return "";
@@ -84,11 +84,11 @@ class HTTPRequestBody {
         return bodyText;
     }
 
-    public byte[] getBodyFile() {
+    byte[] getBodyFile() {
         return bodyFile;
     }
 
-    public Map<String, String> getQueryData() {
+    Map<String, String> getQueryData() {
         return queryData;
     }
 }

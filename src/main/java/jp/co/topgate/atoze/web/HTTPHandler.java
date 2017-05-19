@@ -8,20 +8,17 @@ import org.mozilla.universalchardet.UniversalDetector;
 import java.io.*;
 
 /**
- * Created by atoze on 2017/05/01.
+ * HTTPを受け取った際に、実行されるハンドラーのAbstractClass
  */
 public abstract class HTTPHandler {
 
-    //protected HTTPRequest request;
     protected HTTPResponse response = new HTTPResponse();
     protected int statusCode;
 
     public HTTPHandler() {
     }
 
-    public void setRequest(HTTPRequest request) throws IOException {
-        System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
-        //this.request = request;
+    public void setRequest(HTTPRequest request){
     }
 
     public abstract void generateResponse();

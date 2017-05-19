@@ -46,21 +46,6 @@ public class StaticHandler extends HTTPHandler {
      * @param file        要求されたファイルパス
      * @return ステータスコード
      */
-    /*
-    private int checkStatusCode(HTTPRequest request, File file) {
-        String host = request.getHeaderParam("HOST");
-        if (host == null || !host.startsWith(HOST)) {
-            return 400;
-        }
-        if (!file.exists() || !file.isFile()) {
-            return 404;
-        }
-        if (!file.canRead()) {
-            return 403;
-        }
-        return 200;
-    }
-*/
     private int checkStatusCode(String requestHost, File file) {
         if (requestHost == null || !requestHost.startsWith(HOST)) {
             return 400;

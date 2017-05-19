@@ -5,7 +5,8 @@ import jp.co.topgate.atoze.web.util.ContentType;
 import java.util.*;
 
 /**
- * Created by atoze on 2017/05/17.
+ * HTMLの形に沿ったStringを生成します.
+ * //TODO 効率よくかく
  */
 public class HTMLEditor {
 
@@ -68,6 +69,7 @@ public class HTMLEditor {
         for (String headData : this.headData) {
             head += headData + LINE_FEED;
         }
+        head = head + "<title>" + title + "</title>";
         this.head = head + generateMetaDataField() + generateLinkField();
     }
 
@@ -210,5 +212,9 @@ public class HTMLEditor {
 
     public void setLanguage(String language) {
         setAttribute("html", true, "lang", language);
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

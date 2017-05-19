@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by atoze on 2017/05/16.
+ * multipart/form-data形式で来たリクエストボディからデータを読むクラス.
+ * NOT USED
  */
 class MultiFormData {
 
     private List<Map<String, String>> contentData = new ArrayList<>();
     private List<byte[]> fileByte = new ArrayList<>();
 
-    public int pos = 0;
+    private int pos = 0;
 
     MultiFormData(InputStream input, int length) throws IOException {
         readMulti(input, length);

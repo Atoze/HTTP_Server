@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by atoze on 2017/05/01.
+ * HTTPリクエストのジェネラルラインのデータを読み取ります.
  */
 class HTTPRequestLine {
     private String method;

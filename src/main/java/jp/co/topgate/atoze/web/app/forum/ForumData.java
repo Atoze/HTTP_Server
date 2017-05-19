@@ -51,10 +51,11 @@ class ForumData {
     void overWriteData(List<String[]> data, File file) throws IOException {
         StringBuffer sb = new StringBuffer();
         for (String[] text : data) {
-            for (int i = 1; i < text.length; i++) {
+            for (int i = 0; i < text.length - 1; i++) {
                 String str = text[i];
                 sb.append(str).append(",");
             }
+            sb.append(text[text.length - 1]);
         }
         reader.writeData(sb.toString(), file, false);
     }
@@ -62,7 +63,7 @@ class ForumData {
     /**
      * 文字列が数字であるか判別します.
      *
-     * @param num  文字列
+     * @param num 文字列
      * @return 文字列が数値であるか否か
      */
     @Contract(pure = true, value = "null -> false")
@@ -78,42 +79,52 @@ class ForumData {
     /**
      * 文字列が数字であるか判別します.
      *
-     * @param list
+     * @param data　
      * @param start
      * @param end
      * @return 整列されたデータ
+     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> list, int start, int end) throws UnsupportedEncodingException {
-        if (list.size() == 0) {
-            return list;
+    private static List<String[]> checkData(List<String[]> data, int start, int end) throws UnsupportedEncodingException {
+        if (data.size() == 0) {
+            return data;
         }
         if (start > end) {
             start ^= end;
             end ^= start;
             start ^= end;
         }
-        if (end >= list.size()) {
-            end = list.size() - 1;
+        if (end >= data.size()) {
+            end = data.size() - 1;
         }
         for (int i = start; i <= end; i++) {
-            if (!isNumber(getParameter(list, i, "ID"))) {
-                list.remove(i);
-                if (list.size() <= 0) {
-                    return list;
+            if (!isNumber(getParameter(data, i, "ID")) || data.isEmpty()) {
+                data.remove(i);
+                if (data.size() <= 0) {
+                    return data;
                 }
                 end = end - 1;
                 i = i - 1;
             }
         }
-        return list;
+        return data;
     }
 
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> list) throws UnsupportedEncodingException {
-        return checkData(list, 0, list.size() - 1);
+    private static List<String[]> checkData(List<String[]> data) throws UnsupportedEncodingException {
+        return checkData(data, 0, data.size() - 1);
     }
 
+    /**
+     * #checkDataで作成されたリストに保管されているデータから,指定した属性の値を取り出します.
+     *
+     * @param list データ
+     * @param id リストの番号
+     * @param key 属性
+     * @return 指定した属性に対応した値
+     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
+     */
     static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String[] datas = list.get(id);
         if (datas.length <= 0) {

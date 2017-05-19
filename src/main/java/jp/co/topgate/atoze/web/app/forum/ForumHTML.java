@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 掲示板用のHTMLを作成します.
+ * //TODO HTMLEditorを使ってもっと綺麗に生成する
  */
 class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
@@ -23,7 +24,7 @@ class ForumHTML {
         HTMLEditor html = new HTMLEditor();
 
         html.setLanguage("ja");
-        //html.setTitle(FORUM_TITLE);
+        html.setTitle(FORUM_TITLE);
         html.setStylesheet(host + CSS_FILENAME);
         html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
@@ -34,18 +35,21 @@ class ForumHTML {
             return "";
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("<table width=\"50%\" border=\"1\">");
+        //sb.append("<table width=\"50%\" border=\"1\">");
         for (int i = 0; i < list.size(); i++) {
+            //sb.append("<tr>");
+            //sb.append("<td>");
+            sb.append("<table border=\"1\" width=\"50%\"><tbody>");
             sb.append("<tr>");
-            sb.append("<td>");
-            sb.append("<table border=\"1\" width=\"100%\"><tbody>");
-            sb.append("<tr width=\"200px\">");
-            sb.append("<td rowspan=\"3\">");
-            sb.append("投稿者:");//Icon Name
-            sb.append(getParameter(list, i, "NAME"));//Icon Name
+            sb.append("<td rowspan=\"3\", width=\"100px\">");
+            sb.append("ID:");//Icon Name
+            sb.append(getParameter(list, i, "ID"));//ID
+            sb.append("<br>投稿者:");//Icon Name
+            sb.append(getParameter(list, i, "NAME"));//Name
             sb.append("</td><td>");
-            sb.append("タイトル:");
+            sb.append("<b>");
             sb.append(getParameter(list, i, "TITLE"));//Title
+            sb.append("</b><br>");//Title
             sb.append(getParameter(list, i, "DATE"));//Date
             sb.append("</td>");
             sb.append("</tr><tr><td>");
@@ -62,11 +66,11 @@ class ForumHTML {
             sb.append("</tbody></table>");
 
             //sb.append(dataForm(list,i));
-            sb.append("</td>");
+            //sb.append("</td>");
 
-            sb.append("</tr>");
+            //sb.append("</tr>");
         }
-        sb.append("</table>");
+        //sb.append("</table>");
         return sb.toString();
     }
 
@@ -120,7 +124,7 @@ class ForumHTML {
     }
 
 
-    private String getParameter(List list, int id, String key) throws UnsupportedEncodingException {
+    private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
         return convertSanitize(URLDecoder.decode(param, "UTF-8"));

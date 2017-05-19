@@ -36,18 +36,19 @@ public class Server extends Thread {
             HTTPRequest httpRequest = new HTTPRequest();
             httpRequest.readRequest(input, "localhost:" + PORT);
             System.out.println(httpRequest.getRequestHeader());
-            //System.out.println(httpRequest.getRequestBodyQuery());
+            System.out.println(httpRequest.getRequestText());
+            System.out.println(httpRequest.getRequestBodyFile());
 
             OutputStream output = this.socket.getOutputStream();
+
             String filePath = httpRequest.getFilePath();
             if (filePath.startsWith("/program/board/")) {
-                ForumAppHandler request3 = new ForumAppHandler();
-                request3.setRequest(httpRequest);
-                request3.handle(httpRequest.getMethod());
-                request3.response(output);
+                ForumAppHandler forum = new ForumAppHandler();
+                forum.setRequest(httpRequest);
+                forum.handle(httpRequest.getMethod());
+                forum.response(output);
 
             } else {
-
                 StaticHandler request2 = new StaticHandler();
                 //StaticHandler request2 = new StaticHandler(httpRequest.getFilePath(), HOST_NAME + ":" + PORT);
                 request2.setRequest(httpRequest);
@@ -65,13 +66,5 @@ public class Server extends Thread {
             }
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }
-    }
-
-    public static String getHOST_NAME() {
-        return HOST_NAME;
-    }
-
-    public static String getRootDirectory() {
-        return ROOT_DIRECTORY;
     }
 }
