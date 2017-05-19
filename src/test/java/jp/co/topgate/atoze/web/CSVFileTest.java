@@ -39,7 +39,7 @@ public class CSVFileTest {
 
         //二行書き込みテスト
         testText = "FOO";
-        csv.writeData(testText, file,false);
+        csv.writeData(testText, file,true);
 
         //改行入り読み込みテスト
         data = csv.readCSV(file);
