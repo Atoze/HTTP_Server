@@ -13,12 +13,12 @@ import java.util.Map;
  */
 public class HTTPRequest {
     //private String requestBody;
-    private byte[] requestFile;
-    private String requestText;
-    private String requestHeader;
+    private byte[] requestBodyFile;
+    private String requestBodyQuery;
 
+    private String requestHeader;
+    private String requestHeaderQuery;
     private String method;
-    private String headQuery;
     private String filePath;
     private String protocolVer;
 
@@ -27,30 +27,28 @@ public class HTTPRequest {
     private Map<String, String> headerData = new HashMap<>();
     private Map<String, String> queryData = new HashMap<>();
 
-    private String headerQuery;
-    private String query;
-    private String bodyQuery;
 
     private final static String lineFeed = System.getProperty("line.separator");
 
     /**
      * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
-     * <p>
-     * //* @param input HTTPリクエストのデータストリーム
-     * //* @param host  HTTPホスト名
      *
+     * @param input HTTPリクエストのデータストリーム
+     * @param host  HTTPホスト名
      * @throws IOException ストリームデータ取得エラー
      */
 
-    public void readRequest(InputStream is, String host) throws IOException {
+    public void readRequest(InputStream input, String host) throws IOException {
         this.host = host;
-        BufferedInputStream bi = new BufferedInputStream(is);
+        BufferedInputStream bi = new BufferedInputStream(input);
         StringBuilder text = new StringBuilder();
         String line = readLine(bi);
-        HTTPRequestLine httpRequestLine = new HTTPRequestLine(line, host);
+
+        HTTPRequestLine httpRequestLine = new HTTPRequestLine();
+        httpRequestLine.readRequestLine(line, host);
+
         method = httpRequestLine.getMethod();
-        //headQuery = httpRequestLine.getHeadQuery();
-        headerQuery = httpRequestLine.getHeadQuery();//TODO
+        requestHeaderQuery = httpRequestLine.getHeadQuery();
         filePath = httpRequestLine.getFilePath();
         protocolVer = httpRequestLine.getProtocolVer();
 
@@ -71,11 +69,10 @@ public class HTTPRequest {
         }
         int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
         HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
-        requestText = requestBody.getBodyText();
-        //bodyQuery = requestBody.getQuery();
-        //queryData = requestBody.getQueryData();
+        requestBodyQuery = requestBody.getBodyText();
+        requestBodyFile = requestBody.getBodyFile();
 
-        requestFile = requestBody.getBodyFile();
+        this.queryData = generateQueryMap();
     }
 
     /**
@@ -97,13 +94,15 @@ public class HTTPRequest {
         return headerData.getOrDefault(key.toUpperCase(), null);
     }
 
+
     /**
      * 要求するメッセージボディを返します.
      *
      * @return リクエストボディメッセージ
      */
+
     public String getRequestText() {
-        return this.requestText;
+        return this.requestBodyQuery;
     }
 
     /**
@@ -111,16 +110,17 @@ public class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public byte[] getRequestFile() {
-        return this.requestFile;
+    public byte[] getRequestBodyFile() {
+        return this.requestBodyFile;
     }
 
-    public String getParameter(String key) {
-        String body = "";
-        if ("GET".equals(method))body=headerQuery;
-        if ("POST".equals(method))body=requestText;
 
-        return readQueryData(body).getOrDefault(key, "");
+    public String getQueryParam(String key) {
+        return queryData.getOrDefault(key, "");
+    }
+
+    public Map<String, String> getQuery() {
+        return queryData;
     }
 
     public String getMethod() {
@@ -139,11 +139,12 @@ public class HTTPRequest {
         return this.protocolVer;
     }
 
-    public String getHeadQuery() {
-        return this.headQuery;
-    }
 
-    private Map<String, String> readQueryData(String body) {
+    private Map<String, String> generateQueryMap() {
+        String body;
+        if (method.equals("GET")) body = requestHeaderQuery;
+        else body = requestBodyQuery;
+
         Map<String, String> queryData = new HashMap<>();
         String[] data = body.split("&");
         for (int i = 0; i <= data.length - 1; i++) {
@@ -154,7 +155,6 @@ public class HTTPRequest {
         }
         return queryData;
     }
-
 
     //TODO 改行コードが"\r"のみの対応
     private String readLine(InputStream input) throws IOException {

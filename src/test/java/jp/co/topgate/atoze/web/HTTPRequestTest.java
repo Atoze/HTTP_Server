@@ -196,7 +196,7 @@ public class HTTPRequestTest {
         assertThat("/test.html", is(httpRequest.getFilePath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
-        String largePOST = new String(httpRequest.getRequestFile(), "UTF-8");
+        String largePOST = new String(httpRequest.getRequestBodyFile(), "UTF-8");
 
         System.out.println(httpRequest.getRequestHeader());
         System.out.println(largePOST);
@@ -244,7 +244,7 @@ public class HTTPRequestTest {
         //System.out.println(new String(httpRequest.getRequestFile(), "UTF-8"));
 
         BufferedInputStream bi = new BufferedInputStream(new FileInputStream(imgTestFile));
-        byte[] test = httpRequest.getRequestFile();
+        byte[] test = httpRequest.getRequestBodyFile();
         //byte[] test = requestFile(bi, imgByte.length);
         BufferedImage outputImage = getImageFromBytes(test);
         //System.out.println(new String(test, "UTF-8"));

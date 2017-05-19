@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by atoze on 2017/05/08.
+ * NOT USED
  */
 class UserData {
     private int id;
@@ -23,11 +23,11 @@ class UserData {
     }
 
     public List<String[]> getData() throws UnsupportedEncodingException {
-        return checkData(this.list);
+        return checkData(list);
     }
 
     public void saveData(String text) throws IOException {
-        reader.writeData(text, new File(CSV_FILEPATH, CSV_FILENAME));
+        reader.writeData(text, new File(CSV_FILEPATH, CSV_FILENAME), false);
     }
 
     public String getTitle() {

@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/11.
+ * NOT USED
  */
 class User {
 
@@ -46,7 +46,7 @@ class User {
     String oldUser(String name, int id) throws IOException {
         StringBuffer sb = new StringBuffer();
         sb.append("id:");
-        //sb.append(userData.getParameter());
+        //sb.append(userData.getQueryParam());
         sb.append("name:");
         sb.append(name);
         sb.append("MessageID:");

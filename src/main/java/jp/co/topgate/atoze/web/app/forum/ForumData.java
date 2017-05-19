@@ -1,93 +1,133 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import java.io.*;
-import java.util.*;
+import org.jetbrains.annotations.Contract;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by atoze on 2017/05/09.
+ * CSVFileClassとForumAppHandlerClassの互いのデータを、
+ * それぞれ最適な形に変換します.
  */
 
 class ForumData {
-    private List<String[]> list = new ArrayList<>();
-    private CSVFile reader = new CSVFile();
+    private final List<String[]> data;
+    private final CSVFile reader = new CSVFile();
 
     ForumData(File file) throws IOException {
-        if (reader.readCSV(file) != null) {
-            this.list = checkData(reader.readCSV(file));
-        }
+        data = checkData(reader.readCSV(file));
     }
 
+    /**
+     * リストデータを返します.
+     */
     List<String[]> getData() {
-        return this.list;
+        return data;
     }
 
-    void saveData(String text, File file) throws IOException {
-        reader.writeData(text, file);
+    /**
+     * 既存のデータに追加する形で、データをCSVファイルに保存します.
+     *
+     * @param data 追加するデータ
+     * @param file 保存先ファイル
+     * @throws IOException 書き込みエラー
+     */
+    void saveData(String data, File file) throws IOException {
+        reader.writeData(data, file, true);
     }
 
-    void saveData(List<String[]> list, File file) throws IOException {
+    /**
+     * 保存されているデータを破棄し、入力されたデータでCSVファイルを上書きします.
+     *
+     * @param data 追加するデータ
+     * @param file 上書きする保存先ファイル
+     * @throws IOException 書き込みエラー
+     */
+
+    void overWriteData(List<String[]> data, File file) throws IOException {
         StringBuffer sb = new StringBuffer();
-        for (String[] text : list) {
-            for (String str : text) {
+        for (String[] text : data) {
+            for (int i = 0; i < text.length - 1; i++) {
+                String str = text[i];
                 sb.append(str).append(",");
             }
+            sb.append(text[text.length - 1]);
         }
-        saveData(sb.toString(), file);
+        reader.writeData(sb.toString(), file, false);
     }
 
-    boolean isNumber(String text) {
+    /**
+     * 文字列が数字であるか判別します.
+     *
+     * @param num 文字列
+     * @return 文字列が数値であるか否か
+     */
+    @Contract(pure = true, value = "null -> false")
+    static boolean isNumber(String num) {
         try {
-            Integer.parseInt(text);
+            Integer.parseInt(num);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             return false;
         }
     }
 
-    private List<String[]> checkData(List<String[]> list) throws UnsupportedEncodingException {
-        return checkData(list, 0, list.size() - 1);
-    }
-
-    private List<String[]> checkData(List<String[]> list, int start, int end) throws UnsupportedEncodingException {
-        if (list.size() == 0) {
-            return list;
+    /**
+     * 文字列が数字であるか判別します.
+     *
+     * @param data　
+     * @param start
+     * @param end
+     * @return 整列されたデータ
+     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
+     */
+    @Contract(pure = true)
+    private static List<String[]> checkData(List<String[]> data, int start, int end) throws UnsupportedEncodingException {
+        if (data.size() == 0) {
+            return data;
         }
         if (start > end) {
             start ^= end;
             end ^= start;
             start ^= end;
         }
-        if (end >= list.size()) {
-            end = list.size() - 1;
+        if (end >= data.size()) {
+            end = data.size() - 1;
         }
         for (int i = start; i <= end; i++) {
-            if (!isNumber(getParameter(list, i, "ID"))) {
-                list.remove(i);
-                if (list.size() <= 0) {
-                    return list;
+            if (!isNumber(getParameter(data, i, "ID")) || data.isEmpty()) {
+                data.remove(i);
+                if (data.size() <= 0) {
+                    return data;
                 }
                 end = end - 1;
                 i = i - 1;
             }
         }
-        return list;
+        return data;
     }
 
-    int getNewId(List<String[]> list) throws IOException {
-        if (list == null || list.size() == 0) {
-            return 0;
-        }
-        return Integer.parseInt(getParameter(list, list.size() - 1, "ID")) + 1;
+    @Contract(pure = true)
+    private static List<String[]> checkData(List<String[]> data) throws UnsupportedEncodingException {
+        return checkData(data, 0, data.size() - 1);
     }
 
-    String getDate() {
-        Date date = new Date();
-        return date.toString();
-    }
-
+    /**
+     * #checkDataで作成されたリストに保管されているデータから,指定した属性の値を取り出します.
+     *
+     * @param list データ
+     * @param id リストの番号
+     * @param key 属性
+     * @return 指定した属性に対応した値
+     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
+     */
     static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String[] datas = list.get(id);
-        if(datas.length<=0){
+        if (datas.length <= 0) {
             return null;
         }
 
@@ -110,7 +150,7 @@ class ForumData {
         return data.getOrDefault(key.toUpperCase(), "");
     }
 
-   static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
+    static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
         String[] datas = line;
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);

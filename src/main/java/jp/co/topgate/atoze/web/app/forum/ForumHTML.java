@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.HTMLEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.htmlEditor.HTMLEditor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -8,7 +8,8 @@ import java.net.URLDecoder;
 import java.util.List;
 
 /**
- * Created by atoze on 2017/05/15.
+ * 掲示板用のHTMLを作成します.
+ * //TODO HTMLEditorを使ってもっと綺麗に生成する
  */
 class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
@@ -19,13 +20,13 @@ class ForumHTML {
         this.host = host;
     }
 
-    String indexHTML(List list) throws IOException {
+    String getIndexHTML(List list) throws IOException {
         HTMLEditor html = new HTMLEditor();
-        
+
         html.setLanguage("ja");
-        //html.setTitle(FORUM_TITLE);
+        html.setTitle(FORUM_TITLE);
         html.setStylesheet(host + CSS_FILENAME);
-        html.setBody(form() + table(list) + form2());
+        html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
     }
 
@@ -34,18 +35,22 @@ class ForumHTML {
             return "";
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("<table width=\"50%\" border=\"1\">");
+        //sb.append("<table width=\"50%\" border=\"1\">");
         for (int i = 0; i < list.size(); i++) {
+            //sb.append("<tr>");
+            //sb.append("<td>");
+            sb.append("<table border=\"1\" width=\"50%\"><tbody>");
             sb.append("<tr>");
-            sb.append("<td>");
-            //StringBuffer sb = new StringBuffer();
-            sb.append("<table border=\"1\" width=\"100%\"><tbody>");
-            sb.append("<tr>");
-            sb.append("<td rowspan=\"3\">");
-            sb.append(getParameter(list, i, "NAME"));//Icon Name
+            sb.append("<td rowspan=\"3\", width=\"100px\">");
+            sb.append("ID:");//Icon Name
+            sb.append(getParameter(list, i, "ID"));//ID
+            sb.append("<br>投稿者:");//Icon Name
+            sb.append(getParameter(list, i, "NAME"));//Name
             sb.append("</td><td>");
-            sb.append(getParameter(list, i, "TITLE"));//Title Date
-            sb.append(getParameter(list, i, "DATE"));//Title Date
+            sb.append("<b>");
+            sb.append(getParameter(list, i, "TITLE"));//Title
+            sb.append("</b><br>");//Title
+            sb.append(getParameter(list, i, "DATE"));//Date
             sb.append("</td>");
             sb.append("</tr><tr><td>");
             sb.append(getParameter(list, i, "TEXT"));//Text
@@ -61,15 +66,15 @@ class ForumHTML {
             sb.append("</tbody></table>");
 
             //sb.append(dataForm(list,i));
-            sb.append("</td>");
+            //sb.append("</td>");
 
-            sb.append("</tr>");
+            //sb.append("</tr>");
         }
-        sb.append("</table>");
+        //sb.append("</table>");
         return sb.toString();
     }
 
-    private String form() {
+    private String headerForm() {
         StringBuffer sb = new StringBuffer();
         sb.append("<div align=\"center\">簡易Java掲示板<br/>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
@@ -82,7 +87,7 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String form2() {
+    private String footerForm() {
         StringBuffer sb = new StringBuffer();
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("<INPUT type='hidden' name='_method' value='DELETE'>");
@@ -119,7 +124,7 @@ class ForumHTML {
     }
 
 
-    private String getParameter(List list, int id, String key) throws UnsupportedEncodingException {
+    private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
         return convertSanitize(URLDecoder.decode(param, "UTF-8"));
@@ -141,6 +146,9 @@ class ForumHTML {
         str = str.replaceAll("\"", "&quot;");
         str = str.replaceAll("'", "&#39;");
 
+        str = str.replaceAll("&lt;br&gt;", "<br>");
+        if (str.contains("\r\n")) str = str.replaceAll("\r\n", "<br>");
+        else str = str.replaceAll("\n", "<br>");
         return str;
     }
 

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by atoze on 2017/05/01.
+ * HTTPリクエストのジェネラルラインのデータを読み取ります.
  */
 class HTTPRequestLine {
     private String method;
@@ -28,8 +28,7 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(String line, String host) throws IOException {
-        this.readRequestLine(line, host);
+    HTTPRequestLine(){
     }
 
     /**
@@ -38,7 +37,7 @@ class HTTPRequestLine {
      * @param line
      * @param host
      */
-    private void readRequestLine(String line, String host) throws IOException {
+    void readRequestLine(String line, String host) throws IOException {
         if (line == null) {
             return;
         }

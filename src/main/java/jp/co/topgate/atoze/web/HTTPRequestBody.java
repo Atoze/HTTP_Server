@@ -7,14 +7,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by atoze on 2017/05/16.
+ *　HTTPリクエストボディを処理するクラス.
  */
 class HTTPRequestBody {
     private String bodyText;
     private byte[] bodyFile;
     private Map<String, String> queryData = new HashMap<>();
 
+    private int length;
+
+
     HTTPRequestBody(InputStream input, String contentType, int length) throws IOException {
+        this.length = length;
+        handler(input, contentType);
+    }
+
+    private void handler(InputStream input, String contentType) throws IOException{
         String[] contentTypeValue = contentType.split(";");
         switch (contentTypeValue[0]) {
             case "application/x-www-form-urlencoded":
@@ -23,14 +31,17 @@ class HTTPRequestBody {
                 break;
 
             case "multipart/form-data":
+                /* //TODO完成させる
                 String[] boundary = contentTypeValue[1].split("=", 2);
                 MultiFormData multiFormData = new MultiFormData(input,length);
                 bodyFile = multiFormData.getByteData(0);
                 break;
+                */
 
             default:
                 bodyFile = readBodyFile(input, length);
         }
+
     }
 
     private String readBodyText(InputStream input, int length) throws IOException {
@@ -52,7 +63,7 @@ class HTTPRequestBody {
         return queryData;
     }
 
-    public byte[] readBodyFile(InputStream input, int length) throws IOException {
+    private byte[] readBodyFile(InputStream input, int length) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         byte[] buffer = new byte[length];
         while (true) {
@@ -65,7 +76,7 @@ class HTTPRequestBody {
         return bout.toByteArray();
     }
 
-    public String getBodyText() {
+    String getBodyText() {
         if (bodyText == null) {
             return new String(bodyFile);
             //return "";
@@ -73,11 +84,11 @@ class HTTPRequestBody {
         return bodyText;
     }
 
-    public byte[] getBodyFile() {
+    byte[] getBodyFile() {
         return bodyFile;
     }
 
-    public Map<String, String> getQueryData() {
+    Map<String, String> getQueryData() {
         return queryData;
     }
 }

@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.Util.Status;
+import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.*;
 import java.util.HashMap;
@@ -49,13 +49,12 @@ public class HTTPResponse {
      * 生成したHTTPレスポンスを書き込みます.
      *
      * @param out 書き込み先データストリーム
-     * @throws IOException 書き込みエラー
+     * @throws RuntimeException 書き込みエラー
      */
-    public void writeTo(OutputStream out, int statusCode) throws IOException {
+    public void writeTo(OutputStream out, int statusCode) {
         PrintWriter writer = new PrintWriter(out, true);
         Status status = new Status();
         status.setStatus(statusCode);
-
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
         this.responseHeaders.forEach((key, value) -> {
@@ -68,18 +67,16 @@ public class HTTPResponse {
         writer.println(this.response.toString());
 
         if (this.responseBodyFile != null) {
-            BufferedInputStream bi
-                    = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
             try {
+                BufferedInputStream bi
+                        = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
+
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
                     out.write(c);
                 }
+                bi.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            } finally {
-                if (bi != null) {
-                    bi.close();
-                }
             }
         }
     }

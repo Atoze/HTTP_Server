@@ -10,12 +10,13 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by atoze on 2017/04/17.
  */
-public class HTTPRequestHeaderTest {
+public class HTTPRequestLineTest {
     @Test
     public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
         String line = "GET / HTTP/1.1";
 
-        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine();
+        header.readRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
         assertThat("/index.html", is(header.getFilePath()));
@@ -26,7 +27,8 @@ public class HTTPRequestHeaderTest {
     public void nullテスト() throws IOException {
         String line = null;
 
-        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine();
+        header.readRequestLine(line, "localhost:8080");
 
         assertThat(null, is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
@@ -38,7 +40,9 @@ public class HTTPRequestHeaderTest {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
-        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine();
+        header.readRequestLine(line, "localhost:8080");
+
 
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getFilePath()));
@@ -46,16 +50,16 @@ public class HTTPRequestHeaderTest {
 
         //二重スペース
         line = "GET  /  HTTP/1.1";
+        header.readRequestLine(line, "localhost:8080");
 
-        header = new HTTPRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getFilePath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //URI指定忘れ
         line = "GET  HTTP/1.1";
+        header.readRequestLine(line, "localhost:8080");
 
-        header = new HTTPRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
         assertThat("", is(header.getFilePath()));

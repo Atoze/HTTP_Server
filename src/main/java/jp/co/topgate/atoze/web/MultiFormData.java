@@ -1,7 +1,5 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.Util.ContentType;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by atoze on 2017/05/16.
+ * multipart/form-data形式で来たリクエストボディからデータを読むクラス.
+ * NOT USED
  */
-public class MultiFormData {
+class MultiFormData {
 
     private List<Map<String, String>> contentData = new ArrayList<>();
     private List<byte[]> fileByte = new ArrayList<>();
 
-    public int pos = 0;
+    private int pos = 0;
 
     MultiFormData(InputStream input, int length) throws IOException {
         readMulti(input, length);
@@ -43,8 +42,9 @@ public class MultiFormData {
             readLine(bi);
         }
     }
+    /*
 
-    public void getRequestFile(String value) {
+    public void getRequestBodyFile(String value) {
         ContentType.getKey(value);
 
         for (int i = 0; i < this.contentData.size(); i++) {
@@ -52,7 +52,7 @@ public class MultiFormData {
         }
         this.contentData.size();
 
-    }
+    }*/
 
     public byte[] getByteData(int id) {
         return fileByte.get(id);
