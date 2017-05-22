@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web.app.forum;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ class ForumData {
     /**
      * リストデータを返します.
      */
+    @NotNull
     List<String[]> getData() {
         return data;
     }
@@ -79,7 +81,7 @@ class ForumData {
     /**
      * 文字列が数字であるか判別します.
      *
-     * @param data　
+     * @param data
      * @param start
      * @param end
      * @return 整列されたデータ
@@ -120,11 +122,13 @@ class ForumData {
      * #checkDataで作成されたリストに保管されているデータから,指定した属性の値を取り出します.
      *
      * @param list データ
-     * @param id リストの番号
-     * @param key 属性
+     * @param id   リストの番号
+     * @param key  属性
      * @return 指定した属性に対応した値
      * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
+
+    @Contract(value = "null, _, _ -> null; !null, _, null -> !null")
     static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String[] datas = list.get(id);
         if (datas.length <= 0) {

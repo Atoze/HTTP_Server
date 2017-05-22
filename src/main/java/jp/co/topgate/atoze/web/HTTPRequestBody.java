@@ -30,8 +30,9 @@ class HTTPRequestBody {
                 queryData = readQueryData(bodyText);
                 break;
 
+            //TODO 完成させる
             case "multipart/form-data":
-                /* //TODO完成させる
+                /*
                 String[] boundary = contentTypeValue[1].split("=", 2);
                 MultiFormData multiFormData = new MultiFormData(input,length);
                 bodyFile = multiFormData.getByteData(0);

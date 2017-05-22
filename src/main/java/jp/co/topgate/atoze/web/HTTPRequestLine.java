@@ -28,7 +28,7 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(){
+    HTTPRequestLine() {
     }
 
     /**
@@ -52,7 +52,6 @@ class HTTPRequestLine {
 
     /**
      * 要求するHTTPメソッドを取得します.
-     * ,
      *
      * @return メソッド名
      */
