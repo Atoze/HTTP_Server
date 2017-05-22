@@ -18,11 +18,15 @@ public abstract class HTTPHandler {
     public HTTPHandler() {
     }
 
-    public void setRequest(HTTPRequest request){
-    }
+    public abstract void setRequest(HTTPRequest request);
 
     public abstract void generateResponse();
 
+    /**
+     * エラーページを生成し設定します.
+     *
+     * @param statusCode ステータスコードの値
+     */
     protected void generateErrorPage(int statusCode) {
         Status status = new Status();
         status.setStatus(statusCode);
@@ -39,6 +43,12 @@ public abstract class HTTPHandler {
         }
     }
 
+    /**
+     * ファイルのエンコード値を求めます.
+     *
+     * @param file 判別するファイル
+     * @return エンコード値
+     */
     protected static String detectFileEncoding(File file) {
         String result = null;
         byte[] buf = new byte[4096];
@@ -46,7 +56,7 @@ public abstract class HTTPHandler {
         try {
             fis = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return null;
         }
         UniversalDetector detector = new UniversalDetector(null);
 
@@ -66,6 +76,10 @@ public abstract class HTTPHandler {
         return result;
     }
 
+    /**
+     * @param file 判別するファイル
+     * @return エンコード値
+     */
     public void response(OutputStream out) {
         generateResponse();
         response.writeTo(out, statusCode);

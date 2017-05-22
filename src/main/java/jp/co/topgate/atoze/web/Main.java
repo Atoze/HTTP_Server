@@ -8,7 +8,7 @@ import java.net.Socket;
  * HTTPサーバーを起動します.
  */
 public class Main {
-    final static int PORT = 8080;
+    final static int PORT = 8081;
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {

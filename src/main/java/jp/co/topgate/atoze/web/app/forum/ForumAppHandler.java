@@ -37,24 +37,24 @@ public class ForumAppHandler extends HTTPHandler {
     public void handle(String method) throws IOException {
         switch (method) {
             case "GET":
-                getHandler();
+                methodGetHandler();
                 break;
             case "POST":
-                postHandler();
+                methodPostHandler();
                 break;
         }
         html = new ForumHTML(HOST).getIndexHTML(forum.getMainData());
     }
 
-    private void getHandler() throws IOException {
+    private void methodGetHandler() throws IOException {
         if (filePath.endsWith("search?")) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        forum.GETThread();
+        forum.methodGetHandler();
     }
 
-    private void postHandler() throws IOException {
+    private void methodPostHandler() throws IOException {
         if (!getQueryParam("search").isEmpty()) {
             forum.findThread(getQueryParam("search"));
             return;

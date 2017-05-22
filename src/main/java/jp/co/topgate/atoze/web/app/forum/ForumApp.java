@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web.app.forum;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ class ForumApp {
         User user = new User();
         String name = query.get("name");
         if (!user.exists(name)) {
-            user.saveData(user.newUser(name, getNewId(forumData.getData())));
+            user.saveData(user.newUser(name, retrieveNewID(forumData.getData())));
         }
         */
         File file = new File(CSV_FILEPATH, CSV_FILENAME);
@@ -92,13 +93,13 @@ class ForumApp {
             String key = this.KEY.get(i);
             switch (key) {
                 case "ID":
-                    saveData.add(key + ":" + getNewId(forumData.getData()));
+                    saveData.add(key + ":" + retrieveNewID(forumData.getData()));
                     break;
                 case "ICON":
                     saveData.add(key + ":" + "blank");
                     break;
                 case "DATE":
-                    saveData.add(key + ":" + getDate());
+                    saveData.add(key + ":" + date());
                     break;
 
                 default:
@@ -108,21 +109,22 @@ class ForumApp {
         return saveData.toArray(new String[0]);
     }
 
+    @NotNull
     List<String[]> getMainData() {
         return mainData;
     }
 
-    void GETThread() {
+    void methodGetHandler() {
         mainData = forumData.getData();
     }
 
-    private String getDate() {
+    private String date() {
         Date date = new Date();
         return date.toString();
     }
 
     @Contract(pure = true)
-    int getNewId(List<String[]> list) throws IOException {
+    private int retrieveNewID(List<String[]> list) throws IOException {
         if (list.size() == 0) {
             return 0;
         }
