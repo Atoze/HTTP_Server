@@ -19,7 +19,7 @@ class ForumData {
     private final List<String[]> data;
     private final CSVFile reader = new CSVFile();
 
-    ForumData(File file) throws IOException {
+    ForumData(File file){
         data = checkData(reader.readCSV(file));
     }
 
@@ -88,7 +88,7 @@ class ForumData {
      * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data, int start, int end) throws UnsupportedEncodingException {
+    private static List<String[]> checkData(List<String[]> data, int start, int end){
         if (data.size() == 0) {
             return data;
         }
@@ -114,7 +114,7 @@ class ForumData {
     }
 
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data) throws UnsupportedEncodingException {
+    private static List<String[]> checkData(List<String[]> data) {
         return checkData(data, 0, data.size() - 1);
     }
 
@@ -129,7 +129,7 @@ class ForumData {
      */
 
     @Contract(value = "null, _, _ -> null; !null, _, null -> !null")
-    static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    static String getParameter(List<String[]> list, int id, String key) {
         String[] datas = list.get(id);
         if (datas.length <= 0) {
             return null;
@@ -154,7 +154,7 @@ class ForumData {
         return data.getOrDefault(key.toUpperCase(), "");
     }
 
-    static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
+    static String getParameter(String[] line, String key) {
         String[] datas = line;
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);

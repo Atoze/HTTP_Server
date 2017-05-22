@@ -27,7 +27,7 @@ class ForumApp {
             "ICON"
     );
 
-    ForumApp() throws IOException {
+    ForumApp() {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         mainData = forumData.getData();
     }
@@ -35,7 +35,7 @@ class ForumApp {
     /**
      * 新規に投稿された時
      */
-    void newThread(Map<String, String> query) throws IOException {
+    void createThread(Map<String, String> query) throws IOException {
         List<String[]> list = forumData.getData();
         //TODO ユーザー管理
         /*
@@ -114,7 +114,7 @@ class ForumApp {
         return mainData;
     }
 
-    void methodGetHandler() {
+    void showThread() {
         mainData = forumData.getData();
     }
 

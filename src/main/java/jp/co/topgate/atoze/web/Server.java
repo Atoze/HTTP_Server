@@ -34,7 +34,7 @@ public class Server extends Thread {
         try {
             InputStream input = this.socket.getInputStream();
             HTTPRequest httpRequest = new HTTPRequest();
-            httpRequest.readRequest(input, "localhost:" + PORT);
+            httpRequest.readRequest(input, HOST_NAME + PORT);
             System.out.println(httpRequest.getRequestHeader());
             System.out.println(httpRequest.getRequestText());
             System.out.println(httpRequest.getRequestBodyFile());
@@ -42,18 +42,15 @@ public class Server extends Thread {
             OutputStream output = this.socket.getOutputStream();
 
             String filePath = httpRequest.getFilePath();
-            if (filePath.startsWith("/program/board/")) {
-                ForumAppHandler forum = new ForumAppHandler();
-                forum.setRequest(httpRequest);
-                forum.handle(httpRequest.getMethod());
-                forum.response(output);
 
+            HTTPHandler handler;
+            if (filePath.startsWith("/program/board/")) {
+                handler = new ForumAppHandler(httpRequest);
             } else {
-                StaticHandler request2 = new StaticHandler();
-                //StaticHandler request2 = new StaticHandler(httpRequest.getFilePath(), HOST_NAME + ":" + PORT);
-                request2.setRequest(httpRequest);
-                request2.response(output);
+                handler = new StaticHandler(httpRequest);
+
             }
+            handler.response(output);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

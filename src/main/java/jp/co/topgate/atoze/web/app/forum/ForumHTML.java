@@ -127,7 +127,7 @@ class ForumHTML {
     private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
-        return convertSanitize(URLDecoder.decode(param, "UTF-8"));
+        return sanitizeHTML(URLDecoder.decode(param, "UTF-8"));
     }
 
     /**
@@ -136,7 +136,7 @@ class ForumHTML {
      * @param str
      * @return
      */
-    private static String convertSanitize(String str) {
+    private static String sanitizeHTML(String str) {
         if (str == null) {
             return str;
         }

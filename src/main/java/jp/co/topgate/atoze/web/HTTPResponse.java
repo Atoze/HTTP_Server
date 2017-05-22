@@ -86,8 +86,13 @@ public class HTTPResponse {
      *
      * @return HTTPレスポンス
      */
-    public String getResponse() {
+    /*
+    public String toString() {
         return response.toString();
     }
-
+*/
+    @Override
+    public String toString() {
+        return response.toString();
+    }
 }

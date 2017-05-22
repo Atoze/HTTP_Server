@@ -25,7 +25,7 @@ public class HTTPResponseTest {
         status.setStatus(200);
         response.addResponseHeader("ContentType", "text/html");
         response.writeTo(output, 200);
-        assertThat("HTTP/1.1 " + status.getStatus() + "\n" + "ContentType: text/html\n", is(response.getResponse()));
+        assertThat("HTTP/1.1 " + status.getStatus() + "\n" + "ContentType: text/html\n", is(response.toString()));
 
     }
 }
