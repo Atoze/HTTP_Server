@@ -1,7 +1,6 @@
 package jp.co.topgate.atoze.web.app.forum;
 
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +18,13 @@ class ForumData {
     private final List<String[]> data;
     private final CSVFile reader = new CSVFile();
 
-    ForumData(File file){
+    ForumData(File file) throws IOException {
         data = checkData(reader.readCSV(file));
     }
 
     /**
      * リストデータを返します.
      */
-    @NotNull
     List<String[]> getData() {
         return data;
     }
@@ -79,7 +77,7 @@ class ForumData {
     }
 
     /**
-     * 文字列が数字であるか判別します.
+     * データからForumApp用の形式に削ぐわないものを消去します.
      *
      * @param data
      * @param start
@@ -88,7 +86,7 @@ class ForumData {
      * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data, int start, int end){
+    private static List<String[]> checkData(List<String[]> data, int start, int end) throws UnsupportedEncodingException {
         if (data.size() == 0) {
             return data;
         }
@@ -114,7 +112,7 @@ class ForumData {
     }
 
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data) {
+    private static List<String[]> checkData(List<String[]> data) throws UnsupportedEncodingException {
         return checkData(data, 0, data.size() - 1);
     }
 
@@ -128,8 +126,8 @@ class ForumData {
      * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
 
-    @Contract(value = "null, _, _ -> null; !null, _, null -> !null")
-    static String getParameter(List<String[]> list, int id, String key) {
+    @Contract(value = "null, _, _ -> null;")
+    static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String[] datas = list.get(id);
         if (datas.length <= 0) {
             return null;
@@ -154,7 +152,7 @@ class ForumData {
         return data.getOrDefault(key.toUpperCase(), "");
     }
 
-    static String getParameter(String[] line, String key) {
+    static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
         String[] datas = line;
         Map<String, String> data = new HashMap<>();
         String[] name = datas[0].split(":", 2);

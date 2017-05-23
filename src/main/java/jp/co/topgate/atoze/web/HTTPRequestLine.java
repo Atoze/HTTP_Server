@@ -47,7 +47,7 @@ class HTTPRequestLine {
         if (this.filePath.endsWith("/")) {
             this.filePath += "index.html";
         }
-        this.protocolVer = ProtocolVer(this.protocolVer);
+        protocolVer = ProtocolVer(protocolVer);
     }
 
     /**
@@ -114,10 +114,10 @@ class HTTPRequestLine {
 
     private String ProtocolVer(String protocol) {
         if (protocol != null) {
-            return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
-        } else {
-            return null;
+            if (protocol.startsWith("HTTP/"))
+                return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
         }
+        return null;
     }
 
     /**
@@ -134,13 +134,13 @@ class HTTPRequestLine {
             return;
         }
         String headerLines[] = line.split(" ");
-        if (headerLines.length == this.REQUEST_HEADER_VALUE) {
+        if (headerLines.length == REQUEST_HEADER_VALUE) {
             if (isValidMethod(headerLines[0])) {
-                this.method = headerLines[0];
+                method = headerLines[0];
             }
             this.filePath = URLDecoder.decode(headerLines[1], "UTF-8");
             if (headerLines[2].startsWith("HTTP/")) {
-                this.protocolVer = headerLines[2];
+                protocolVer = headerLines[2];
             }
         }
     }

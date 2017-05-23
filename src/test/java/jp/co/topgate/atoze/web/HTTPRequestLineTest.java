@@ -14,7 +14,6 @@ public class HTTPRequestLineTest {
     @Test
     public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
         String line = "GET / HTTP/1.1";
-
         HTTPRequestLine header = new HTTPRequestLine();
         header.readRequestLine(line, "localhost:8080");
 
@@ -26,7 +25,6 @@ public class HTTPRequestLineTest {
     @Test
     public void nullテスト() throws IOException {
         String line = null;
-
         HTTPRequestLine header = new HTTPRequestLine();
         header.readRequestLine(line, "localhost:8080");
 
@@ -42,27 +40,40 @@ public class HTTPRequestLineTest {
 
         HTTPRequestLine header = new HTTPRequestLine();
         header.readRequestLine(line, "localhost:8080");
-
-
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getFilePath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //二重スペース
         line = "GET  /  HTTP/1.1";
+        header = new HTTPRequestLine();
         header.readRequestLine(line, "localhost:8080");
-
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getFilePath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //URI指定忘れ
         line = "GET  HTTP/1.1";
+        header = new HTTPRequestLine();
         header.readRequestLine(line, "localhost:8080");
-
-
         assertThat("GET", is(header.getMethod()));
         assertThat("", is(header.getFilePath()));
         assertThat("1.1", is(header.getProtocolVer()));
+
+        //適当な文字列
+        line = "hoge";
+        header = new HTTPRequestLine();
+        header.readRequestLine(line, "localhost:8080");
+        assertThat(null, is(header.getMethod()));
+        assertThat("", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocolVer()));
+
+        //適当な文字列
+        line = "hoge hoge hoge";
+        header = new HTTPRequestLine();
+        header.readRequestLine(line, "localhost:8080");
+        assertThat(null, is(header.getMethod()));
+        assertThat("hoge", is(header.getFilePath()));
+        assertThat(null, is(header.getProtocolVer()));
     }
 }

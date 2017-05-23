@@ -20,7 +20,7 @@ public class StaticHandler extends HTTPHandler {
 
     @Override
     public HTTPResponse generateResponse() {
-        statusCode = checkStatusCode(HOST, file);
+        int statusCode = checkStatusCode(HOST, file);
         if (statusCode == 200) {
             HTTPResponse response = new HTTPResponse();
             if (Arrays.asList("html", "txt").contains(ContentType.getFileExtension(file.toString()))) {

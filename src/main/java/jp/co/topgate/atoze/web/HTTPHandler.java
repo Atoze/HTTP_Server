@@ -11,9 +11,6 @@ import java.io.*;
  * HTTPを受け取った際に、実行されるハンドラーのAbstractClass
  */
 public abstract class HTTPHandler {
-    protected int statusCode;
-
-
     public HTTPHandler(HTTPRequest request) {
     }
 
@@ -25,7 +22,7 @@ public abstract class HTTPHandler {
      * @param statusCode ステータスコードの値
      */
     protected HTTPResponse generateErrorResponse(int statusCode) {
-        HTTPResponse response = new HTTPResponse();
+        HTTPResponse response = new HTTPResponse(statusCode);
         Status status = new Status();
         status.setStatus(statusCode);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
@@ -37,7 +34,7 @@ public abstract class HTTPHandler {
             HTMLEditor html = new HTMLEditor();
             //html.setTitle(status.getStatus());
             html.setBody("<h1>" + status.getStatus() + "</h1>");
-            //response.setResponseBody(html.getHTML());
+            response.setResponseBody(html.getHTML());
         }
         return response;
     }
@@ -77,6 +74,6 @@ public abstract class HTTPHandler {
 
     public void response(OutputStream out) {
         HTTPResponse response = generateResponse();
-        response.writeTo(out, statusCode);
+        response.writeTo(out);
     }
 }

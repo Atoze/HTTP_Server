@@ -27,8 +27,10 @@ class ForumApp {
             "ICON"
     );
 
-    ForumApp() {
+    ForumApp() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
+        //forumData = new ForumData(null);
+
         mainData = forumData.getData();
     }
 
@@ -59,9 +61,11 @@ class ForumApp {
     void findThread(String name) throws IOException {
         List<String[]> list = forumData.getData();
         List<String[]> data = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            if (name.equals(ForumData.getParameter(list, i, "NAME"))) {
-                data.add(list.get(i));
+        if (name != null) {
+            for (int i = 0; i < list.size(); i++) {
+                if (name.equals(ForumData.getParameter(list, i, "NAME"))) {
+                    data.add(list.get(i));
+                }
             }
         }
         mainData = data;
@@ -70,17 +74,43 @@ class ForumApp {
     /**
      * 削除時
      */
-    void deleteThread(int id, String requestPassword) throws IOException {
+    void deleteThread(String id2, String requestPassword) throws IOException {
         List<String[]> list = forumData.getData();
-        if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
+        if (list.size() <= 0) {
             return;
         }
-        if (requestPassword.equals(ForumData.getParameter(list, id, "PASSWORD"))) {
-            list.remove(id);
-            mainData = list;
-            forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+
+        for (int i = 0; i < list.size(); i++) {
+            if (id2.equals(ForumData.getParameter(list, i, "ID"))) {
+                if (requestPassword.equals(ForumData.getParameter(list, i, "PASSWORD"))) {
+                    list.remove(i);
+                    mainData = list;
+                    forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+                    return;
+                }
+            }
         }
-        System.out.println("パスワードが合っていません");
+    }
+
+    /**
+     * 削除時
+     */
+    void deleteThread(int id, String requestPassword) throws IOException {
+        List<String[]> list = forumData.getData();
+        if (list.size() <= 0) {
+            return;
+        }
+        if (id >= 0 && id < list.size()) {
+            if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
+                return;
+            }
+            if (requestPassword.equals(ForumData.getParameter(list, id, "PASSWORD"))) {
+                list.remove(id);
+                mainData = list;
+                forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+            }
+            System.out.println("パスワードが合っていません");
+        }
     }
 
     /**
@@ -114,7 +144,8 @@ class ForumApp {
         return mainData;
     }
 
-    void showThread() {
+    //直接読み込んだものをそのまま返す
+    void threadByCSV() {
         mainData = forumData.getData();
     }
 

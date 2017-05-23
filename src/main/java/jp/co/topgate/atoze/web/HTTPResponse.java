@@ -14,8 +14,18 @@ import java.util.Map;
 public class HTTPResponse {
     private String responseBodyText;
     private File responseBodyFile;
-    private StringBuilder response = new StringBuilder();
-    private Map<String, String> responseHeaders = new HashMap<>();
+
+    private int statusCode;
+    private final StringBuilder response = new StringBuilder();
+    private final Map<String, String> responseHeaders = new HashMap<>();
+
+    public HTTPResponse() {
+        this.statusCode = 200;
+    }
+
+    public HTTPResponse(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     /**
      * HTTPレスポンスボディを設定します.
@@ -51,17 +61,26 @@ public class HTTPResponse {
      * @param out 書き込み先データストリーム
      * @throws RuntimeException 書き込みエラー
      */
-    public void writeTo(OutputStream out, int statusCode) {
+    public void writeTo(OutputStream out) {
         PrintWriter writer = new PrintWriter(out, true);
-        Status status = new Status();
-        status.setStatus(statusCode);
+        Status status = new Status(statusCode);
+
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
+
+        /*
+        if (!responseHeaders.containsKey("Content-Type")) {
+            if (responseBodyFile != null) {
+                this.responseHeaders.put("Content-Type", ContentType.getContentType(responseBodyFile.toString()));
+            } else if (responseBodyText != null) {
+                this.addResponseHeader("Content-Type", ContentType.getContentType("html"));
+            }
+        }*/
 
         this.responseHeaders.forEach((key, value) -> {
             this.response.append(key + ": " + value + "\n");
         });
 
-        if (this.responseBodyText != null) {
+        if (this.responseBodyText != null && this.responseBodyFile == null) {
             this.response.append("\n").append(this.responseBodyText + "\n");
         }
         writer.println(this.response.toString());
@@ -86,11 +105,6 @@ public class HTTPResponse {
      *
      * @return HTTPレスポンス
      */
-    /*
-    public String toString() {
-        return response.toString();
-    }
-*/
     @Override
     public String toString() {
         return response.toString();

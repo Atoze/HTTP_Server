@@ -13,6 +13,16 @@ public class Status {
     private String status;
     private String statusMessage;
 
+    private static final String NO_CODE_EXISTS_MESSAGE = "Unknown Status";
+
+    public Status() {
+        setStatus(200);
+    }
+
+    public Status(int statusCode) {
+        setStatus(statusCode);
+    }
+
     private static final Map<Integer, String> STATUS = new HashMap<Integer, String>() {
         {
             put(200, "OK");
@@ -35,11 +45,9 @@ public class Status {
 
     private String getStatusParameter(int statusCode) {
         if (STATUS.containsKey(statusCode)) {
-            statusMessage = STATUS.get(statusCode);
-            return statusCode + " " + STATUS.get(statusCode);
-        } else {
-            return this.statusCode + " Unknown Status";
+            return statusCode + " " + statusMessage;
         }
+        return NO_CODE_EXISTS_MESSAGE;
     }
 
     /**
@@ -48,8 +56,9 @@ public class Status {
      * @param i ステータスコード
      */
     public void setStatus(int i) {
-        this.statusCode = i;
-        this.status = getStatusParameter(i);
+        statusCode = i;
+        statusMessage = STATUS.getOrDefault(statusCode, NO_CODE_EXISTS_MESSAGE);
+        status = getStatusParameter(i);
     }
 
     /**

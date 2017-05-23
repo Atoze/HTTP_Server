@@ -3,7 +3,6 @@ package jp.co.topgate.atoze.web.app.forum;
 import jp.co.topgate.atoze.web.HTTPHandler;
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPResponse;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
  * 掲示板の挙動を制御します.
  */
 public class ForumAppHandler extends HTTPHandler {
-    private final ForumApp forum;
+    private ForumApp forum;
 
     private final Map<String, String> query;
     private final String filePath;
@@ -20,17 +19,20 @@ public class ForumAppHandler extends HTTPHandler {
 
     private String html;
 
+    private int statusCode;
+
     public ForumAppHandler(HTTPRequest request) {
         super(request);
         filePath = request.getFilePath();
         query = request.getQuery();
         HOST = request.getHost();
-        forum = new ForumApp();
         try {
-            handle(request.getMethod());
+            forum = new ForumApp();
             statusCode = 200;
-        } catch (IOException e) {
+            handle(request.getMethod());
+        } catch (NullPointerException | IOException e) {
             statusCode = 500;
+            e.printStackTrace();
         }
     }
 
@@ -50,26 +52,28 @@ public class ForumAppHandler extends HTTPHandler {
     }
 
     private void handlerGET() throws IOException {
-        if (filePath.endsWith("search?")) {
-            forum.findThread(getQueryParam("search"));
-        }
-        //forum.showThread();
-    }
-
-    private void handlerPOST() throws IOException {
-        if (!getQueryParam("search").isEmpty()) {
+        if (filePath.startsWith("/program/board/search")) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        if (getQueryParam("_method").equals("DELETE")) {
+        if(filePath.equals("/program/board/index.html")){
+            forum.threadByCSV();
+            return;
+        }
+        statusCode = 404;
+    }
+
+    private void handlerPOST() throws IOException {
+        if (getQueryParam("search") != null) {
+            forum.findThread(getQueryParam("search"));
+            return;
+        }
+        if ("DELETE".equals(getQueryParam("_method"))) {
             if (ForumData.isNumber(getQueryParam("threadID"))) {
-                int id = Integer.parseInt(getQueryParam("threadID"));
-                if (id <= forum.getMainData().size() - 1) {
-                    forum.deleteThread(id, getQueryParam("password"));
-                    return;
-                }
+                String id = getQueryParam("threadID");
+                //int id = Integer.parseInt(getQueryParam("threadID"));
+                forum.deleteThread(id, getQueryParam("password"));
             }
-            System.out.println("範囲外です");
             return;
         }
         forum.createThread(query);
@@ -80,18 +84,15 @@ public class ForumAppHandler extends HTTPHandler {
      */
     @Override
     public HTTPResponse generateResponse() {
-        if (statusCode == 200) {
-            HTTPResponse response = new HTTPResponse();
-            response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
-            response.setResponseBody(html);
-            return response;
-        } else {
+        if (statusCode != 200) {
             return generateErrorResponse(statusCode);
         }
+        HTTPResponse response = new HTTPResponse();
+        response.setResponseBody(html);
+        return response;
     }
 
-    @NotNull
     private String getQueryParam(String key) {
-        return query.getOrDefault(key, "");
+        return query.getOrDefault(key, null);
     }
 }
