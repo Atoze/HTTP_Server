@@ -12,30 +12,27 @@ public class StaticHandler extends HTTPHandler {
     private File file;
     private String HOST;
 
-    StaticHandler() {
-        super();
-    }
-
-    @Override
-    public void setRequest(HTTPRequest request) {
+    StaticHandler(HTTPRequest request) {
+        super(request);
         file = new File(Server.ROOT_DIRECTORY, request.getFilePath());
         HOST = request.getHost();
     }
 
     @Override
-    public void generateResponse() {
-        statusCode = checkStatusCode(HOST, file);
-
+    public HTTPResponse generateResponse() {
+        int statusCode = checkStatusCode(HOST, file);
         if (statusCode == 200) {
+            HTTPResponse response = new HTTPResponse();
             if (Arrays.asList("html", "txt").contains(ContentType.getFileExtension(file.toString()))) {
                 response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
             } else {
                 response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()));
             }
             response.setResponseBody(file);
+            return response;
 
         } else {
-            this.generateErrorPage(statusCode);
+            return this.generateErrorResponse(statusCode);
         }
     }
 

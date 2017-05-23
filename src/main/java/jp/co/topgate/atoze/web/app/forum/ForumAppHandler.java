@@ -2,7 +2,7 @@ package jp.co.topgate.atoze.web.app.forum;
 
 import jp.co.topgate.atoze.web.HTTPHandler;
 import jp.co.topgate.atoze.web.HTTPRequest;
-import org.jetbrains.annotations.NotNull;
+import jp.co.topgate.atoze.web.HTTPResponse;
 
 import java.io.IOException;
 import java.util.Map;
@@ -11,85 +11,88 @@ import java.util.Map;
  * 掲示板の挙動を制御します.
  */
 public class ForumAppHandler extends HTTPHandler {
-    private final ForumApp forum;
+    private ForumApp forum;
 
-    private Map<String, String> query;
-    private String filePath;
-    private String HOST;
+    private final Map<String, String> query;
+    private final String filePath;
+    private final String HOST;
 
     private String html;
 
-    public ForumAppHandler() throws IOException {
-        super();
-        forum = new ForumApp();
-    }
+    private int statusCode;
 
-    @Override
-    public void setRequest(HTTPRequest request) {
+    public ForumAppHandler(HTTPRequest request) {
+        super(request);
         filePath = request.getFilePath();
-        HOST = request.getHost();
         query = request.getQuery();
+        HOST = request.getHost();
+        try {
+            forum = new ForumApp();
+            statusCode = 200;
+            handle(request.getMethod());
+        } catch (NullPointerException | IOException e) {
+            statusCode = 500;
+            e.printStackTrace();
+        }
     }
 
     /**
      * 受け取ったリクエストのメソッドに基づいて処理を分岐します.
      */
-    public void handle(String method) throws IOException {
+    private void handle(String method) throws IOException {
         switch (method) {
             case "GET":
-                methodGetHandler();
+                handlerGET();
                 break;
             case "POST":
-                methodPostHandler();
+                handlerPOST();
                 break;
         }
         html = new ForumHTML(HOST).getIndexHTML(forum.getMainData());
     }
 
-    private void methodGetHandler() throws IOException {
-        if (filePath.endsWith("search?")) {
+    private void handlerGET() throws IOException {
+        if (filePath.startsWith("/program/board/search")) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        forum.methodGetHandler();
+        if(filePath.equals("/program/board/index.html")){
+            forum.threadByCSV();
+            return;
+        }
+        statusCode = 404;
     }
 
-    private void methodPostHandler() throws IOException {
-        if (!getQueryParam("search").isEmpty()) {
+    private void handlerPOST() throws IOException {
+        if (getQueryParam("search") != null) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        if (getQueryParam("_method").equals("DELETE")) {
+        if ("DELETE".equals(getQueryParam("_method"))) {
             if (ForumData.isNumber(getQueryParam("threadID"))) {
-                int id = Integer.parseInt(getQueryParam("threadID"));
-                if (id <= forum.getMainData().size() - 1) {
-                    forum.deleteThread(id, getQueryParam("password"));
-                    return;
-                }
+                String id = getQueryParam("threadID");
+                //int id = Integer.parseInt(getQueryParam("threadID"));
+                forum.deleteThread(id, getQueryParam("password"));
             }
-            System.out.println("範囲外です");
             return;
         }
-        forum.newThread(query);
-
+        forum.createThread(query);
     }
 
     /**
      * レスポンスを生成します.
      */
     @Override
-    public void generateResponse() {
-        response.addResponseHeader("Content-Type", "text/html; charset=UTF-8");
-
-        if (statusCode == 0 || statusCode == 200) {
-            response.setResponseBody(html);
-        } else {
-            generateErrorPage(statusCode);
+    public HTTPResponse generateResponse() {
+        if (statusCode != 200) {
+            return generateErrorResponse(statusCode);
         }
+        HTTPResponse response = new HTTPResponse();
+        response.setResponseBody(html);
+        return response;
     }
 
-    @NotNull
     private String getQueryParam(String key) {
-        return query.getOrDefault(key, "");
+        return query.getOrDefault(key, null);
     }
 }

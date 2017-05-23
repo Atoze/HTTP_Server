@@ -11,23 +11,18 @@ import java.io.*;
  * HTTPを受け取った際に、実行されるハンドラーのAbstractClass
  */
 public abstract class HTTPHandler {
-
-    protected HTTPResponse response = new HTTPResponse();
-    protected int statusCode;
-
-    public HTTPHandler() {
+    public HTTPHandler(HTTPRequest request) {
     }
 
-    public abstract void setRequest(HTTPRequest request);
-
-    public abstract void generateResponse();
+    public abstract HTTPResponse generateResponse();
 
     /**
      * エラーページを生成し設定します.
      *
      * @param statusCode ステータスコードの値
      */
-    protected void generateErrorPage(int statusCode) {
+    protected HTTPResponse generateErrorResponse(int statusCode) {
+        HTTPResponse response = new HTTPResponse(statusCode);
         Status status = new Status();
         status.setStatus(statusCode);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
@@ -41,6 +36,7 @@ public abstract class HTTPHandler {
             html.setBody("<h1>" + status.getStatus() + "</h1>");
             response.setResponseBody(html.getHTML());
         }
+        return response;
     }
 
     /**
@@ -76,13 +72,8 @@ public abstract class HTTPHandler {
         return result;
     }
 
-    /**
-     * @param file 判別するファイル
-     * @return エンコード値
-     */
     public void response(OutputStream out) {
-        generateResponse();
-        response.writeTo(out, statusCode);
+        HTTPResponse response = generateResponse();
+        response.writeTo(out);
     }
-
 }

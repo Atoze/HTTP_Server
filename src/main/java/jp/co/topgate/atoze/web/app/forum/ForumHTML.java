@@ -39,6 +39,7 @@ class ForumHTML {
         for (int i = 0; i < list.size(); i++) {
             //sb.append("<tr>");
             //sb.append("<td>");
+            sb.append("<img src=\"" + "../../" + "img/bird.png\" alt=\"PNGテスト\" width=\"300px\">");
             sb.append("<table border=\"1\" width=\"50%\"><tbody>");
             sb.append("<tr>");
             sb.append("<td rowspan=\"3\", width=\"100px\">");
@@ -58,7 +59,7 @@ class ForumHTML {
             sb.append("</tr><tr>");
             sb.append("<td><form method=\"POST\" action=\"/program/board/\"><br/>");
             sb.append("<input type=\"hidden\" name=\"_method\" value=\"DELETE\">");
-            sb.append("<input type=\"hidden\" name=\"threadID\" value=\"").append(i).append("\">");
+            sb.append("<input type=\"hidden\" name=\"threadID\" value=\"").append(getParameter(list, i, "ID")).append("\">");
             sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
             sb.append("<input type=\"submit\" name=\"button\" value=\"削除\">");
             sb.append("</form></td>");
@@ -94,7 +95,7 @@ class ForumHTML {
         sb.append("メッセージID:<input type=\"text\" name=\"threadID\" size=\"3\">");
         sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
         sb.append("<INPUT type='submit' name='button' value='削除'></form>");
-        sb.append("<form method=\"post\" action=\"/program/board/search\"><br/>");
+        sb.append("<form method=\"get\" action=\"/program/board/search\"><br/>");
         sb.append("検索:<INPUT type='search' name='search'>");
         sb.append("<input type=\"submit\" value=\"送信する\">");
         sb.append("</form>");
@@ -127,7 +128,7 @@ class ForumHTML {
     private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
-        return convertSanitize(URLDecoder.decode(param, "UTF-8"));
+        return sanitizeHTML(URLDecoder.decode(param, "UTF-8"));
     }
 
     /**
@@ -136,7 +137,7 @@ class ForumHTML {
      * @param str
      * @return
      */
-    private static String convertSanitize(String str) {
+    private static String sanitizeHTML(String str) {
         if (str == null) {
             return str;
         }
