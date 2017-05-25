@@ -1,0 +1,5 @@
+GET http://localhost:8080/hoge.html HTTP/1.1
+Host: localhost:8080
+test: hogehoge
+ManyCollon: hoge: hoge: hoge
+hoge:hoge

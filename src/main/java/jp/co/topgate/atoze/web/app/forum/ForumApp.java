@@ -10,23 +10,33 @@ import java.util.*;
 /**
  * 掲示板アプリ
  */
-class ForumApp {
-    private final ForumData forumData;
+public class ForumApp {
+    private ForumData forumData;
 
     private List<String[]> mainData = new ArrayList<>();
 
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
     private static final String CSV_FILENAME = "save.csv";
-    ForumApp() throws IOException {
+
+    public ForumApp() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         //forumData = new ForumData(null);
+        mainData = forumData.getData();
+    }
+
+    public void setMainData(List<String[]> data) {
+        mainData = data;
+    }
+
+    public void setForumDataFile(File file) throws IOException {
+        this.forumData = new ForumData(file);
         mainData = forumData.getData();
     }
 
     /**
      * 新規に投稿された時
      */
-    void createThread(Map<String, String> query) throws IOException {
+    public void createThread(Map<String, String> query) throws IOException {
         List<String[]> list = forumData.getData();
         //TODO ユーザー管理
         /*
@@ -47,7 +57,7 @@ class ForumApp {
     /**
      * 検索時
      */
-    void findThread(String name) throws IOException {
+    public void findThread(String name) throws IOException {
         List<String[]> list = forumData.getData();
         List<String[]> data = new ArrayList<>();
         if (name != null) {
@@ -63,7 +73,7 @@ class ForumApp {
     /**
      * 保存しているデータのID値から一致したものを削除
      */
-    void deleteThreadByID(String id, String requestPassword) throws IOException {
+    public void deleteThreadByID(String id, String requestPassword) throws IOException {
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
@@ -84,7 +94,7 @@ class ForumApp {
     /**
      * Listのインデックス番号を指定し削除
      */
-    void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
+    public void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
         if (!ForumData.isNumber(id)) {
             return;
         }
@@ -133,7 +143,7 @@ class ForumApp {
     }
 
     @NotNull
-    List<String[]> getMainData() {
+    public List<String[]> getMainData() {
         return mainData;
     }
 

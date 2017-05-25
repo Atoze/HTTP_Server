@@ -5,6 +5,7 @@ import org.junit.Test;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertThat;
 public class HTTPRequestTest {
     @Test
     public void Requestのデータをパース() throws IOException {
-        File file = new File("src/test/Document/test.txt"); //実データに近いもの
+        File file = new File("src/test/Document/request.txt"); //実データに近いもの
         HTTPRequest httpRequest = new HTTPRequest(null, null, null, null);
         InputStream input = new FileInputStream(file);
 
@@ -38,17 +39,7 @@ public class HTTPRequestTest {
         assertThat("localhost:8080", is(httpRequest.getHeaderParam("Host")));
 
 
-        File test = new File("src/test/Document/httpRequestLine.txt");
-        OutputStream output = new FileOutputStream(test);
-        PrintWriter writer = new PrintWriter(output, true);
-
-        //検証ファイルにデータ挿入
-        writer.println("GET http://localhost:8080/hoge.html HTTP/1.1");
-        writer.println("Host: localhost:8080");
-        writer.println("test: hogehoge");
-        writer.println("ManyCollon: hoge: hoge: hoge");
-        writer.println("hoge:hoge");
-
+        File test = new File("src/test/Document/requestHoge.txt");
         input = new FileInputStream(test);
         httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
 
@@ -65,87 +56,17 @@ public class HTTPRequestTest {
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("src/test/Document/httpRequestLine.txt");
+        File test = new File("src/test/Document/requestLine.txt");
         OutputStream output = new FileOutputStream(test);
-        PrintWriter writer = new PrintWriter(output, true);
-
-        InputStream input = new FileInputStream(test);
-        HTTPRequest httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        //間違ったローカルホスト指定 そのまま返して来る
-        writer.flush();
-        writer.println("GET http://hogehoge/hoge.html HTTP/1.1");
-
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-        assertThat("http://hogehoge/hoge.html", is(httpRequestLine.getFilePath()));
-    }
-
-    @Test
-    public void 間違ったリクエストがきた場合() throws IOException {
-        File test = new File("src/test/Document/httpRequestLine.txt");
-        OutputStream output = new FileOutputStream(test);
-        PrintWriter writer = new PrintWriter(output, true);
         InputStream input = new FileInputStream(test);
 
-        //スペースがない場合
-        writer.println("GET/HTTP/1.1");
-        HTTPRequest httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat(null, is(httpRequestLine.getMethod()));
-        assertThat("", is(httpRequestLine.getFilePath()));
-        assertThat(null, is(httpRequestLine.getProtocolVer()));
-
-        //スペースが2つだけの場合
-        writer.flush();
-        writer.println("GET https://localhost:8080/hoge.htmlHTTP/1.1");
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat(null, is(httpRequestLine.getMethod()));
-        assertThat("", is(httpRequestLine.getFilePath()));
-        assertThat(null, is(httpRequestLine.getProtocolVer()));
-
-        //スペースが４つ以上の場合
-        writer.flush();
-        writer.println("GET https://localhost:8080/hoge.html HTTP/1.1 hogehoge");
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat(null, is(httpRequestLine.getMethod()));
-        assertThat("", is(httpRequestLine.getFilePath()));
-        assertThat(null, is(httpRequestLine.getProtocolVer()));
-
-        //順番がバラバラの場合
-        writer.flush();
-        writer.println("HTTP/1.1 GET https://localhost:8080/hoge.html");
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat(null, is(httpRequestLine.getMethod()));
-        assertThat("GET", is(httpRequestLine.getFilePath()));
-        assertThat(null, is(httpRequestLine.getProtocolVer()));
-
-        //Methodが間違っている場合
-        writer.flush();
-        writer.println("Foo: http://localhost:8080/hoge.html HTTP/1.1");
-
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat(null, is(httpRequestLine.getMethod()));
-        assertThat("/hoge.html", is(httpRequestLine.getFilePath()));
-        assertThat("1.1", is(httpRequestLine.getProtocolVer()));
-
-        //URL指定忘れ & HTTP指定が間違っている場合
-        writer.flush();
-        writer.println("GET  HTTPhoge");
-
-        httpRequestLine = HTTPRequestParser.parse(input, "localhost:8080");
-
-        assertThat("GET", is(httpRequestLine.getMethod()));
-        assertThat("", is(httpRequestLine.getFilePath()));
-        assertThat(null, is(httpRequestLine.getProtocolVer()));
+        HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
+        assertThat("http://hogehoge/hoge.html", is(httpRequest.getFilePath()));
     }
 
     @Test
     public void POSTテスト() throws IOException {
-        File file = new File("src/test/Document/test_POST.txt"); //実データに近いもの
+        File file = new File("src/test/Document/requestPost.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
         HTTPRequest httpRequest;
         //データ挿入
@@ -161,16 +82,14 @@ public class HTTPRequestTest {
         assertThat("key1=value1&key2=あいうえお", is(httpRequest.getBodyText()));
         System.out.println(httpRequest.getHeader());
         System.out.println(httpRequest.getBodyText());
-
     }
 
     @Test
     public void POSTLargeテスト() throws IOException {
-        //HTTPRequest httpRequest = HTTPRequestParser.parse(null, null);
-        File file = new File("src/test/Document/test_LargePOST.txt"); //実データに近いもの
+        File file = new File("src/test/Document/requestLargePOST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
-        HTTPRequest httpRequest = null;
+        HTTPRequest httpRequest;
         //データ挿入
         try {
             httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
@@ -185,12 +104,32 @@ public class HTTPRequestTest {
 
         System.out.println(httpRequest.getHeader());
         System.out.println(largePOST);
-
     }
 
     @Test
+    public void POSTの中身がない場合のテスト() throws IOException {
+        File file = new File("src/test/Document/requestPostNoData"); //実データに近いもの
+        InputStream input = new FileInputStream(file);
+
+        HTTPRequest httpRequest;
+        //データ挿入
+        try {
+            httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertThat("POST", is(httpRequest.getMethod()));
+        assertThat("/index.html", is(httpRequest.getFilePath()));
+        assertThat("1.1", is(httpRequest.getProtocolVer()));
+
+        assertThat(null, is(httpRequest.getBodyText()));
+        assertThat(null, is(httpRequest.getBodyFile()));
+        assertThat(new HashMap<String, String>(), is(httpRequest.getQuery()));
+    }
+
+    //直接元画像(src/test/Document/bird.png)と出力画像(src/test/Document/bird2.png)を比べてください
+    @Test
     public void 画像データ取得のテスト() throws Exception {
-        //HTTPRequest httpRequest = new HTTPRequest();
         String filePath = "src/test/Document/test_imagePOST.txt";
         File file = new File(filePath);
         File img = new File("src/test/Document/bird.png");
@@ -225,19 +164,15 @@ public class HTTPRequestTest {
         HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
         assertThat("POST", is(httpRequest.getMethod()));
 
-        //System.out.println(httpRequest.getHeader());
-        //System.out.println(new String(httpRequest.getRequestFile(), "UTF-8"));
-
         BufferedInputStream bi = new BufferedInputStream(new FileInputStream(imgTestFile));
         byte[] test = httpRequest.getBodyFile();
         //byte[] test = requestFile(bi, imgByte.length);
         BufferedImage outputImage = getImageFromBytes(test);
         //System.out.println(new String(test, "UTF-8"));
-
         ImageIO.write(outputImage, "png", new File("src/test/Document/bird2.png"));
     }
 
-    public static byte[] getBytesFromImage(BufferedImage img, String format) throws IOException {
+    private static byte[] getBytesFromImage(BufferedImage img, String format) throws IOException {
         if (format == null) {
             format = "png";
         }
@@ -246,21 +181,7 @@ public class HTTPRequestTest {
         return baos.toByteArray();
     }
 
-    private byte[] readFileToByte(String filePath) throws Exception {
-        byte[] b = new byte[1];
-        FileInputStream fis = new FileInputStream(filePath);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while (fis.read(b) > 0) {
-            baos.write(b);
-        }
-        baos.close();
-        fis.close();
-        b = baos.toByteArray();
-
-        return b;
-    }
-
-    public static BufferedImage getImageFromBytes(byte[] bytes) throws IOException {
+    private static BufferedImage getImageFromBytes(byte[] bytes) throws IOException {
         ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
         BufferedImage img = ImageIO.read(baos);
         return img;

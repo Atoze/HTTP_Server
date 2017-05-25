@@ -5,27 +5,25 @@ import org.jetbrains.annotations.Contract;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * CSVFileClassとForumAppHandlerClassの互いのデータを、
  * それぞれ最適な形に変換します.
  */
 
-class ForumData {
+public class ForumData {
     private final List<String[]> data;
     private final CSVFile reader = new CSVFile();
 
-    ForumData(File file) throws IOException {
+    public ForumData(File file) throws IOException {
         data = checkData(reader.readCSV(file));
     }
 
     /**
      * リストデータを返します.
      */
-    List<String[]> getData() {
+    public List<String[]> getData() {
         return data;
     }
 
@@ -77,9 +75,9 @@ class ForumData {
     }
 
     /**
-     * データからID値が最初に挿入されていないものを削除します.
+     * データからID値が最初に挿入されていないもの,ID値が重複しているものを削除します.
      *
-     * @param data 確認するリストデータ
+     * @param data  確認するリストデータ
      * @param start
      * @param end
      * @return 整列されたデータ
@@ -98,8 +96,10 @@ class ForumData {
         if (end >= data.size()) {
             end = data.size() - 1;
         }
+        Set<String> existsID = new HashSet<>();
         for (int i = start; i <= end; i++) {
-            if (!isNumber(getParameter(data, i, ForumDataPattern.ID.getKey())) || data.isEmpty()) {
+            String currentID = getParameter(data, i, ForumDataPattern.ID.getKey());
+            if (!isNumber(currentID) || data.isEmpty() || existsID.contains(currentID)) {
                 data.remove(i);
                 if (data.size() <= 0) {
                     return data;
@@ -107,6 +107,7 @@ class ForumData {
                 end = end - 1;
                 i = i - 1;
             }
+            existsID.add(currentID);
         }
         return data;
     }
