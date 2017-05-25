@@ -56,8 +56,16 @@ public class HTTPRequestTest {
 
     @Test
     public void 絶対パスのテスト() throws IOException {
-        File test = new File("src/test/Document/requestLine.txt");
-        OutputStream output = new FileOutputStream(test);
+        File test = new File("src/test/Document/requestAbsolutePath");
+        InputStream input = new FileInputStream(test);
+
+        HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
+        assertThat("/hoge.html", is(httpRequest.getFilePath()));
+    }
+
+    @Test
+    public void サーバーの絶対パスと異なる時のテスト() throws IOException {
+        File test = new File("src/test/Document/requestWrongAbsolutePath");
         InputStream input = new FileInputStream(test);
 
         HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
