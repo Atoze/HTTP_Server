@@ -8,7 +8,7 @@ import java.util.*;
  * HTMLの形に沿ったStringを生成します.
  * //TODO 効率よくかく
  */
-public class HTMLEditor {
+public class HTMLBuilder {
 
     private static final String LINE_FEED = System.getProperty("line.separator");
 
@@ -28,7 +28,7 @@ public class HTMLEditor {
     private String charset = "UTF-8";
     private String doctype = "html";
 
-    public HTMLEditor() {
+    public HTMLBuilder() {
         init();
     }
 
@@ -61,13 +61,15 @@ public class HTMLEditor {
     }
 
     public void addBody(String body) {
+
         bodyData.add(body);
     }
 
     private void generateHead() {
         String head = "";
         for (String headData : this.headData) {
-            head += headData + LINE_FEED;
+            if (headData != null && !headData.isEmpty())
+                head += headData + LINE_FEED;
         }
         head = head + "<title>" + title + "</title>";
         this.head = head + generateMetaDataField() + generateLinkField();
@@ -132,6 +134,10 @@ public class HTMLEditor {
             sb.append("</").append(tag).append(">");
         }
         return sb.toString();
+    }
+
+    public String generateField(String tag, String content) {
+        return generateMainField(tag, content, null);
     }
 
     public String generateField(String tag, String content, String[]... attribute) {

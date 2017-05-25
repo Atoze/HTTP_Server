@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.htmlEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
 import jp.co.topgate.atoze.web.util.ContentType;
 import jp.co.topgate.atoze.web.util.Status;
 import org.mozilla.universalchardet.UniversalDetector;
@@ -11,8 +11,6 @@ import java.io.*;
  * HTTPを受け取った際に、実行されるハンドラーのAbstractClass
  */
 public abstract class HTTPHandler {
-    public HTTPHandler(HTTPRequest request) {
-    }
 
     public abstract HTTPResponse generateResponse();
 
@@ -31,7 +29,7 @@ public abstract class HTTPHandler {
             response.setResponseBody(errorFile);
         } else {
             response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=UTF-8");
-            HTMLEditor html = new HTMLEditor();
+            HTMLBuilder html = new HTMLBuilder();
             //html.setTitle(status.getStatus());
             html.setBody("<h1>" + status.getStatus() + "</h1>");
             response.setResponseBody(html.getHTML());
@@ -72,7 +70,7 @@ public abstract class HTTPHandler {
         return result;
     }
 
-    public void response(OutputStream out) {
+    public void writeResponse(OutputStream out) {
         HTTPResponse response = generateResponse();
         response.writeTo(out);
     }

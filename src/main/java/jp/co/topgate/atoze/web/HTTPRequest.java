@@ -1,8 +1,7 @@
 package jp.co.topgate.atoze.web;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,67 +11,44 @@ import java.util.Map;
  * @author atoze
  */
 public class HTTPRequest {
-    //private String requestBody;
-    private byte[] requestBodyFile;
-    private String requestBodyQuery;
+    private byte[] bodyFile;
+    private String bodyText;
+    private Map<String, String> bodyQuery;
 
-    private String requestHeader;
-    private String requestHeaderQuery;
-    private String method;
-    private String filePath;
-    private String protocolVer;
+    private String header;
+    private Map<String, String> headerQuery;
 
-    private String host;
+    private final String method;
+    private final String filePath;
+    private final String protocolVer;
+    private final String host;
 
-    private Map<String, String> headerData = new HashMap<>();
-    private Map<String, String> queryData = new HashMap<>();
+    private Map<String, String> headerField = new HashMap<>();
 
 
-    private final static String lineFeed = System.getProperty("line.separator");
-
-    /**
-     * InputStreamより受け取ったHTTPリクエストを行ごとに分割し、保管します.
-     *
-     * @param input HTTPリクエストのデータストリーム
-     * @param host  HTTPホスト名
-     * @throws IOException ストリームデータ取得エラー
-     */
-
-    public void readRequest(InputStream input, String host) throws IOException {
+    HTTPRequest(String method, String filePath, String protocolVer, String host) {
+        this.method = method;
+        this.filePath = filePath;
+        this.protocolVer = protocolVer;
         this.host = host;
-        BufferedInputStream bi = new BufferedInputStream(input);
-        StringBuilder text = new StringBuilder();
-        String line = readLine(bi);
+    }
 
-        HTTPRequestLine httpRequestLine = new HTTPRequestLine();
-        httpRequestLine.readRequestLine(line, host);
+    void setHeader(String header, Map<String, String> headerField) {
+        this.header = header;
+        this.headerField = headerField;
+    }
 
-        method = httpRequestLine.getMethod();
-        requestHeaderQuery = httpRequestLine.getHeadQuery();
-        filePath = httpRequestLine.getFilePath();
-        protocolVer = httpRequestLine.getProtocolVer();
+    void setBody(String bodyText, byte[] bodyFile) {
+        this.bodyText = bodyText;
+        this.bodyFile = bodyFile;
+    }
 
-        while (line != null && !line.isEmpty()) {
-            text.append(line).append(lineFeed);
-            String[] headerLineData = line.split(":", 2);
-            if (headerLineData.length == 2) {
-                this.headerData.put(headerLineData[0].toUpperCase(), headerLineData[1].trim());
-            }
-            line = readLine(bi);
-        }
-        this.requestHeader = text.toString();
+    void setHeaderQuery(Map<String, String> query) {
+        this.headerQuery = query;
+    }
 
-        //RequestBody処理
-        String contentType = getHeaderParam("Content-Type");
-        if (line == null || contentType == null) {
-            return;
-        }
-        int contentLength = Integer.parseInt(getHeaderParam("Content-Length"));
-        HTTPRequestBody requestBody = new HTTPRequestBody(bi, contentType, contentLength);
-        requestBodyQuery = requestBody.getBodyText();
-        requestBodyFile = requestBody.getBodyFile();
-
-        this.queryData = generateQueryMap();
+    void setBodyQuery(Map<String, String> query) {
+        this.bodyQuery = query;
     }
 
     /**
@@ -80,8 +56,8 @@ public class HTTPRequest {
      *
      * @return HTTPリクエストヘッダ
      */
-    public String getRequestHeader() {
-        return this.requestHeader;
+    public String getHeader() {
+        return this.header;
     }
 
     /**
@@ -91,18 +67,7 @@ public class HTTPRequest {
      * @return 値
      */
     public String getHeaderParam(String key) {
-        return headerData.getOrDefault(key.toUpperCase(), null);
-    }
-
-
-    /**
-     * 要求するメッセージボディを返します.
-     *
-     * @return リクエストボディメッセージ
-     */
-
-    public String getRequestText() {
-        return this.requestBodyQuery;
+        return headerField.getOrDefault(key.toUpperCase(), null);
     }
 
     /**
@@ -110,17 +75,21 @@ public class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    public byte[] getRequestBodyFile() {
-        return this.requestBodyFile;
+    public String getBodyText() {
+        return this.bodyText;
     }
 
-
-    public String getQueryParam(String key) {
-        return queryData.getOrDefault(key, "");
+    /**
+     * 要求するメッセージボディを返します.
+     *
+     * @return リクエストボディメッセージ
+     */
+    public byte[] getBodyFile() {
+        return this.bodyFile;
     }
 
     public Map<String, String> getQuery() {
-        return queryData;
+        return generateQueryMap();
     }
 
     public String getMethod() {
@@ -139,53 +108,14 @@ public class HTTPRequest {
         return this.protocolVer;
     }
 
-
+    @NotNull
     private Map<String, String> generateQueryMap() {
-        String body;
-        if (method.equals("GET")) body = requestHeaderQuery;
-        else body = requestBodyQuery;
-
-        Map<String, String> queryData = new HashMap<>();
-        String[] data = body.split("&");
-        for (int i = 0; i <= data.length - 1; i++) {
-            String[] queryValue = data[i].split("=", 2);
-            if (queryValue.length >= 2) {
-                queryData.put(queryValue[0], queryValue[1]);
-            }
-        }
-        return queryData;
-    }
-
-    //TODO 改行コードが"\r"のみの対応
-    private String readLine(InputStream input) throws IOException {
-        int num = 0;
-        StringBuffer sb = new StringBuffer();
-        boolean r = false;
-        try {
-            while ((num = input.read()) >= 0) {
-                sb.append((char) num);
-                String line = sb.toString();
-                switch ((char) num) {
-                    case '\r':
-                        r = true;
-                        break;
-                    case '\n':
-                        if (r) {
-                            line = line.replace("\r", "");
-                        }
-                        line = line.replace("\n", "");
-                        return line;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (sb.length() == 0) {
-            return null;
+        if (method.equals("GET")) {
+            if (headerQuery != null) return headerQuery;
+            else return new HashMap<>();
         } else {
-            return sb.toString();
+            if (bodyQuery != null) return bodyQuery;
+            else return new HashMap<>();
         }
     }
 }

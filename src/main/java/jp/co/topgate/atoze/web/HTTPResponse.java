@@ -67,28 +67,14 @@ public class HTTPResponse {
 
         this.response.append("HTTP/1.1 " + status.getStatus() + "\n");
 
-        /*
-        if (!responseHeaders.containsKey("Content-Type")) {
-            if (responseBodyFile != null) {
-                this.responseHeaders.put("Content-Type", ContentType.getContentType(responseBodyFile.toString()));
-            } else if (responseBodyText != null) {
-                this.addResponseHeader("Content-Type", ContentType.getContentType("html"));
-            }
-        }*/
-
         this.responseHeaders.forEach((key, value) -> {
             this.response.append(key + ": " + value + "\n");
         });
-
-        if (this.responseBodyText != null && this.responseBodyFile == null) {
-            this.response.append("\n").append(this.responseBodyText + "\n");
-        }
         writer.println(this.response.toString());
 
         if (this.responseBodyFile != null) {
             try {
-                BufferedInputStream bi
-                        = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
+                BufferedInputStream bi = new BufferedInputStream(new FileInputStream(this.responseBodyFile));
 
                 for (int c = bi.read(); c >= 0; c = bi.read()) {
                     out.write(c);
@@ -97,6 +83,8 @@ public class HTTPResponse {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else if (this.responseBodyText != null) {
+            writer.println(this.responseBodyText + "\n");
         }
     }
 

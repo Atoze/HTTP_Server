@@ -10,34 +10,33 @@ import java.util.*;
 /**
  * 掲示板アプリ
  */
-class ForumApp {
-    private final ForumData forumData;
+public class ForumApp {
+    private ForumData forumData;
 
     private List<String[]> mainData = new ArrayList<>();
 
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
     private static final String CSV_FILENAME = "save.csv";
-    private static final List<String> KEY = Arrays.asList(
-            "ID",
-            "NAME",
-            "TITLE",
-            "TEXT",
-            "PASSWORD",
-            "DATE",
-            "ICON"
-    );
 
-    ForumApp() throws IOException {
+    public ForumApp() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         //forumData = new ForumData(null);
+        mainData = forumData.getData();
+    }
 
+    public void setMainData(List<String[]> data) {
+        mainData = data;
+    }
+
+    public void setForumDataFile(File file) throws IOException {
+        this.forumData = new ForumData(file);
         mainData = forumData.getData();
     }
 
     /**
      * 新規に投稿された時
      */
-    void createThread(Map<String, String> query) throws IOException {
+    public void createThread(Map<String, String> query) throws IOException {
         List<String[]> list = forumData.getData();
         //TODO ユーザー管理
         /*
@@ -58,7 +57,7 @@ class ForumApp {
     /**
      * 検索時
      */
-    void findThread(String name) throws IOException {
+    public void findThread(String name) throws IOException {
         List<String[]> list = forumData.getData();
         List<String[]> data = new ArrayList<>();
         if (name != null) {
@@ -72,16 +71,16 @@ class ForumApp {
     }
 
     /**
-     * 削除時
+     * 保存しているデータのID値から一致したものを削除
      */
-    void deleteThread(String id2, String requestPassword) throws IOException {
+    public void deleteThreadByID(String id, String requestPassword) throws IOException {
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
         }
 
         for (int i = 0; i < list.size(); i++) {
-            if (id2.equals(ForumData.getParameter(list, i, "ID"))) {
+            if (id.equals(ForumData.getParameter(list, i, "ID"))) {
                 if (requestPassword.equals(ForumData.getParameter(list, i, "PASSWORD"))) {
                     list.remove(i);
                     mainData = list;
@@ -93,19 +92,23 @@ class ForumApp {
     }
 
     /**
-     * 削除時
+     * Listのインデックス番号を指定し削除
      */
-    void deleteThread(int id, String requestPassword) throws IOException {
+    public void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
+        if (!ForumData.isNumber(id)) {
+            return;
+        }
+        int listIndex = Integer.parseInt(id);
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
         }
-        if (id >= 0 && id < list.size()) {
-            if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
+        if (listIndex >= 0 && listIndex < list.size()) {
+            if (ForumData.getParameter(list, listIndex, "PASSWORD").isEmpty()) {
                 return;
             }
-            if (requestPassword.equals(ForumData.getParameter(list, id, "PASSWORD"))) {
-                list.remove(id);
+            if (requestPassword.equals(ForumData.getParameter(list, listIndex, "PASSWORD"))) {
+                list.remove(listIndex);
                 mainData = list;
                 forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
             }
@@ -119,8 +122,9 @@ class ForumApp {
     @Contract(pure = true)
     private String[] generateNewThreadData(Map<String, String> query) throws IOException {
         List<String> saveData = new ArrayList<>();
-        for (int i = 0; i < KEY.size(); i++) {
-            String key = this.KEY.get(i);
+
+        for (int i = 0; i < ForumDataPattern.size(); i++) {
+            String key = ForumDataPattern.getKeyByIndex(i);
             switch (key) {
                 case "ID":
                     saveData.add(key + ":" + retrieveNewID(forumData.getData()));
@@ -131,16 +135,15 @@ class ForumApp {
                 case "DATE":
                     saveData.add(key + ":" + date());
                     break;
-
                 default:
-                    saveData.add(key + ":" + query.get(key.toLowerCase()));
+                    saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
             }
         }
         return saveData.toArray(new String[0]);
     }
 
     @NotNull
-    List<String[]> getMainData() {
+    public List<String[]> getMainData() {
         return mainData;
     }
 
@@ -159,6 +162,6 @@ class ForumApp {
         if (list.size() == 0) {
             return 0;
         }
-        return Integer.parseInt(forumData.getParameter(list, list.size() - 1, "ID")) + 1;
+        return Integer.parseInt(forumData.getParameter(list, list.size() - 1, ForumDataPattern.ID.getKey())) + 1;
     }
 }

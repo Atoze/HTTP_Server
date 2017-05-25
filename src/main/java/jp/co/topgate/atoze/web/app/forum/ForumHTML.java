@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.htmlEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,22 +16,36 @@ class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
     private String host;
     private static final String CSS_FILENAME = "/css/board.css";
+    private static final String NAME_QUERY = "hoge";
+    private static final String TITLE_QUERY = "title";
+    private static final String TEXT_QUERY = "text";
+    private static final String PASSWORD_QUERY = "password";
+
 
     ForumHTML(String host) {
         this.host = host;
     }
 
     String getIndexHTML(List list) throws IOException {
-        HTMLEditor html = new HTMLEditor();
+        HTMLBuilder html = new HTMLBuilder();
+
+        ForumDataPattern.NAME.setQueryKey(NAME_QUERY);
+        ForumDataPattern.TITLE.setQueryKey(TITLE_QUERY);
+        ForumDataPattern.TEXT.setQueryKey(TEXT_QUERY);
+        ForumDataPattern.PASSWORD.setQueryKey(PASSWORD_QUERY);
 
         html.setLanguage("ja");
         html.setTitle(FORUM_TITLE);
-        html.setStylesheet(host + CSS_FILENAME);
-        html.setBody(headerForm() + table(list) + footerForm());
+        html.setStylesheet("http://" + host + CSS_FILENAME);
+        html.addBody(headerForm());
+        html.addBody(table(list));
+        html.addBody(footerForm());
+        //html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
     }
 
-    private String table(List<String[]> list) throws IOException {
+    @NotNull
+    private static String table(List<String[]> list) throws IOException {
         if (list == null) {
             return "";
         }
@@ -39,27 +54,26 @@ class ForumHTML {
         for (int i = 0; i < list.size(); i++) {
             //sb.append("<tr>");
             //sb.append("<td>");
-            sb.append("<img src=\"" + "../../" + "img/bird.png\" alt=\"PNGテスト\" width=\"300px\">");
             sb.append("<table border=\"1\" width=\"50%\"><tbody>");
             sb.append("<tr>");
             sb.append("<td rowspan=\"3\", width=\"100px\">");
             sb.append("ID:");//Icon Name
-            sb.append(getParameter(list, i, "ID"));//ID
-            sb.append("<br>投稿者:");//Icon Name
-            sb.append(getParameter(list, i, "NAME"));//Name
+            sb.append(getParameter(list, i, ForumDataPattern.ID.getKey()));//ID
+            sb.append("<br>投稿者:");
+            sb.append(getParameter(list, i, ForumDataPattern.NAME.getKey()));//Name
             sb.append("</td><td>");
             sb.append("<b>");
-            sb.append(getParameter(list, i, "TITLE"));//Title
+            sb.append(getParameter(list, i, ForumDataPattern.TITLE.getKey()));//Title
             sb.append("</b><br>");//Title
-            sb.append(getParameter(list, i, "DATE"));//Date
+            sb.append(getParameter(list, i, ForumDataPattern.DATE.getKey()));//Date
             sb.append("</td>");
             sb.append("</tr><tr><td>");
-            sb.append(getParameter(list, i, "TEXT"));//Text
+            sb.append(getParameter(list, i, ForumDataPattern.TEXT.getKey()));//Text
             sb.append("</td>");
             sb.append("</tr><tr>");
             sb.append("<td><form method=\"POST\" action=\"/program/board/\"><br/>");
             sb.append("<input type=\"hidden\" name=\"_method\" value=\"DELETE\">");
-            sb.append("<input type=\"hidden\" name=\"threadID\" value=\"").append(getParameter(list, i, "ID")).append("\">");
+            sb.append("<input type=\"hidden\" name=\"tableIndex\" value=\"").append(i).append("\">");
             sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
             sb.append("<input type=\"submit\" name=\"button\" value=\"削除\">");
             sb.append("</form></td>");
@@ -75,20 +89,22 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String headerForm() {
+    private static String headerForm() {
         StringBuffer sb = new StringBuffer();
-        sb.append("<div align=\"center\">簡易Java掲示板<br/>");
+        sb.append("<div align=\"center\">" + FORUM_TITLE + "<br/>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
-        sb.append("名前:<input required type=\"text\" name=\"name\" size=\"50\"><br/>");
-        sb.append("タイトル:<input required type=\"text\" name=\"title\" size=\"50\"><br/>");
-        sb.append("本文:<textarea required name=\"text\" rows=\"10\" cols=\"48\"></textarea><br/>");
-        sb.append("パスワード:<input required type=\"password\" name=\"password\"><br/>");
+        sb.append("名前:<input required type=\"text\" name=\"");
+        sb.append(NAME_QUERY);
+        sb.append("\" size=\"50\"><br/>");
+        sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\"><br/>");
+        sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"48\"></textarea><br/>");
+        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\"><br/>");
         sb.append("<INPUT type='submit' name='button' value='入力'></form>");
 
         return sb.toString();
     }
 
-    private String footerForm() {
+    private static String footerForm() {
         StringBuffer sb = new StringBuffer();
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("<INPUT type='hidden' name='_method' value='DELETE'>");
@@ -103,7 +119,7 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String dataForm(List<String[]> list, Integer id) throws IOException {
+    private static String dataForm(List<String[]> list, Integer id) throws IOException {
         StringBuffer sb = new StringBuffer();
         sb.append("<table width=\"50%\"><tbody>");
         sb.append("<tr>");
@@ -125,7 +141,7 @@ class ForumHTML {
     }
 
 
-    private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    private static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
         return sanitizeHTML(URLDecoder.decode(param, "UTF-8"));

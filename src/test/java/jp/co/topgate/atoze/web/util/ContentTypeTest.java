@@ -14,13 +14,11 @@ public class ContentTypeTest {
         //NULL
         assertThat(null, is(ContentType.getContentType(null)));
 
-        //通常ファイル
-        String file = "test.html";
-        assertThat("text/html", is(ContentType.getContentType(file)));
+        //通常HTMLファイル
+        assertThat("text/html", is(ContentType.getContentType("test.html")));
 
         //テキストファイル
-        file = "test.txt";
-        assertThat("text/plain", is(ContentType.getContentType(file)));
+        assertThat("text/plain", is(ContentType.getContentType("test.txt")));
 
         //拡張子がcontent Mapにない場合
         assertThat("application/octet-stream", is(ContentType.getContentType("hoge.hoge")));

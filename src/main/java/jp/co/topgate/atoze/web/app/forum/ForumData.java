@@ -5,27 +5,25 @@ import org.jetbrains.annotations.Contract;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * CSVFileClassとForumAppHandlerClassの互いのデータを、
  * それぞれ最適な形に変換します.
  */
 
-class ForumData {
+public class ForumData {
     private final List<String[]> data;
     private final CSVFile reader = new CSVFile();
 
-    ForumData(File file) throws IOException {
+    public ForumData(File file) throws IOException {
         data = checkData(reader.readCSV(file));
     }
 
     /**
      * リストデータを返します.
      */
-    List<String[]> getData() {
+    public List<String[]> getData() {
         return data;
     }
 
@@ -77,9 +75,9 @@ class ForumData {
     }
 
     /**
-     * データからForumApp用の形式に削ぐわないものを消去します.
+     * データからID値が最初に挿入されていないもの,ID値が重複しているものを削除します.
      *
-     * @param data
+     * @param data  確認するリストデータ
      * @param start
      * @param end
      * @return 整列されたデータ
@@ -98,8 +96,10 @@ class ForumData {
         if (end >= data.size()) {
             end = data.size() - 1;
         }
+        Set<String> existsID = new HashSet<>();
         for (int i = start; i <= end; i++) {
-            if (!isNumber(getParameter(data, i, "ID")) || data.isEmpty()) {
+            String currentID = getParameter(data, i, ForumDataPattern.ID.getKey());
+            if (!isNumber(currentID) || data.isEmpty() || existsID.contains(currentID)) {
                 data.remove(i);
                 if (data.size() <= 0) {
                     return data;
@@ -107,6 +107,7 @@ class ForumData {
                 end = end - 1;
                 i = i - 1;
             }
+            existsID.add(currentID);
         }
         return data;
     }
@@ -128,42 +129,24 @@ class ForumData {
 
     @Contract(value = "null, _, _ -> null;")
     static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
-        String[] datas = list.get(id);
-        if (datas.length <= 0) {
+        String[] line = list.get(id);
+        if (line.length <= 0) {
             return null;
         }
-
-        String[] name = datas[0].split(":", 2);
-        Map<String, String> data = new HashMap<>();
-        if (name.length >= 2) {
-            data.put(name[0], name[1]);
-        } else {
-            data.put("ID", name[0]);
-        }
-
-        for (int i = 1; i < datas.length; i++) {
-            String[] values = datas[i].split(":", 2);
-            if (values.length == 2) {
-                data.put(values[0], values[1]);
-            } else if (values.length == 1) {
-                data.put(String.valueOf(i), values[0]);
-            }
-        }
-        return data.getOrDefault(key.toUpperCase(), "");
+        return getParameter(line, key);
     }
 
     static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
-        String[] datas = line;
         Map<String, String> data = new HashMap<>();
-        String[] name = datas[0].split(":", 2);
+        String[] name = line[0].split(":", 2);
         if (name.length >= 2) {
             data.put(name[0], name[1]);
         } else {
-            data.put("ID", name[0]);
+            data.put(ForumDataPattern.ID.getKey(), name[0]);
         }
 
-        for (int i = 1; i < datas.length; i++) {
-            String[] values = datas[i].split(":", 2);
+        for (int i = 1; i < line.length; i++) {
+            String[] values = line[i].split(":", 2);
             if (values.length == 2) {
                 data.put(values[0], values[1]);
             } else if (values.length == 1) {

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * HTTPリクエストに応じた処理を行います.
@@ -17,6 +19,13 @@ public class Server extends Thread {
     private final int PORT;
     private static final String HOST_NAME = "localhost";
     static final String ROOT_DIRECTORY = "./src/main/resources";
+
+    private final static Set<String> SUPPORTED_PROTOCOL_VERSION = new HashSet<>();
+
+    static {
+        SUPPORTED_PROTOCOL_VERSION.add("1.0");
+        SUPPORTED_PROTOCOL_VERSION.add("1.1");
+    }
 
     public Server(Socket socket, int PORT) {
         this.PORT = PORT;
@@ -33,24 +42,22 @@ public class Server extends Thread {
 
         try {
             InputStream input = socket.getInputStream();
-            HTTPRequest httpRequest = new HTTPRequest();
-            httpRequest.readRequest(input, HOST_NAME + PORT);
-            System.out.println(httpRequest.getRequestHeader());
-            System.out.println(httpRequest.getRequestText());
-            System.out.println(httpRequest.getRequestBodyFile());
-
-            OutputStream output = socket.getOutputStream();
-
+            HTTPRequest httpRequest = HTTPRequestParser.parse(input, HOST_NAME + ":" + PORT);
+            System.out.println(httpRequest.getHeader());
+            System.out.println(httpRequest.getBodyText());
+            System.out.println(httpRequest.getBodyFile());
             String filePath = httpRequest.getFilePath();
 
-            HTTPHandler handler;
-            if (filePath.startsWith("/program/board/")) {
-                handler = new ForumAppHandler(httpRequest);
-            } else {
-                handler = new StaticHandler(httpRequest);
+            OutputStream output = socket.getOutputStream();
+            if (checkIfSupportsProtocolVer(httpRequest.getProtocolVer(), httpRequest.getHeaderParam("Host"), output)) {
+                HTTPHandler handler;
+                if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
+                    handler = new ForumAppHandler(httpRequest);
+                } else {
+                    handler = new StaticHandler(httpRequest);
+                }
+                handler.writeResponse(output);
             }
-            handler.response(output);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -64,4 +71,19 @@ public class Server extends Thread {
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }
     }
+
+    private boolean checkIfSupportsProtocolVer(String protocolVer, String requestHost, OutputStream output) {
+        if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) {
+            HTTPResponse response = new HTTPResponse(505);
+            response.writeTo(output);
+            return false;
+        }
+        if (protocolVer.equals("1.1") && !requestHost.equals(HOST_NAME + ":" + PORT)) {
+            HTTPResponse response = new HTTPResponse(400);
+            response.writeTo(output);
+            return false;
+        }
+        return true;
+    }
+
 }
