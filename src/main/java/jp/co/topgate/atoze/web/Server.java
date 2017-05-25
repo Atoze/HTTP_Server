@@ -51,7 +51,7 @@ public class Server extends Thread {
             OutputStream output = socket.getOutputStream();
             if (checkIfSupportsProtocolVer(httpRequest.getProtocolVer(), httpRequest.getHeaderParam("Host"), output)) {
                 HTTPHandler handler;
-                if (filePath.startsWith("/program/board/")) {
+                if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
                     handler = new ForumAppHandler(httpRequest);
                 } else {
                     handler = new StaticHandler(httpRequest);

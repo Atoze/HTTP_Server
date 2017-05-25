@@ -3,6 +3,7 @@ package jp.co.topgate.atoze.web.app.forum;
 import jp.co.topgate.atoze.web.HTTPHandler;
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPResponse;
+import jp.co.topgate.atoze.web.URLPattern;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,20 +14,19 @@ import java.util.Map;
 public class ForumAppHandler extends HTTPHandler {
     private ForumApp forum;
 
-    private final Map<String, String> query;
-    private final String filePath;
+    private final Map<String, String> QUERY;
+    private final String PATH;
     private final String HOST;
 
     private String html;
 
     private int statusCode;
 
-    private static String SEARCH="search";
-
+    private static String SEARCH = "search";
 
     public ForumAppHandler(HTTPRequest request) {
-        filePath = request.getFilePath().replaceFirst("/program/board/","");
-        query = request.getQuery();
+        PATH = request.getFilePath().replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
+        QUERY = request.getQuery();
         HOST = request.getHost();
         try {
             forum = new ForumApp();
@@ -59,11 +59,11 @@ public class ForumAppHandler extends HTTPHandler {
      * "GET"時の処理
      */
     private void handlerGET() throws IOException {
-        if (filePath.startsWith("search")) {
+        if (PATH.startsWith("search") && getQueryParam("search") != null) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        if (filePath.equals("index.html")) {
+        if (PATH.equals("index.html")) {
             forum.threadByCSV();
             return;
         }
@@ -78,15 +78,15 @@ public class ForumAppHandler extends HTTPHandler {
         if ("DELETE".equals(getQueryParam("_method"))) {
             String threadID;
             if ((threadID = getQueryParam("tableIndex")) != null) {
-                forum.deleteThreadByListIndex(threadID, getQueryParam("password"));
+                forum.deleteThreadByListIndex(threadID, getQueryParam(ForumDataPattern.PASSWORD.getQueryKey()));
             } else if ((threadID = getQueryParam("threadID")) != null) {
                 if (ForumData.isNumber(threadID)) {
-                    forum.deleteThreadByID(threadID, getQueryParam("password"));
+                    forum.deleteThreadByID(threadID, getQueryParam(ForumDataPattern.PASSWORD.getQueryKey()));
                 }
             }
             return;
         }
-        forum.createThread(query);
+        forum.createThread(QUERY);
     }
 
     /**
@@ -103,6 +103,6 @@ public class ForumAppHandler extends HTTPHandler {
     }
 
     private String getQueryParam(String key) {
-        return query.getOrDefault(key, null);
+        return QUERY.getOrDefault(key, null);
     }
 }

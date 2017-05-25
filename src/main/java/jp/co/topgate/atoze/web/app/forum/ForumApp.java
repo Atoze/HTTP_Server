@@ -17,16 +17,6 @@ class ForumApp {
 
     private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
     private static final String CSV_FILENAME = "save.csv";
-    private static final List<String> KEY = Arrays.asList(
-            "ID",
-            "NAME",
-            "TITLE",
-            "TEXT",
-            "PASSWORD",
-            "DATE",
-            "ICON"
-    );
-
     ForumApp() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         //forumData = new ForumData(null);
@@ -122,8 +112,9 @@ class ForumApp {
     @Contract(pure = true)
     private String[] generateNewThreadData(Map<String, String> query) throws IOException {
         List<String> saveData = new ArrayList<>();
-        for (int i = 0; i < KEY.size(); i++) {
-            String key = this.KEY.get(i);
+
+        for (int i = 0; i < ForumDataPattern.size(); i++) {
+            String key = ForumDataPattern.getKeyByIndex(i);
             switch (key) {
                 case "ID":
                     saveData.add(key + ":" + retrieveNewID(forumData.getData()));
@@ -134,9 +125,8 @@ class ForumApp {
                 case "DATE":
                     saveData.add(key + ":" + date());
                     break;
-
                 default:
-                    saveData.add(key + ":" + query.get(key.toLowerCase()));
+                    saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
             }
         }
         return saveData.toArray(new String[0]);
@@ -162,6 +152,6 @@ class ForumApp {
         if (list.size() == 0) {
             return 0;
         }
-        return Integer.parseInt(forumData.getParameter(list, list.size() - 1, "ID")) + 1;
+        return Integer.parseInt(forumData.getParameter(list, list.size() - 1, ForumDataPattern.ID.getKey())) + 1;
     }
 }

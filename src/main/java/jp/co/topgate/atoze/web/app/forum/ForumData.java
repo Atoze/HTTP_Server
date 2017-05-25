@@ -99,7 +99,7 @@ class ForumData {
             end = data.size() - 1;
         }
         for (int i = start; i <= end; i++) {
-            if (!isNumber(getParameter(data, i, "ID")) || data.isEmpty()) {
+            if (!isNumber(getParameter(data, i, ForumDataPattern.ID.getKey())) || data.isEmpty()) {
                 data.remove(i);
                 if (data.size() <= 0) {
                     return data;
@@ -128,42 +128,24 @@ class ForumData {
 
     @Contract(value = "null, _, _ -> null;")
     static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
-        String[] datas = list.get(id);
-        if (datas.length <= 0) {
+        String[] line = list.get(id);
+        if (line.length <= 0) {
             return null;
         }
-
-        String[] name = datas[0].split(":", 2);
-        Map<String, String> data = new HashMap<>();
-        if (name.length >= 2) {
-            data.put(name[0], name[1]);
-        } else {
-            data.put("ID", name[0]);
-        }
-
-        for (int i = 1; i < datas.length; i++) {
-            String[] values = datas[i].split(":", 2);
-            if (values.length == 2) {
-                data.put(values[0], values[1]);
-            } else if (values.length == 1) {
-                data.put(String.valueOf(i), values[0]);
-            }
-        }
-        return data.getOrDefault(key.toUpperCase(), "");
+        return getParameter(line, key);
     }
 
     static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
-        String[] datas = line;
         Map<String, String> data = new HashMap<>();
-        String[] name = datas[0].split(":", 2);
+        String[] name = line[0].split(":", 2);
         if (name.length >= 2) {
             data.put(name[0], name[1]);
         } else {
-            data.put("ID", name[0]);
+            data.put(ForumDataPattern.ID.getKey(), name[0]);
         }
 
-        for (int i = 1; i < datas.length; i++) {
-            String[] values = datas[i].split(":", 2);
+        for (int i = 1; i < line.length; i++) {
+            String[] values = line[i].split(":", 2);
             if (values.length == 2) {
                 data.put(values[0], values[1]);
             } else if (values.length == 1) {

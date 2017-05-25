@@ -19,11 +19,11 @@ public class HTMLBuilderTest {
 
         //null代入テスト
         html.addBody(null);
-        assertThat(null, is(html.getBodyData()));
+        assertThat("null\n", is(html.getBodyData()));
 
         //空文字代入テスト
-        html.addBody("");
-        assertThat("", is(html.getBodyData()));
+        html.setBody("");
+        assertThat("\n", is(html.getBodyData()));
 
         //囲みタグ生成テスト
         String h1 = html.generateField("h1", "TitleTag");
