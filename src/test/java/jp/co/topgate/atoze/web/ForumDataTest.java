@@ -32,7 +32,7 @@ public class ForumDataTest {
     public void IDか番号から始まらないデータをcheckDataで省くテスト() throws IOException {
         File file = new File("src/test/Document/forumDataWithIdBug.csv"); //実データに近いもの
         CSVFile csv = new CSVFile();
-        assertThat(csv.readCSV(file).size(), is(4));
+        assertThat((csv.readCSV(file)).size(), is(4));
         ForumData forum = new ForumData(file);
         assertThat(forum.getData().size(), is(2));
     }
@@ -41,7 +41,7 @@ public class ForumDataTest {
     public void 重複IDをcheckDataで省くテスト() throws IOException {
         File file = new File("src/test/Document/forumDoubledID.csv"); //実データに近いもの
         CSVFile csv = new CSVFile();
-        assertThat(csv.readCSV(file).size(), is(3));
+        assertThat((csv.readCSV(file)).size(), is(3));
         ForumData forum = new ForumData(file);
         assertThat(forum.getData().size(), is(2));
     }
