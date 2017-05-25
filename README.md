@@ -23,6 +23,9 @@ Java 1.8.0
 HTTPエラーの際は、ルートディレクトリに入っている "HTTPステータスコード" + .html を参照します.<br>
 ファイルが存在しない場合は、簡易的なテンプレートに沿ったHTMLを返します.
 
+HTTPResponse#setResponseBodyにて、文字列とFile型を挿入できますが、
+両方代入した場合はFile型の方が優先されます.
+
 SSLは非対応です.
 
 ## Author

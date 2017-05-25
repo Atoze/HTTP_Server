@@ -30,7 +30,6 @@ class ForumApp {
     ForumApp() throws IOException {
         forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
         //forumData = new ForumData(null);
-
         mainData = forumData.getData();
     }
 
@@ -72,16 +71,16 @@ class ForumApp {
     }
 
     /**
-     * 削除時
+     * 保存しているデータのID値から一致したものを削除
      */
-    void deleteThread(String id2, String requestPassword) throws IOException {
+    void deleteThreadByID(String id, String requestPassword) throws IOException {
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
         }
 
         for (int i = 0; i < list.size(); i++) {
-            if (id2.equals(ForumData.getParameter(list, i, "ID"))) {
+            if (id.equals(ForumData.getParameter(list, i, "ID"))) {
                 if (requestPassword.equals(ForumData.getParameter(list, i, "PASSWORD"))) {
                     list.remove(i);
                     mainData = list;
@@ -93,19 +92,23 @@ class ForumApp {
     }
 
     /**
-     * 削除時
+     * Listのインデックス番号を指定し削除
      */
-    void deleteThread(int id, String requestPassword) throws IOException {
+    void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
+        if (!ForumData.isNumber(id)) {
+            return;
+        }
+        int listIndex = Integer.parseInt(id);
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
         }
-        if (id >= 0 && id < list.size()) {
-            if (ForumData.getParameter(list, id, "PASSWORD").isEmpty()) {
+        if (listIndex >= 0 && listIndex < list.size()) {
+            if (ForumData.getParameter(list, listIndex, "PASSWORD").isEmpty()) {
                 return;
             }
-            if (requestPassword.equals(ForumData.getParameter(list, id, "PASSWORD"))) {
-                list.remove(id);
+            if (requestPassword.equals(ForumData.getParameter(list, listIndex, "PASSWORD"))) {
+                list.remove(listIndex);
                 mainData = list;
                 forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
             }

@@ -77,9 +77,9 @@ class ForumData {
     }
 
     /**
-     * データからForumApp用の形式に削ぐわないものを消去します.
+     * データからID値が最初に挿入されていないものを削除します.
      *
-     * @param data
+     * @param data 確認するリストデータ
      * @param start
      * @param end
      * @return 整列されたデータ

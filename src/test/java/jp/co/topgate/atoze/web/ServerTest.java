@@ -16,8 +16,5 @@ public class ServerTest {
 
         File log = new File("src/test/Document/httpRequestLine.txt");
         OutputStream output = new FileOutputStream(log);
-
-        HTTPRequest request = new HTTPRequest();
-        request.readRequest(input, "localhost:8080");
     }
 }

@@ -21,9 +21,11 @@ public class ForumAppHandler extends HTTPHandler {
 
     private int statusCode;
 
+    private static String SEARCH="search";
+
+
     public ForumAppHandler(HTTPRequest request) {
-        super(request);
-        filePath = request.getFilePath();
+        filePath = request.getFilePath().replaceFirst("/program/board/","");
         query = request.getQuery();
         HOST = request.getHost();
         try {
@@ -38,6 +40,8 @@ public class ForumAppHandler extends HTTPHandler {
 
     /**
      * 受け取ったリクエストのメソッドに基づいて処理を分岐します.
+     *
+     * @param method リクエストされたメソッド
      */
     private void handle(String method) throws IOException {
         switch (method) {
@@ -51,12 +55,15 @@ public class ForumAppHandler extends HTTPHandler {
         html = new ForumHTML(HOST).getIndexHTML(forum.getMainData());
     }
 
+    /**
+     * "GET"時の処理
+     */
     private void handlerGET() throws IOException {
-        if (filePath.startsWith("/program/board/search")) {
+        if (filePath.startsWith("search")) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        if(filePath.equals("/program/board/index.html")){
+        if (filePath.equals("index.html")) {
             forum.threadByCSV();
             return;
         }
@@ -69,10 +76,13 @@ public class ForumAppHandler extends HTTPHandler {
             return;
         }
         if ("DELETE".equals(getQueryParam("_method"))) {
-            if (ForumData.isNumber(getQueryParam("threadID"))) {
-                String id = getQueryParam("threadID");
-                //int id = Integer.parseInt(getQueryParam("threadID"));
-                forum.deleteThread(id, getQueryParam("password"));
+            String threadID;
+            if ((threadID = getQueryParam("tableIndex")) != null) {
+                forum.deleteThreadByListIndex(threadID, getQueryParam("password"));
+            } else if ((threadID = getQueryParam("threadID")) != null) {
+                if (ForumData.isNumber(threadID)) {
+                    forum.deleteThreadByID(threadID, getQueryParam("password"));
+                }
             }
             return;
         }

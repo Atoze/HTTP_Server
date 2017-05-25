@@ -9,12 +9,12 @@ import java.util.Arrays;
  * リクエストが静的コンテンツの場合のサーバーの挙動を制御します.
  */
 public class StaticHandler extends HTTPHandler {
-    private File file;
-    private String HOST;
+    private final File file;
+    private final String HOST;
 
     StaticHandler(HTTPRequest request) {
-        super(request);
-        file = new File(Server.ROOT_DIRECTORY, request.getFilePath());
+        String filePath = request.getFilePath();
+        file = new File(Server.ROOT_DIRECTORY, filePath);
         HOST = request.getHost();
     }
 
@@ -54,6 +54,6 @@ public class StaticHandler extends HTTPHandler {
             return 403;
         }
         return 200;
-    }
 
+    }
 }

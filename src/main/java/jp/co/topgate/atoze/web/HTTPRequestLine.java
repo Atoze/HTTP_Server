@@ -1,8 +1,13 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.util.ParseUtil;
+import org.jetbrains.annotations.Contract;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -10,8 +15,9 @@ import java.util.Set;
  */
 class HTTPRequestLine {
     private String method;
+    private String uri;
     private String filePath;
-    private String headQuery;
+    private Map<String, String> headQuery;
     private String protocolVer;
 
     private final static Set<String> METHODS = new HashSet<>();
@@ -28,7 +34,13 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine() {
+    HTTPRequestLine(InputStream input, String host) throws IOException {
+        String line = ParseUtil.readLine(input);
+        readRequest(line, host);
+    }
+
+    HTTPRequestLine(String line, String host) throws IOException {
+        readRequest(line, host);
     }
 
     /**
@@ -37,17 +49,17 @@ class HTTPRequestLine {
      * @param line
      * @param host
      */
-    void readRequestLine(String line, String host) throws IOException {
+    private void readRequest(String line, String host) throws IOException {
         if (line == null) {
             return;
         }
-        this.readRequestHeader(line);
+        parse(line);
 
-        this.filePath = uriQuerySplitter(urlDivider(this.filePath, host));
-        if (this.filePath.endsWith("/")) {
-            this.filePath += "index.html";
+        filePath = uriQuerySplitter(urlDivider(uri, host));
+        if (filePath.endsWith("/")) {
+            filePath += "index.html";
         }
-        protocolVer = ProtocolVer(protocolVer);
+        protocolVer = checkProtocolVer(protocolVer);
     }
 
     /**
@@ -57,6 +69,15 @@ class HTTPRequestLine {
      */
     String getMethod() {
         return this.method;
+    }
+
+    /**
+     * 要求するリソースのURIを取得します.
+     *
+     * @return ファイルパス
+     */
+    String getURI() {
+        return this.uri;
     }
 
     /**
@@ -75,6 +96,7 @@ class HTTPRequestLine {
      * @param host
      * @return ファイルパス
      */
+    @Contract("null, _ -> !null")
     private String urlDivider(String filePath, String host) {
         if (filePath == null) {
             return "";
@@ -98,7 +120,7 @@ class HTTPRequestLine {
 
         String urlQuery[] = filePath.split("\\?", 2);
         if (urlQuery[0] != filePath) {
-            this.headQuery = urlQuery[1];
+            this.headQuery = ParseUtil.parseQueryData(urlQuery[1]);
         }
         return urlQuery[0];
     }
@@ -112,7 +134,7 @@ class HTTPRequestLine {
         return this.protocolVer;
     }
 
-    private String ProtocolVer(String protocol) {
+    private String checkProtocolVer(String protocol) {
         if (protocol != null) {
             if (protocol.startsWith("HTTP/"))
                 return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
@@ -125,11 +147,11 @@ class HTTPRequestLine {
      *
      * @return クエリ値
      */
-    public String getHeadQuery() {
+    public Map<String, String> getHeaderQuery() {
         return this.headQuery;
     }
 
-    private void readRequestHeader(String line) throws IOException {
+    private void parse(String line) throws IOException {
         if (line == null) {
             return;
         }
@@ -138,10 +160,8 @@ class HTTPRequestLine {
             if (isValidMethod(headerLines[0])) {
                 method = headerLines[0];
             }
-            this.filePath = URLDecoder.decode(headerLines[1], "UTF-8");
-            if (headerLines[2].startsWith("HTTP/")) {
-                protocolVer = headerLines[2];
-            }
+            uri = URLDecoder.decode(headerLines[1], "UTF-8");
+            protocolVer = headerLines[2];
         }
     }
 

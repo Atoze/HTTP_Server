@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.htmlEditor.HTMLEditor;
+import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,16 +22,20 @@ class ForumHTML {
     }
 
     String getIndexHTML(List list) throws IOException {
-        HTMLEditor html = new HTMLEditor();
+        HTMLBuilder html = new HTMLBuilder();
 
         html.setLanguage("ja");
         html.setTitle(FORUM_TITLE);
         html.setStylesheet(host + CSS_FILENAME);
-        html.setBody(headerForm() + table(list) + footerForm());
+        html.addBody(headerForm());
+        html.addBody(table(list));
+        html.addBody(footerForm());
+        //html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
     }
 
-    private String table(List<String[]> list) throws IOException {
+    @NotNull
+    private static String table(List<String[]> list) throws IOException {
         if (list == null) {
             return "";
         }
@@ -59,7 +64,7 @@ class ForumHTML {
             sb.append("</tr><tr>");
             sb.append("<td><form method=\"POST\" action=\"/program/board/\"><br/>");
             sb.append("<input type=\"hidden\" name=\"_method\" value=\"DELETE\">");
-            sb.append("<input type=\"hidden\" name=\"threadID\" value=\"").append(getParameter(list, i, "ID")).append("\">");
+            sb.append("<input type=\"hidden\" name=\"tableIndex\" value=\"").append(i).append("\">");
             sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
             sb.append("<input type=\"submit\" name=\"button\" value=\"削除\">");
             sb.append("</form></td>");
@@ -75,7 +80,7 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String headerForm() {
+    private static String headerForm() {
         StringBuffer sb = new StringBuffer();
         sb.append("<div align=\"center\">簡易Java掲示板<br/>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
@@ -88,7 +93,7 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String footerForm() {
+    private static String footerForm() {
         StringBuffer sb = new StringBuffer();
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("<INPUT type='hidden' name='_method' value='DELETE'>");
@@ -103,7 +108,7 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private String dataForm(List<String[]> list, Integer id) throws IOException {
+    private static String dataForm(List<String[]> list, Integer id) throws IOException {
         StringBuffer sb = new StringBuffer();
         sb.append("<table width=\"50%\"><tbody>");
         sb.append("<tr>");
@@ -125,7 +130,7 @@ class ForumHTML {
     }
 
 
-    private String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    private static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
         return sanitizeHTML(URLDecoder.decode(param, "UTF-8"));
