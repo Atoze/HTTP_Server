@@ -23,14 +23,14 @@ public class ForumDataTest {
 
     @Test
     public void 空データCSVテスト() throws IOException {
-        File file = new File("src/test/Document/forumNoData.csv"); //実データに近いもの
+        File file = new File("src/test/Document/forumNoData.csv");
         ForumData forum = new ForumData(file);
         assertThat(forum.getData().size(), is(0));
     }
 
     @Test
     public void IDか番号から始まらないデータをcheckDataで省くテスト() throws IOException {
-        File file = new File("src/test/Document/forumDataWithIdBug.csv"); //実データに近いもの
+        File file = new File("src/test/Document/forumDataWithIdBug.csv");
         CSVFile csv = new CSVFile();
         assertThat((csv.readCSV(file)).size(), is(4));
         ForumData forum = new ForumData(file);
@@ -39,7 +39,7 @@ public class ForumDataTest {
 
     @Test
     public void 重複IDをcheckDataで省くテスト() throws IOException {
-        File file = new File("src/test/Document/forumDoubledID.csv"); //実データに近いもの
+        File file = new File("src/test/Document/forumDoubledId.csv");
         CSVFile csv = new CSVFile();
         assertThat((csv.readCSV(file)).size(), is(3));
         ForumData forum = new ForumData(file);
