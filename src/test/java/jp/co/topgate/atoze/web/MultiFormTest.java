@@ -19,8 +19,8 @@ import static org.junit.Assert.assertThat;
 
 public class MultiFormTest {
 
-    @Test
     @Ignore
+    @Test
     public void 画像データ取得のテスト() throws Exception {
         String lineFeed = "\r\n";//System.getProperty("line.separator");
         String boundary = "-----------------------------146617270317";

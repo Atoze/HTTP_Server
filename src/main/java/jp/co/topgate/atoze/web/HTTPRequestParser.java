@@ -14,7 +14,7 @@ public class HTTPRequestParser {
     private final static String LINE_FEED = System.getProperty("line.separator");
     //private Map<String, String> headerField;
 
-    static HTTPRequest parse(InputStream input, String host) throws IOException {
+    public static HTTPRequest parse(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
 
         //RequestLine
@@ -42,11 +42,7 @@ public class HTTPRequestParser {
         }
         int contentLength = Integer.parseInt(headerField.get("Content-Length".toUpperCase()));
         HTTPRequestBody body = new HTTPRequestBody(bi, contentType, contentLength);
-        String requestBodyBodyText = body.getBodyText();
-
-        byte[] bodyFile = body.getBodyFile();
-        request.setBody(requestBodyBodyText, bodyFile);
-
+        request.setBody(body.getBodyText(), body.getBodyFile());
         request.setBodyQuery(body.getQueryData());
         return request;
 
