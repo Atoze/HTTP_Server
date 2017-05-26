@@ -1,0 +1,25 @@
+#wrapper {
+	width:50%;
+}
+
+#wrapper table {
+	width:100%;
+	table-layout:fixed;
+}
+
+#wrapper td {
+    word-wrap:break-word;
+    padding: 5px 10px;
+}
+
+#wrapper td#footer form{
+    margin:0;
+}
+
+header{
+    padding: 0px 10px;
+}
+
+#content{
+     margin: 30px 0px;
+}

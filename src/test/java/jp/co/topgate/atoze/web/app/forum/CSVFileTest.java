@@ -1,6 +1,5 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.app.forum.CSVFile;
 import org.junit.Test;
 
 import java.io.File;
