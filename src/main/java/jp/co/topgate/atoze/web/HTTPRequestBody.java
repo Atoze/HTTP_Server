@@ -39,8 +39,8 @@ class HTTPRequestBody {
                 */
 
             default:
-                bodyInput = input;
-                //odyFile = readBodyFile(input, length);
+                //bodyInput = input;
+                bodyFile = readBodyFile(input, length);
         }
     }
 
@@ -70,11 +70,11 @@ class HTTPRequestBody {
         }
         return bodyText;
     }
-/*
+
     byte[] getBodyFile() {
         return bodyFile;
     }
-    */
+
     InputStream getBodyInput() {
         return bodyInput;
     }

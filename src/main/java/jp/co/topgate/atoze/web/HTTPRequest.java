@@ -92,11 +92,11 @@ public class HTTPRequest {
      *
      * @return リクエストボディメッセージ
      */
-    /*
+
     public byte[] getBodyFile() {
         return this.bodyFile;
     }
-*/
+
     public InputStream getBodyInput() {
         return bodyInput;
     }

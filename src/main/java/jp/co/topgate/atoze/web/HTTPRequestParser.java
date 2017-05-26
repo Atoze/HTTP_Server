@@ -42,7 +42,7 @@ public class HTTPRequestParser {
         }
         int contentLength = Integer.parseInt(headerField.get("Content-Length".toUpperCase()));
         HTTPRequestBody body = new HTTPRequestBody(bi, contentType, contentLength);
-        request.setBody(body.getBodyText(), body.getBodyInput());
+        request.setBody(body.getBodyText(), body.getBodyFile());
         request.setBodyQuery(body.getQueryData());
         return request;
 
