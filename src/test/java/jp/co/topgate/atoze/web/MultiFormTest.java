@@ -1,6 +1,5 @@
 package jp.co.topgate.atoze.web;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -20,7 +19,6 @@ import static org.junit.Assert.assertThat;
 public class MultiFormTest {
 
     @Test
-    @Ignore
     public void 画像データ取得のテスト() throws Exception {
         String lineFeed = "\r\n";//System.getProperty("line.separator");
         String boundary = "-----------------------------146617270317";

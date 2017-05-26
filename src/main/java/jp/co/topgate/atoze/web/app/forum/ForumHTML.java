@@ -15,11 +15,12 @@ import java.util.List;
 class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
     private String host;
-    private static final String CSS_FILENAME = "/css/board.css";
+    private static final String CSS_FILE_PATH = "/css/board.css";
     private static final String NAME_QUERY = "hoge";
     private static final String TITLE_QUERY = "title";
     private static final String TEXT_QUERY = "text";
     private static final String PASSWORD_QUERY = "password";
+    private HTMLBuilder html = new HTMLBuilder();
 
 
     ForumHTML(String host) {
@@ -27,8 +28,6 @@ class ForumHTML {
     }
 
     String getIndexHTML(List list) throws IOException {
-        HTMLBuilder html = new HTMLBuilder();
-
         ForumDataPattern.NAME.setQueryKey(NAME_QUERY);
         ForumDataPattern.TITLE.setQueryKey(TITLE_QUERY);
         ForumDataPattern.TEXT.setQueryKey(TEXT_QUERY);
@@ -36,10 +35,12 @@ class ForumHTML {
 
         html.setLanguage("ja");
         html.setTitle(FORUM_TITLE);
-        html.setStylesheet("http://" + host + CSS_FILENAME);
+        html.setStylesheet("http://" + host + CSS_FILE_PATH);
+        html.addBody("<div align=\"center\">");
         html.addBody(headerForm());
         html.addBody(table(list));
         html.addBody(footerForm());
+        html.addBody("</div>");
         //html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
     }
@@ -54,9 +55,10 @@ class ForumHTML {
         for (int i = 0; i < list.size(); i++) {
             //sb.append("<tr>");
             //sb.append("<td>");
-            sb.append("<table border=\"1\" width=\"50%\"><tbody>");
+            sb.append("<div id=\"wrapper\">");
+            sb.append("<table border=\"1\"><tbody>");
             sb.append("<tr>");
-            sb.append("<td rowspan=\"3\", width=\"100px\">");
+            sb.append("<td rowspan=\"3\" width=\"100px\">");
             sb.append("ID:");//Icon Name
             sb.append(getParameter(list, i, ForumDataPattern.ID.getKey()));//ID
             sb.append("<br>投稿者:");
@@ -70,15 +72,16 @@ class ForumHTML {
             sb.append("</tr><tr><td>");
             sb.append(getParameter(list, i, ForumDataPattern.TEXT.getKey()));//Text
             sb.append("</td>");
-            sb.append("</tr><tr>");
-            sb.append("<td><form method=\"POST\" action=\"/program/board/\"><br/>");
+            sb.append("</tr><tr><td id=\"footer\">");
+            sb.append("<form method=\"POST\" action=\"/program/board/\">");
             sb.append("<input type=\"hidden\" name=\"_method\" value=\"DELETE\">");
             sb.append("<input type=\"hidden\" name=\"tableIndex\" value=\"").append(i).append("\">");
             sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
             sb.append("<input type=\"submit\" name=\"button\" value=\"削除\">");
-            sb.append("</form></td>");
-            sb.append("</tr>");
+            sb.append("</form>");
+            sb.append("</td></tr>");
             sb.append("</tbody></table>");
+            sb.append("</div>");
 
             //sb.append(dataForm(list,i));
             //sb.append("</td>");
@@ -89,33 +92,36 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private static String headerForm() {
+    private String headerForm() {
         StringBuffer sb = new StringBuffer();
-        sb.append("<div align=\"center\">" + FORUM_TITLE + "<br/>");
+        sb.append("<header>");
+        sb.append(FORUM_TITLE).append("<br/>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("名前:<input required type=\"text\" name=\"");
         sb.append(NAME_QUERY);
-        sb.append("\" size=\"50\"><br/>");
-        sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\"><br/>");
-        sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"48\"></textarea><br/>");
-        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\"><br/>");
+        sb.append("\" size=\"50\" maxlength=\"50\"><br/>");
+        sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\" maxlength=\"50\"><br/>");
+        sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"50\" maxlength=\"500\" ></textarea><br/>");
+        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\" maxlength=\"20\" ><br/>");
         sb.append("<INPUT type='submit' name='button' value='入力'></form>");
+        sb.append("</header>");
 
         return sb.toString();
     }
 
     private static String footerForm() {
         StringBuffer sb = new StringBuffer();
+        sb.append("<footer>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("<INPUT type='hidden' name='_method' value='DELETE'>");
         sb.append("メッセージID:<input type=\"text\" name=\"threadID\" size=\"3\">");
-        sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
+        sb.append("パスワード:<input type=\"password\" name=\"password\" size=\"20\">");
         sb.append("<INPUT type='submit' name='button' value='削除'></form>");
         sb.append("<form method=\"get\" action=\"/program/board/search\"><br/>");
         sb.append("検索:<INPUT type='search' name='search'>");
         sb.append("<input type=\"submit\" value=\"送信する\">");
         sb.append("</form>");
-        sb.append("</div>");
+        sb.append("</footer>");
         return sb.toString();
     }
 

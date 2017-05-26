@@ -15,28 +15,27 @@ public class ForumApp {
 
     private List<String[]> mainData = new ArrayList<>();
 
-    private static final String CSV_FILEPATH = "./src/main/resources/program/board/";
-    private static final String CSV_FILENAME = "save.csv";
+    private static final String CSV_FILE_DIRECTORY = "./src/main/resources/program/board/";
+    private static final String CSV_FILE_NAME = "save.csv";
 
-    public ForumApp() throws IOException {
-        forumData = new ForumData(new File(CSV_FILEPATH, CSV_FILENAME));
+    private File csvFile = new File(CSV_FILE_DIRECTORY, CSV_FILE_NAME);
+
+    ForumApp() throws IOException {
+        forumData = new ForumData(csvFile);
         //forumData = new ForumData(null);
         mainData = forumData.getData();
     }
 
-    public void setMainData(List<String[]> data) {
-        mainData = data;
-    }
-
-    public void setForumDataFile(File file) throws IOException {
+    void setForumDataFile(File file) throws IOException {
         this.forumData = new ForumData(file);
+        csvFile = file;
         mainData = forumData.getData();
     }
 
     /**
      * 新規に投稿された時
      */
-    public void createThread(Map<String, String> query) throws IOException {
+    void createThread(Map<String, String> query) throws IOException {
         List<String[]> list = forumData.getData();
         //TODO ユーザー管理
         /*
@@ -46,23 +45,22 @@ public class ForumApp {
             user.saveData(user.newUser(name, retrieveNewID(forumData.getData())));
         }
         */
-        File file = new File(CSV_FILEPATH, CSV_FILENAME);
         String text[] = generateNewThreadData(query);
 
         list.add(text);
-        forumData.saveData(String.join(",", text), file);
+        forumData.saveData(String.join(",", text), csvFile);
         mainData = list;
     }
 
     /**
      * 検索時
      */
-    public void findThread(String name) throws IOException {
+     void findThread(String name) throws IOException {
         List<String[]> list = forumData.getData();
         List<String[]> data = new ArrayList<>();
         if (name != null) {
             for (int i = 0; i < list.size(); i++) {
-                if (name.equals(ForumData.getParameter(list, i, "NAME"))) {
+                if (name.equals(ForumData.getParameter(list, i, ForumDataPattern.NAME.getKey()))) {
                     data.add(list.get(i));
                 }
             }
@@ -73,18 +71,18 @@ public class ForumApp {
     /**
      * 保存しているデータのID値から一致したものを削除
      */
-    public void deleteThreadByID(String id, String requestPassword) throws IOException {
+    void deleteThreadByID(String id, String requestPassword) throws IOException {
         List<String[]> list = forumData.getData();
         if (list.size() <= 0) {
             return;
         }
 
         for (int i = 0; i < list.size(); i++) {
-            if (id.equals(ForumData.getParameter(list, i, "ID"))) {
-                if (requestPassword.equals(ForumData.getParameter(list, i, "PASSWORD"))) {
+            if (id.equals(ForumData.getParameter(list, i, ForumDataPattern.ID.getKey()))) {
+                if (requestPassword.equals(ForumData.getParameter(list, i, ForumDataPattern.PASSWORD.getKey()))) {
                     list.remove(i);
                     mainData = list;
-                    forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+                    forumData.overWriteData(list, csvFile);
                     return;
                 }
             }
@@ -94,7 +92,7 @@ public class ForumApp {
     /**
      * Listのインデックス番号を指定し削除
      */
-    public void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
+    void deleteThreadByListIndex(String id, String requestPassword) throws IOException {
         if (!ForumData.isNumber(id)) {
             return;
         }
@@ -110,7 +108,7 @@ public class ForumApp {
             if (requestPassword.equals(ForumData.getParameter(list, listIndex, "PASSWORD"))) {
                 list.remove(listIndex);
                 mainData = list;
-                forumData.overWriteData(list, new File(CSV_FILEPATH, CSV_FILENAME));
+                forumData.overWriteData(list, csvFile);
             }
             System.out.println("パスワードが合っていません");
         }
@@ -143,7 +141,7 @@ public class ForumApp {
     }
 
     @NotNull
-    public List<String[]> getMainData() {
+    List<String[]> getMainData() {
         return mainData;
     }
 
