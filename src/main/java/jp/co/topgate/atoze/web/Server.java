@@ -59,33 +59,29 @@ public class Server extends Thread {
                 handler = new StaticHandler(httpRequest);
             }
             response = handler.generateResponse();
-
+            if (response == null) {
+                throw new Exception();
+            }
         } catch (StatusBadRequestException e) {
-            if (output != null) {
-                response = new HTTPResponse(400);
-            }
+            response = new HTTPResponse(400);
         } catch (StatusProtocolException e) {
-            if (output != null) {
-                response = new HTTPResponse(505);
-            }
-        } catch (NullPointerException | IOException e) {
-            if (output != null) {
-                response = new HTTPResponse(500);
-            }
+            response = new HTTPResponse(505);
+        } catch (Exception e) {
+            response = new HTTPResponse(500);
             throw new RuntimeException(e);
         } finally {
-            if (response != null) {
+            if (response != null && output != null) {
                 response.writeTo(output);
             }
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println("Disconnected" + Thread.currentThread().getName());
         }
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Disconnected" + Thread.currentThread().getName());
     }
 
     private void checkValidRequest(HTTPRequest request) throws StatusBadRequestException, StatusProtocolException {
