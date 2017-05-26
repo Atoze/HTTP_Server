@@ -20,7 +20,7 @@ public class ForumAppHandler extends HTTPHandler {
 
     private String html;
 
-    private int statusCode;
+    private int statusCode = 200;
 
     private static String SEARCH = "search";
 
@@ -30,7 +30,6 @@ public class ForumAppHandler extends HTTPHandler {
         HOST = request.getHost();
         try {
             forum = new ForumApp();
-            statusCode = 200;
             handle(request.getMethod());
         } catch (NullPointerException | IOException e) {
             statusCode = 500;

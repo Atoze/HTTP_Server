@@ -22,7 +22,7 @@ public class ForumApp {
 
     ForumApp() throws IOException {
         forumData = new ForumData(csvFile);
-        //forumData = new ForumData(null);
+        forumData = new ForumData(null);
         mainData = forumData.getData();
     }
 

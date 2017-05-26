@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web;
 
 import jp.co.topgate.atoze.web.app.forum.ForumAppHandler;
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,25 +40,40 @@ public class Server extends Thread {
     @Override
     public void run() {
         System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
-
+        OutputStream output = null;
         try {
             InputStream input = socket.getInputStream();
+            output = socket.getOutputStream();
             HTTPRequest httpRequest = HTTPRequestParser.parse(input, HOST_NAME + ":" + PORT);
             System.out.println(httpRequest.getHeader());
             System.out.println(httpRequest.getBodyText());
+            checkValidRequest(httpRequest);
+
+            HTTPHandler handler;
             String filePath = httpRequest.getFilePath();
 
-            OutputStream output = socket.getOutputStream();
-            if (checkIfSupportsProtocolVer(httpRequest.getProtocolVer(), httpRequest.getHeaderParam("Host"), output)) {
-                HTTPHandler handler;
-                if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
-                    handler = new ForumAppHandler(httpRequest);
-                } else {
-                    handler = new StaticHandler(httpRequest);
-                }
-                handler.writeResponse(output);
+            if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
+                handler = new ForumAppHandler(httpRequest);
+            } else {
+                handler = new StaticHandler(httpRequest);
             }
-        } catch (IOException e) {
+            handler.writeResponse(output);
+
+        } catch (StatusBadRequestException e) {
+            if (output != null) {
+                HTTPResponse response = new HTTPResponse(400);
+                response.writeTo(output);
+            }
+        } catch (StatusProtocolException e) {
+            if (output != null) {
+                HTTPResponse response = new HTTPResponse(505);
+                response.writeTo(output);
+            }
+        } catch (NullPointerException | IOException e) {
+            if (output != null) {
+                HTTPResponse response = new HTTPResponse(500);
+                response.writeTo(output);
+            }
             throw new RuntimeException(e);
         } finally {
             try {
@@ -71,18 +87,16 @@ public class Server extends Thread {
         }
     }
 
-    private boolean checkIfSupportsProtocolVer(String protocolVer, String requestHost, OutputStream output) {
-        if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) {
-            HTTPResponse response = new HTTPResponse(505);
-            response.writeTo(output);
-            return false;
-        }
-        if (protocolVer.equals("1.1") && !requestHost.equals(HOST_NAME + ":" + PORT)) {
-            HTTPResponse response = new HTTPResponse(400);
-            response.writeTo(output);
-            return false;
-        }
-        return true;
+    private void checkValidRequest(HTTPRequest request) throws StatusBadRequestException, StatusProtocolException {
+        String protocolVer = request.getProtocolVer();
+        if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) throw new StatusProtocolException();
+        if (protocolVer.equals("1.1") && !request.getHeaderParam("Host").equals(request.getHost()))
+            throw new StatusBadRequestException();
     }
+}
 
+class StatusProtocolException extends Exception {
+    StatusProtocolException() {
+        super();
+    }
 }
