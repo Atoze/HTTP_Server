@@ -36,11 +36,11 @@ public class HTTPRequestParser {
         request.setHeader(text.toString(), headerField);
 
         //RequestBody
-        String contentType = headerField.get("Content-Type".toUpperCase());
-        if (input.available() <= 0 || contentType == null || headerField.get("Content-Length".toUpperCase()) == null) {
+        String contentType = headerField.get("Content-Type");
+        if (input.available() <= 0 || contentType == null || headerField.get("Content-Length") == null) {
             return request;
         }
-        int contentLength = Integer.parseInt(headerField.get("Content-Length".toUpperCase()));
+        int contentLength = Integer.parseInt(headerField.get("Content-Length"));
         HTTPRequestBody body = new HTTPRequestBody(bi, contentType, contentLength);
         request.setBody(body.getBodyText(), body.getBodyFile());
         request.setBodyQuery(body.getQueryData());

@@ -74,7 +74,7 @@ public class HTTPRequest {
      * @return 値
      */
     public String getHeaderParam(String key) {
-        return headerField.getOrDefault(key.toUpperCase(), null);
+        return headerField.getOrDefault(key, null);
     }
 
     /**
