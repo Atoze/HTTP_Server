@@ -2,6 +2,7 @@ package jp.co.topgate.atoze.web;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  */
 public class HTTPRequest {
     private byte[] bodyFile;
+    private InputStream bodyInput;
     private String bodyText;
     private Map<String, String> bodyQuery;
 
@@ -41,6 +43,11 @@ public class HTTPRequest {
     void setBody(String bodyText, byte[] bodyFile) {
         this.bodyText = bodyText;
         this.bodyFile = bodyFile;
+    }
+
+    void setBody(String bodyText, InputStream input) {
+        this.bodyText = bodyText;
+        this.bodyInput = input;
     }
 
     void setHeaderQuery(Map<String, String> query) {
@@ -79,13 +86,19 @@ public class HTTPRequest {
         return this.bodyText;
     }
 
+
     /**
      * 要求するメッセージボディを返します.
      *
      * @return リクエストボディメッセージ
      */
+    /*
     public byte[] getBodyFile() {
         return this.bodyFile;
+    }
+*/
+    public InputStream getBodyInput() {
+        return bodyInput;
     }
 
     public Map<String, String> getQuery() {

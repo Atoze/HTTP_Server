@@ -14,6 +14,7 @@ import java.util.Map;
 class HTTPRequestBody {
     private String bodyText;
     private byte[] bodyFile;
+    InputStream bodyInput;
     private Map<String, String> queryData = new HashMap<>();
 
     HTTPRequestBody(InputStream input, String contentType, int length) throws IOException {
@@ -38,7 +39,8 @@ class HTTPRequestBody {
                 */
 
             default:
-                bodyFile = readBodyFile(input, length);
+                bodyInput = input;
+                //odyFile = readBodyFile(input, length);
         }
     }
 
@@ -68,9 +70,13 @@ class HTTPRequestBody {
         }
         return bodyText;
     }
-
+/*
     byte[] getBodyFile() {
         return bodyFile;
+    }
+    */
+    InputStream getBodyInput() {
+        return bodyInput;
     }
 
     Map<String, String> getQueryData() {

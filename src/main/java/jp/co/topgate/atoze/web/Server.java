@@ -45,7 +45,6 @@ public class Server extends Thread {
             HTTPRequest httpRequest = HTTPRequestParser.parse(input, HOST_NAME + ":" + PORT);
             System.out.println(httpRequest.getHeader());
             System.out.println(httpRequest.getBodyText());
-            System.out.println(httpRequest.getBodyFile());
             String filePath = httpRequest.getFilePath();
 
             OutputStream output = socket.getOutputStream();
