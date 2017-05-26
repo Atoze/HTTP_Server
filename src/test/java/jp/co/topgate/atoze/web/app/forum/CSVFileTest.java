@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web;
+package jp.co.topgate.atoze.web.forum.app;
 
 import jp.co.topgate.atoze.web.app.forum.CSVFile;
 import org.junit.Test;
