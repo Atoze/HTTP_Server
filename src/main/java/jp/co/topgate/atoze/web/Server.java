@@ -41,6 +41,7 @@ public class Server extends Thread {
     public void run() {
         System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
         OutputStream output = null;
+        HTTPResponse response = null;
         try {
             InputStream input = socket.getInputStream();
             output = socket.getOutputStream();
@@ -57,25 +58,25 @@ public class Server extends Thread {
             } else {
                 handler = new StaticHandler(httpRequest);
             }
-            handler.writeResponse(output);
+            response = handler.generateResponse();
 
         } catch (StatusBadRequestException e) {
             if (output != null) {
-                HTTPResponse response = new HTTPResponse(400);
-                response.writeTo(output);
+                response = new HTTPResponse(400);
             }
         } catch (StatusProtocolException e) {
             if (output != null) {
-                HTTPResponse response = new HTTPResponse(505);
-                response.writeTo(output);
+                response = new HTTPResponse(505);
             }
         } catch (NullPointerException | IOException e) {
             if (output != null) {
-                HTTPResponse response = new HTTPResponse(500);
-                response.writeTo(output);
+                response = new HTTPResponse(500);
             }
             throw new RuntimeException(e);
         } finally {
+            if (response != null) {
+                response.writeTo(output);
+            }
             try {
                 if (socket != null) {
                     socket.close();
