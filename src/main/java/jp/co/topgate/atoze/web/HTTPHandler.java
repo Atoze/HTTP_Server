@@ -3,9 +3,11 @@ package jp.co.topgate.atoze.web;
 import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
 import jp.co.topgate.atoze.web.util.ContentType;
 import jp.co.topgate.atoze.web.util.Status;
-import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.*;
+import java.io.File;
+import java.io.OutputStream;
+
+import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 
 /**
  * HTTPを受け取った際に、実行されるハンドラーのAbstractClass
@@ -35,39 +37,6 @@ public abstract class HTTPHandler {
             response.setResponseBody(html.getHTML());
         }
         return response;
-    }
-
-    /**
-     * ファイルのエンコード値を求めます.
-     *
-     * @param file 判別するファイル
-     * @return エンコード値
-     */
-    protected static String detectFileEncoding(File file) {
-        String result = null;
-        byte[] buf = new byte[4096];
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
-        UniversalDetector detector = new UniversalDetector(null);
-
-        int nread;
-        try {
-            while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
-                detector.handleData(buf, 0, nread);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        detector.dataEnd();
-
-        result = detector.getDetectedCharset();
-        detector.reset();
-
-        return result;
     }
 
     public void writeResponse(OutputStream out) {
