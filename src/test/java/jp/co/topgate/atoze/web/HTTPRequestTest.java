@@ -47,11 +47,11 @@ public class HTTPRequestTest {
         assertThat("/hoge.html", is(httpRequest.getFilePath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
-        assertThat("localhost:8080", is(httpRequest.getHeaderParam("HOST")));
-        assertThat("hogehoge", is(httpRequest.getHeaderParam("TEST")));
-        assertThat("hoge: hoge: hoge", is(httpRequest.getHeaderParam("MANYCOLLON")));
-        assertThat("hoge", is(httpRequest.getHeaderParam("HOGE")));
-        assertThat(null, is(httpRequest.getHeaderParam("FOO")));
+        assertThat("localhost:8080", is(httpRequest.getHeaderParam("Host")));
+        assertThat("hogehoge", is(httpRequest.getHeaderParam("Test")));
+        assertThat("hoge: hoge: hoge", is(httpRequest.getHeaderParam("ManyCollon")));
+        assertThat("hoge", is(httpRequest.getHeaderParam("Hoge")));
+        assertThat(null, is(httpRequest.getHeaderParam("Foo")));
     }
 
     @Test

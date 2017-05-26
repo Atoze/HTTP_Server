@@ -31,7 +31,7 @@ class HTTPRequestHeader {
             text.append(line).append(LINE_FEED);
             String[] headerLineData = line.split(":", 2);
             if (headerLineData.length == 2) {
-                this.headerField.put(headerLineData[0].toUpperCase(), headerLineData[1].trim());
+                this.headerField.put(headerLineData[0], headerLineData[1].trim());
             }
             line = readLine(input);
         }
@@ -44,7 +44,7 @@ class HTTPRequestHeader {
         for (int i = 0; i < header.length; i++) {
             String[] headerLineData = header[i].split(":", 2);
             if (header.length >= 2) {
-                this.headerField.put(headerLineData[0].toUpperCase(), headerLineData[1].trim());
+                this.headerField.put(headerLineData[0], headerLineData[1].trim());
             }
         }
     }
