@@ -41,6 +41,7 @@ public class Server extends Thread {
     public void run() {
         System.out.println("\nRequest incoming..." + Thread.currentThread().getName());
         OutputStream output = null;
+        HTTPResponse response = null;
         try {
             InputStream input = socket.getInputStream();
             output = socket.getOutputStream();
@@ -57,34 +58,30 @@ public class Server extends Thread {
             } else {
                 handler = new StaticHandler(httpRequest);
             }
-            handler.writeResponse(output);
-
+            response = handler.generateResponse();
+            if (response == null) {
+                throw new Exception();
+            }
         } catch (StatusBadRequestException e) {
-            if (output != null) {
-                HTTPResponse response = new HTTPResponse(400);
-                response.writeTo(output);
-            }
+            response = new HTTPResponse(400);
         } catch (StatusProtocolException e) {
-            if (output != null) {
-                HTTPResponse response = new HTTPResponse(505);
-                response.writeTo(output);
-            }
-        } catch (NullPointerException | IOException e) {
-            if (output != null) {
-                HTTPResponse response = new HTTPResponse(500);
-                response.writeTo(output);
-            }
+            response = new HTTPResponse(505);
+        } catch (Exception e) {
+            response = new HTTPResponse(500);
             throw new RuntimeException(e);
         } finally {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (response != null && output != null) {
+                response.writeTo(output);
             }
-            System.out.println("Disconnected" + Thread.currentThread().getName());
         }
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Disconnected" + Thread.currentThread().getName());
     }
 
     private void checkValidRequest(HTTPRequest request) throws StatusBadRequestException, StatusProtocolException {

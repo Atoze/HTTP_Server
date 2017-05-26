@@ -5,7 +5,6 @@ import jp.co.topgate.atoze.web.util.ContentType;
 import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.File;
-import java.io.OutputStream;
 
 import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 
@@ -37,10 +36,5 @@ public abstract class HTTPHandler {
             response.setResponseBody(html.getHTML());
         }
         return response;
-    }
-
-    public void writeResponse(OutputStream out) {
-        HTTPResponse response = generateResponse();
-        response.writeTo(out);
     }
 }
