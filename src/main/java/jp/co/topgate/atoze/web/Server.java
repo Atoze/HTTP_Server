@@ -73,21 +73,21 @@ public class Server extends Thread {
             if (response != null && output != null) {
                 response.writeTo(output);
             }
-        }
-        try {
-            if (socket != null) {
-                socket.close();
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Disconnected" + Thread.currentThread().getName());
         }
-        System.out.println("Disconnected" + Thread.currentThread().getName());
     }
 
     private void checkValidRequest(HTTPRequest request) throws StatusBadRequestException, StatusProtocolException {
         String protocolVer = request.getProtocolVer();
         if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) throw new StatusProtocolException();
-        if (protocolVer.equals("1.1") && !request.getHeaderParam("Host").equals(request.getHost()))
+        if (protocolVer.equals("1.1") && !request.getHost().equals(request.getHeaderParam("Host")))
             throw new StatusBadRequestException();
     }
 }
