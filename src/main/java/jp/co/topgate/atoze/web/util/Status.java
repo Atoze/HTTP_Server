@@ -27,6 +27,7 @@ public class Status {
         {
             put(200, "OK");
 
+            put(303, "See Other");
             put(304, "NotModified");
 
             put(400, "Bad Request");

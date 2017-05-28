@@ -85,6 +85,7 @@ public class ForumAppHandler extends HTTPHandler {
             }
             return;
         }
+        statusCode = 303;
         forum.createThread(QUERY);
     }
 
@@ -93,10 +94,14 @@ public class ForumAppHandler extends HTTPHandler {
      */
     @Override
     public HTTPResponse generateResponse() {
-        if (statusCode != 200) {
+        if (statusCode != 200 && statusCode != 303) {
             return generateErrorResponse(statusCode);
         }
-        HTTPResponse response = new HTTPResponse();
+        System.out.print(statusCode);
+        HTTPResponse response = new HTTPResponse(statusCode);
+        if (statusCode == 303) {
+            response.addResponseHeader("Location", "http://" + HOST + URLPattern.PROGRAM_BOARD.getURL());
+        }
         response.setResponseBody(html);
         return response;
     }
