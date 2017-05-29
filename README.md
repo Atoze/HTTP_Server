@@ -27,7 +27,6 @@ HTTPResponse#setResponseBodyにて、文字列とFile型を挿入できますが
 両方代入した場合はFile型の方が優先されます.
 
 `/program/board/`にアクセスすると、簡易的な掲示板が表示されます。
-データの保存場所は
 
 SSLは非対応です.
 
