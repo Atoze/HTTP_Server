@@ -5,10 +5,8 @@ import jp.co.topgate.atoze.web.HTTPRequestParser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLDecoder;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -63,6 +61,44 @@ public class ForumAppTest {
         File file = new File("src/test/Document/forumAppData.csv");
         app.setForumDataFile(file);
         app.findThread("test", "UTF-8");
-        assertThat(app.getMainData().size(),is(3));
+        assertThat(app.getMainData().size(), is(3));
+    }
+
+    @Test
+    public void createThreadSHIFT_JISテスト() throws IOException {
+        File file = new File("src/test/Document/forumAppData.csv");
+        CSVFile csv = new CSVFile();
+        List<String[]> data = csv.readCSV(file);
+        int currentLastID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
+
+        ForumApp app = new ForumApp();
+        app.setForumDataFile(file);
+
+        String ENCODER = "UTF-8";
+        HTTPRequest request = HTTPRequestParser.parse(new FileInputStream("src/test/Document/forumAppRequestJIS"), "localhost:8080");
+        if (request.getHeaderParam("Content-Type") != null) {
+            String[] encode = request.getHeaderParam("Content-Type").split(";");
+            if (encode.length >= 2 && encode[1].trim().startsWith("charset=")) {
+                ENCODER = checkEncode(encode[1].substring("charset=".length() + 1).trim());
+            }
+        }
+
+        app.createThread(request.getQuery(), ENCODER);
+        data = csv.readCSV(file);
+        int newID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
+        assertThat(newID, is(currentLastID + 1));
+        assertThat("ほげ", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.NAME.getKey())));
+        assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
+        assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
+        assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
+    }
+
+    private String checkEncode(String encode) {
+        try {
+            URLDecoder.decode("", encode);
+            return encode;
+        } catch (UnsupportedEncodingException e) {
+            return "UTF-8";
+        }
     }
 }
