@@ -125,25 +125,16 @@ public class ForumApp {
     @Contract(pure = true)
     private String[] generateNewThreadData(Map<String, String> query, String encode) throws IOException {
         List<String> saveData = new ArrayList<>();
-
         for (int i = 0; i < ForumDataPattern.size(); i++) {
             String key = ForumDataPattern.getKeyByIndex(i);
-            switch (key) {
-                case "ID":
-                    saveData.add(key + ":" + retrieveNewID(forumData.getData()));
-                    break;
-                case "ICON":
-                    saveData.add(key + ":" + "blank");
-                    break;
-                case "DATE":
-                    saveData.add(key + ":" + date());
-                    break;
-                case "ENCODER":
-                    saveData.add(key + ":" + encode);
-                    break;
-                default:
-                    saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
-            }
+            if (key.equals(ForumDataPattern.ID.getKey()))
+                saveData.add(key + ":" + retrieveNewID(forumData.getData()));
+            else if (key.equals(ForumDataPattern.DATE.getKey()))
+                saveData.add(key + ":" + date());
+            else if (key.equals(ForumDataPattern.ENCODER.getKey()))
+                saveData.add(key + ":" + encode);
+            else
+                saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
         }
         return saveData.toArray(new String[0]);
     }
