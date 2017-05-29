@@ -3,9 +3,7 @@ package jp.co.topgate.atoze.web.app.forum;
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPRequestParser;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
@@ -25,8 +23,13 @@ public class ForumAppTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Before
-    public void initFiles() throws IOException {
+    public void tempファイル作成() throws IOException {
         Files.copy(new File("src/test/Document/", "forumAppData.csv").toPath(), new File(tempFolder.getRoot(), "forumAppData.csv").toPath());
+    }
+
+    @After
+    public void 削除() {
+        new File(tempFolder.getRoot(), "forumAppData.csv").delete();
     }
 
     @Test
@@ -78,7 +81,7 @@ public class ForumAppTest {
     }
 
     @Test
-    public void createThreadSHIFT_JISテスト() throws IOException {
+    public void createThreadSHIFT_JISで指定されたときテスト() throws IOException {
         String ENCODER = "UTF-8";
         HTTPRequest request = HTTPRequestParser.parse(new FileInputStream("src/test/Document/forumAppRequestJIS"), "localhost:8080");
         if (request.getHeaderParam("Content-Type") != null) {

@@ -1,9 +1,14 @@
 package jp.co.topgate.atoze.web.app.forum;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +19,18 @@ import static org.junit.Assert.assertThat;
  * Created by atoze on 2017/05/19.
  */
 public class CSVFileTest {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Before
+    public void tempファイル作成() throws IOException {
+        Files.copy(new File("src/test/Document/", "csv_test").toPath(), new File(tempFolder.getRoot(), "csv_test").toPath());
+    }
+
+    @After
+    public void 削除() {
+        new File(tempFolder.getRoot(), "csv_test").delete();
+    }
 
     @Test
     public void CSVファイル読み書きテスト() throws IOException {
@@ -25,8 +42,8 @@ public class CSVFileTest {
         assertThat(data, is(new ArrayList<String[]>()));
 
         //書き込み
-        String testFilePath = "src/test/Document/csv_test";
-        file = new File(testFilePath);
+        //String testFilePath = "src/test/Document/csv_test";
+        file = new File(tempFolder.getRoot(), "csv_test");
         String testText = "HOGE";
         csv.writeData(testText, file);
 
@@ -53,7 +70,7 @@ public class CSVFileTest {
         readText = data.get(1);
         assertThat(testText, is(readText[0]));
 
-        //改行テスト
+        //改行判定テスト
         testText = "HOGE\nFOO,BAR\rHOGE1\r\nHOGE2\n\r";
         csv.writeData(testText, file);
         data = csv.readCSV(file);
@@ -70,6 +87,8 @@ public class CSVFileTest {
         assertThat("HOGE2\n", is(readText[0]));
         readText = data.get(4);
         assertThat("\r", is(readText[0]));
+
+        file.delete();
     }
 
     @Test
@@ -83,11 +102,11 @@ public class CSVFileTest {
         assertThat(data.size(), is(4));
 
         //指定読み込み
-        data = csv.readCSV(file,3);
+        data = csv.readCSV(file, 3);
         assertThat(data.size(), is(2));
 
         //指定読み込み
-        data = csv.readCSV(file,4);
+        data = csv.readCSV(file, 4);
         assertThat(data.size(), is(1));
     }
 
