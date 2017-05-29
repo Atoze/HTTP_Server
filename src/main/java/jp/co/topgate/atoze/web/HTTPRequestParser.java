@@ -14,6 +14,9 @@ public class HTTPRequestParser {
     private final static String LINE_FEED = System.getProperty("line.separator");
     //private Map<String, String> headerField;
 
+    private HTTPRequestParser() {
+    }
+
     public static HTTPRequest parse(InputStream input, String host) throws IOException {
         BufferedInputStream bi = new BufferedInputStream(input);
 

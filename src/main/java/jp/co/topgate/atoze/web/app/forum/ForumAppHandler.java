@@ -1,9 +1,6 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.HTTPHandler;
-import jp.co.topgate.atoze.web.HTTPRequest;
-import jp.co.topgate.atoze.web.HTTPResponse;
-import jp.co.topgate.atoze.web.URLPattern;
+import jp.co.topgate.atoze.web.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -66,7 +63,6 @@ public class ForumAppHandler extends HTTPHandler {
             forum.threadByCSV();
             return;
         }
-        statusCode = 404;
     }
 
     private void handlerPOST() throws IOException {
