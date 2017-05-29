@@ -152,12 +152,11 @@ public class ForumData {
                 data.put(String.valueOf(i), values[0]);
             }
         }
-        String encode = data.getOrDefault(ForumDataPattern.ENCODER.getKey(), "UTF-8");
-        encode = checkEncode(encode);
+        String encode = checkEncode(data.getOrDefault(ForumDataPattern.ENCODER.getKey(), "UTF-8"));
         String parameter = data.getOrDefault(key.toUpperCase(), "");
 
         if (key.equals(ForumDataPattern.ENCODER.getKey())) {
-            parameter = data.getOrDefault(key.toUpperCase(), "UTF-8");
+            parameter = data.getOrDefault(key, "UTF-8");
         }
         try {
             return URLDecoder.decode(parameter, encode);
