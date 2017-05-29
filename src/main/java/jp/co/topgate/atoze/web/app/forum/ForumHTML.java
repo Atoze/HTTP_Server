@@ -77,8 +77,8 @@ class ForumHTML {
             sb.append("<form method=\"POST\" action=\"/program/board/\">");
             sb.append("<input type=\"hidden\" name=\"_method\" value=\"DELETE\">");
             sb.append("<input type=\"hidden\" name=\"tableIndex\" value=\"").append(i).append("\">");
-            sb.append("パスワード:<input type=\"text\" name=\"password\" size=\"20\">");
-            sb.append("<input type=\"submit\" name=\"button\" value=\"削除\">");
+            sb.append("パスワード:<input type=\"password\" name=\"password\" size=\"20\">");
+            sb.append("<input type=\"submit\" value=\"削除\">");
             sb.append("</form>");
             sb.append("</td></tr>");
             sb.append("</tbody></table>");
@@ -104,7 +104,7 @@ class ForumHTML {
         sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\" maxlength=\"50\" placeholder=\"タイトルを入力してください(50文字まで)\"><br/>");
         sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"50\" maxlength=\"200\" placeholder=\"コメントを入力してください(200文字まで)\"></textarea><br/>");
         sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\" maxlength=\"10\" ><br/>");
-        sb.append("<INPUT type='submit' name='button' value='入力'></form>");
+        sb.append("<INPUT type='submit' value='入力'></form>");
         sb.append("</header>");
 
         return sb.toString();

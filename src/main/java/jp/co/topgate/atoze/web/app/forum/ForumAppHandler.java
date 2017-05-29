@@ -1,7 +1,11 @@
 package jp.co.topgate.atoze.web.app.forum;
 
-import jp.co.topgate.atoze.web.*;
+import jp.co.topgate.atoze.web.HTTPHandler;
+import jp.co.topgate.atoze.web.HTTPRequest;
+import jp.co.topgate.atoze.web.HTTPResponse;
+import jp.co.topgate.atoze.web.URLPattern;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -12,7 +16,7 @@ public class ForumAppHandler extends HTTPHandler {
     private ForumApp forum;
 
     private final Map<String, String> QUERY;
-    private final String PATH;
+    private final String FILE_PATH;
     private final String HOST;
 
     private String html;
@@ -22,7 +26,7 @@ public class ForumAppHandler extends HTTPHandler {
     private static String SEARCH = "search";
 
     public ForumAppHandler(HTTPRequest request) {
-        PATH = request.getFilePath().replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
+        FILE_PATH = request.getFilePath();
         QUERY = request.getQuery();
         HOST = request.getHost();
         try {
@@ -55,14 +59,17 @@ public class ForumAppHandler extends HTTPHandler {
      * "GET"時の処理
      */
     private void handlerGET() throws IOException {
-        if (PATH.startsWith("search") && getQueryParam("search") != null) {
+        String path = FILE_PATH.replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
+        if (path.startsWith("search") && getQueryParam("search") != null) {
             forum.findThread(getQueryParam("search"));
             return;
         }
-        if (PATH.equals("index.html")) {
+        if (path.equals("index.html")) {
             forum.threadByCSV();
             return;
         }
+        File file = new File(path);
+        statusCode = 404;
     }
 
     private void handlerPOST() throws IOException {
