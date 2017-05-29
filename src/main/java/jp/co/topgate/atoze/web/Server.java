@@ -88,7 +88,7 @@ public class Server extends Thread {
         String protocolVer = request.getProtocolVer();
         if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) throw new StatusProtocolException();
         if (protocolVer.equals("1.1") && !request.getHost().equals(request.getHeaderParam("Host")))
-            throw new StatusBadRequestException();
+            throw new StatusBadRequestException("Hostが指定されていません");
     }
 }
 

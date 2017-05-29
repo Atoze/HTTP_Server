@@ -7,4 +7,8 @@ public class StatusBadRequestException extends Exception {
     public StatusBadRequestException() {
         super();
     }
+
+    public StatusBadRequestException(String msg) {
+        super(msg);
+    }
 }

@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 import jp.co.topgate.atoze.web.util.ParseUtil;
 import org.jetbrains.annotations.Contract;
 
@@ -34,12 +35,12 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(InputStream input, String host) throws IOException {
+    HTTPRequestLine(InputStream input, String host) throws IOException, StatusBadRequestException {
         String line = ParseUtil.readLine(input);
         readRequest(line, host);
     }
 
-    HTTPRequestLine(String line, String host) throws IOException {
+    HTTPRequestLine(String line, String host) throws IOException, StatusBadRequestException {
         readRequest(line, host);
     }
 
@@ -49,7 +50,7 @@ class HTTPRequestLine {
      * @param line
      * @param host
      */
-    private void readRequest(String line, String host) throws IOException {
+    private void readRequest(String line, String host) throws IOException, StatusBadRequestException {
         if (line == null) {
             return;
         }
@@ -59,6 +60,7 @@ class HTTPRequestLine {
         if (filePath.endsWith("/")) {
             filePath += "index.html";
         }
+        checkIsValidMethod(method);
         protocolVer = checkProtocolVer(protocolVer);
     }
 
@@ -134,12 +136,12 @@ class HTTPRequestLine {
         return this.protocolVer;
     }
 
-    private String checkProtocolVer(String protocol) {
+    private String checkProtocolVer(String protocol) throws StatusBadRequestException {
         if (protocol != null) {
             if (protocol.startsWith("HTTP/"))
                 return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
         }
-        return null;
+        throw new StatusBadRequestException("プロトコルが正しく書かれていません");
     }
 
     /**
@@ -157,9 +159,7 @@ class HTTPRequestLine {
         }
         String headerLines[] = line.split(" ");
         if (headerLines.length == REQUEST_HEADER_VALUE) {
-            if (isValidMethod(headerLines[0])) {
-                method = headerLines[0];
-            }
+            method = headerLines[0];
             uri = URLDecoder.decode(headerLines[1], "UTF-8");
             protocolVer = headerLines[2];
         }
@@ -167,13 +167,10 @@ class HTTPRequestLine {
 
     /**
      * 要求したメソッド名が存在しているか確認します.
-     *
-     * @return 有効なメソッド名であるか
      */
-    private boolean isValidMethod(String method) {
-        if (METHODS.contains(method)) {
-            return true;
+    private void checkIsValidMethod(String method) throws StatusBadRequestException {
+        if (!METHODS.contains(method)) {
+            throw new StatusBadRequestException("有効なメソッドではありません");
         }
-        return false;
     }
 }

@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPRequestTest {
     @Test
-    public void Requestのデータをパース() throws IOException {
+    public void Requestのデータをパース() throws IOException, StatusBadRequestException {
         File file = new File("src/test/Document/request.txt"); //実データに近いもの
         HTTPRequest httpRequest = new HTTPRequest(null, null, null, null);
         InputStream input = new FileInputStream(file);
@@ -55,7 +56,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void 絶対パスのテスト() throws IOException {
+    public void 絶対パスのテスト() throws IOException, StatusBadRequestException {
         File test = new File("src/test/Document/requestAbsolutePath");
         InputStream input = new FileInputStream(test);
 
@@ -64,7 +65,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void サーバーの絶対パスと異なる時のテスト() throws IOException {
+    public void サーバーの絶対パスと異なる時のテスト() throws IOException, StatusBadRequestException {
         File test = new File("src/test/Document/requestWrongAbsolutePath");
         InputStream input = new FileInputStream(test);
 
@@ -73,7 +74,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTテスト() throws IOException {
+    public void POSTテスト() throws IOException, StatusBadRequestException {
         File file = new File("src/test/Document/requestPost.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
         HTTPRequest httpRequest;
@@ -93,7 +94,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTLargeテスト() throws IOException {
+    public void POSTLargeテスト() throws IOException, StatusBadRequestException {
         File file = new File("src/test/Document/requestLargePOST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
@@ -115,7 +116,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTの中身がない場合のテスト() throws IOException {
+    public void POSTの中身がない場合のテスト() throws IOException, StatusBadRequestException {
         File file = new File("src/test/Document/requestPostNoData"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 

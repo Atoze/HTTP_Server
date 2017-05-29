@@ -2,6 +2,7 @@ package jp.co.topgate.atoze.web.app.forum;
 
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPRequestParser;
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -33,7 +34,7 @@ public class ForumAppTest {
     }
 
     @Test
-    public void createThreadテスト() throws IOException {
+    public void createThreadテスト() throws IOException, StatusBadRequestException {
         File file = new File(tempFolder.getRoot(), "forumAppData.csv");
         CSVFile csv = new CSVFile();
         List<String[]> data = csv.readCSV(file);
@@ -81,7 +82,7 @@ public class ForumAppTest {
     }
 
     @Test
-    public void createThreadSHIFT_JISで指定されたときテスト() throws IOException {
+    public void createThreadSHIFT_JISで指定されたときテスト() throws IOException, StatusBadRequestException {
         String ENCODER = "UTF-8";
         HTTPRequest request = HTTPRequestParser.parse(new FileInputStream("src/test/Document/forumAppRequestJIS"), "localhost:8080");
         if (request.getHeaderParam("Content-Type") != null) {

@@ -1,5 +1,7 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +19,7 @@ public class HTTPRequestParser {
     private HTTPRequestParser() {
     }
 
-    public static HTTPRequest parse(InputStream input, String host) throws IOException {
+    public static HTTPRequest parse(InputStream input, String host) throws IOException, StatusBadRequestException {
         BufferedInputStream bi = new BufferedInputStream(input);
 
         //RequestLine
