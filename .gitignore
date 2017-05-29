@@ -23,6 +23,7 @@
 hs_err_pid*
 
 /src/main/resources/program/board/save.csv
+/src/main/resources/program/board/user.csv
 /.idea/
 /.gradle/
 /build/
