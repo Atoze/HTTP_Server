@@ -32,10 +32,12 @@ public class HTTPRequestParser {
         //RequestHeader
         line = readLine(input);
         StringBuilder text = new StringBuilder();
+
         while (line != null && !line.isEmpty()) {
             text.append(line).append(LINE_FEED);
             line = readLine(input);
         }
+
         HTTPRequestHeader header = new HTTPRequestHeader(text.toString());
         Map<String, String> headerField = header.getHeaderField();
         request.setHeader(text.toString(), headerField);

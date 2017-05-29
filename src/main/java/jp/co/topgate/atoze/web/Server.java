@@ -64,6 +64,7 @@ public class Server extends Thread {
             }
         } catch (StatusBadRequestException e) {
             response = new HTTPResponse(400);
+            //throw new RuntimeException(e);
         } catch (StatusProtocolException e) {
             response = new HTTPResponse(505);
         } catch (Exception e) {
@@ -88,7 +89,7 @@ public class Server extends Thread {
         String protocolVer = request.getProtocolVer();
         if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) throw new StatusProtocolException();
         if (protocolVer.equals("1.1") && !request.getHost().equals(request.getHeaderParam("Host")))
-            throw new StatusBadRequestException("Hostが指定されていません");
+            throw new StatusBadRequestException("Hostが指定されていないか間違っています");
     }
 }
 
