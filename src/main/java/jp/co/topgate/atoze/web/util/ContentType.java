@@ -28,7 +28,7 @@ public class ContentType {
             put("jpeg", "image/jpeg");
             put("jpg", "image/jpeg");
             put("png", "image/png");
-            put("gif", "image/mp4");
+            put("gif", "image/gif");
 
             put("mp4", "video/mp4");
         }
