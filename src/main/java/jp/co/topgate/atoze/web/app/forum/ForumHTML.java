@@ -4,8 +4,6 @@ import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -14,9 +12,9 @@ import java.util.List;
  */
 class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
-    private String host;
     private static final String CSS_FILE_PATH = "/css/board.css";
-    private static final String NAME_QUERY = "hoge";
+    private final String host;
+    private static final String NAME_QUERY = "name";
     private static final String TITLE_QUERY = "title";
     private static final String TEXT_QUERY = "text";
     private static final String PASSWORD_QUERY = "password";
@@ -34,6 +32,7 @@ class ForumHTML {
         ForumDataPattern.PASSWORD.setQueryKey(PASSWORD_QUERY);
 
         html.setLanguage("ja");
+        html.setMetaData("charset", "UTF-8");
         html.setTitle(FORUM_TITLE);
         html.setStylesheet("http://" + host + CSS_FILE_PATH);
         html.addBody("<div align=\"center\">");
@@ -46,7 +45,7 @@ class ForumHTML {
     }
 
     @NotNull
-    private static String table(List<String[]> list) throws IOException {
+    private String table(List<String[]> list) throws IOException {
         if (list == null || list.size() == 0) {
             return "<div id=\"content\"><p>No Data</p></div>";
         }
@@ -149,10 +148,11 @@ class ForumHTML {
     }
 
 
-    private static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    private String getParameter(List<String[]> list, int id, String key) {
         String keyToFind = key.toUpperCase();
         String param = ForumData.getParameter(list, id, keyToFind);
-        return sanitizeHTML(URLDecoder.decode(param, "UTF-8"));
+        //String encode = ForumData.getParameter(list, id, ForumDataPattern.ENCODER.getKey());
+        return sanitizeHTML(param);
     }
 
     /**
