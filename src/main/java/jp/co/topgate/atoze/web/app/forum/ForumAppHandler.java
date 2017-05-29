@@ -87,6 +87,7 @@ public class ForumAppHandler extends HTTPHandler {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;
         }
+        statusCode = 303;
         if ("DELETE".equals(getQueryParam("_method"))) {
             String threadID;
             String requestPassword = getQueryParam(ForumDataPattern.PASSWORD.getQueryKey());
@@ -99,7 +100,6 @@ public class ForumAppHandler extends HTTPHandler {
             }
             return;
         }
-        statusCode = 303;
         forum.createThread(QUERY, ENCODER);
     }
 
