@@ -48,7 +48,7 @@ public class HTTPRequestLineTest {
         assertThat(null, is(header.getProtocolVer()));
     }
 
-    @Test
+    @Test(expected = StatusBadRequestException.class)
     public void エラーテスト() throws IOException, StatusBadRequestException {
         //スペースなし
         String line = "GET/HTTP/1.1";
