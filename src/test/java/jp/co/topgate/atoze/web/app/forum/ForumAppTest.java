@@ -3,6 +3,7 @@ package jp.co.topgate.atoze.web.app.forum;
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPRequestParser;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -23,10 +24,13 @@ public class ForumAppTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
+    @Before
+    public void initFiles() throws IOException {
+        Files.copy(new File("src/test/Document/", "forumAppData.csv").toPath(), new File(tempFolder.getRoot(), "forumAppData.csv").toPath());
+    }
+
     @Test
     public void createThreadテスト() throws IOException {
-        Files.copy(new File("src/test/Document/", "forumAppData.csv").toPath(), new File(tempFolder.getRoot(), "forumAppData.csv").toPath());
-        //File file = new File("src/test/Document/forumAppData.csv");
         File file = new File(tempFolder.getRoot(), "forumAppData.csv");
         CSVFile csv = new CSVFile();
         List<String[]> data = csv.readCSV(file);
@@ -61,6 +65,7 @@ public class ForumAppTest {
         assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
         assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
+        file.delete();
     }
 
     @Test
@@ -94,7 +99,7 @@ public class ForumAppTest {
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
         assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
         data.remove(data.size() - 1);
-        new File(tempFolder.getRoot(), "forumAppData.csv").delete();
+        file.delete();
     }
 
     private String checkEncode(String encode) {
