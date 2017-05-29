@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Contract;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -81,10 +82,9 @@ public class ForumData {
      * @param start
      * @param end
      * @return 整列されたデータ
-     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data, int start, int end) throws UnsupportedEncodingException {
+    private static List<String[]> checkData(List<String[]> data, int start, int end) {
         if (data.size() == 0) {
             return data;
         }
@@ -113,7 +113,7 @@ public class ForumData {
     }
 
     @Contract(pure = true)
-    private static List<String[]> checkData(List<String[]> data) throws UnsupportedEncodingException {
+    private static List<String[]> checkData(List<String[]> data) {
         return checkData(data, 0, data.size() - 1);
     }
 
@@ -124,11 +124,10 @@ public class ForumData {
      * @param id   リストの番号
      * @param key  属性
      * @return 指定した属性に対応した値
-     * @throws UnsupportedEncodingException 読み込みデータがエンコードできない
      */
 
     @Contract(value = "null, _, _ -> null;")
-    static String getParameter(List<String[]> list, int id, String key) throws UnsupportedEncodingException {
+    static String getParameter(List<String[]> list, int id, String key) {
         String[] line = list.get(id);
         if (line.length <= 0) {
             return null;
@@ -136,7 +135,7 @@ public class ForumData {
         return getParameter(line, key);
     }
 
-    static String getParameter(String[] line, String key) throws UnsupportedEncodingException {
+    static String getParameter(String[] line, String key) {
         Map<String, String> data = new HashMap<>();
         String[] name = line[0].split(":", 2);
         if (name.length >= 2) {
@@ -153,6 +152,25 @@ public class ForumData {
                 data.put(String.valueOf(i), values[0]);
             }
         }
-        return data.getOrDefault(key.toUpperCase(), "");
+        String encode = checkEncode(data.getOrDefault(ForumDataPattern.ENCODER.getKey(), "UTF-8"));
+        String parameter = data.getOrDefault(key.toUpperCase(), "");
+
+        if (key.equals(ForumDataPattern.ENCODER.getKey())) {
+            parameter = data.getOrDefault(key, "UTF-8");
+        }
+        try {
+            return URLDecoder.decode(parameter, encode);
+        } catch (UnsupportedEncodingException e) {
+            return parameter;
+        }
+    }
+
+    private static String checkEncode(String encode) {
+        try {
+            URLDecoder.decode("", encode);
+            return encode;
+        } catch (UnsupportedEncodingException e) {
+            return "UTF-8";
+        }
     }
 }

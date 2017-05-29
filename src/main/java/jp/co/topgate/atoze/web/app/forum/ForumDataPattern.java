@@ -8,12 +8,13 @@ package jp.co.topgate.atoze.web.app.forum;
  */
 public enum ForumDataPattern {
     ID(0, "ID", null),
-    NAME(1, "NAME", "name"),
-    TITLE(2, "TITLE", "title"),
-    TEXT(3, "TEXT", "text"),
-    PASSWORD(4, "PASSWORD", "password"),
-    DATE(5, "DATE", null),
-    ICON(6, "ICON", "icon"),
+    ENCODER(1, "ENCODER", null),
+    NAME(2, "NAME", "name"),
+    TITLE(3, "TITLE", "title"),
+    TEXT(4, "TEXT", "text"),
+    PASSWORD(5, "PASSWORD", "password"),
+    DATE(6, "DATE", null),
+    ICON(7, "ICON", "icon"),
     DEFAULT(99, null, null);
 
     private final int index;
@@ -72,9 +73,10 @@ public enum ForumDataPattern {
         return key;
     }
 
-    public void setQueryKey(String queryKey){
+    public void setQueryKey(String queryKey) {
         this.queryKey = queryKey;
     }
+
     /**
      * このENUMに保存されているDEFAULT以外のデータの数を返します.
      */

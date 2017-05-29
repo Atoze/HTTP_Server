@@ -5,7 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 掲示板アプリ
@@ -35,7 +39,7 @@ public class ForumApp {
     /**
      * 新規に投稿された時
      */
-    void createThread(Map<String, String> query) throws IOException {
+    void createThread(Map<String, String> query, String encode) throws IOException {
         List<String[]> list = forumData.getData();
         //TODO ユーザー管理
         /*
@@ -45,7 +49,7 @@ public class ForumApp {
             user.saveData(user.newUser(name, retrieveNewID(forumData.getData())));
         }
         */
-        String text[] = generateNewThreadData(query);
+        String text[] = generateNewThreadData(query, encode);
 
         list.add(text);
         forumData.saveData(String.join(",", text), csvFile);
@@ -55,12 +59,13 @@ public class ForumApp {
     /**
      * 検索時
      */
-     void findThread(String name) throws IOException {
+    void findThread(String name, String encoder) throws IOException {
         List<String[]> list = forumData.getData();
         List<String[]> data = new ArrayList<>();
         if (name != null) {
             for (int i = 0; i < list.size(); i++) {
-                if (name.equals(ForumData.getParameter(list, i, ForumDataPattern.NAME.getKey()))) {
+                String nameData = ForumData.getParameter(list, i, ForumDataPattern.NAME.getKey());
+                if (name.equals(nameData) || name.equals(URLDecoder.decode(nameData, encoder))) {
                     data.add(list.get(i));
                 }
             }
@@ -102,10 +107,10 @@ public class ForumApp {
             return;
         }
         if (listIndex >= 0 && listIndex < list.size()) {
-            if (ForumData.getParameter(list, listIndex, "PASSWORD").isEmpty()) {
+            if (ForumData.getParameter(list, listIndex, ForumDataPattern.PASSWORD.getKey()).isEmpty()) {
                 return;
             }
-            if (requestPassword.equals(ForumData.getParameter(list, listIndex, "PASSWORD"))) {
+            if (requestPassword.equals(ForumData.getParameter(list, listIndex, ForumDataPattern.PASSWORD.getKey()))) {
                 list.remove(listIndex);
                 mainData = list;
                 forumData.overWriteData(list, csvFile);
@@ -118,7 +123,7 @@ public class ForumApp {
      * 追加するデータをリクエストのクエリ値を元に生成します.
      */
     @Contract(pure = true)
-    private String[] generateNewThreadData(Map<String, String> query) throws IOException {
+    private String[] generateNewThreadData(Map<String, String> query, String encode) throws IOException {
         List<String> saveData = new ArrayList<>();
 
         for (int i = 0; i < ForumDataPattern.size(); i++) {
@@ -132,6 +137,9 @@ public class ForumApp {
                     break;
                 case "DATE":
                     saveData.add(key + ":" + date());
+                    break;
+                case "ENCODER":
+                    saveData.add(key + ":" + encode);
                     break;
                 default:
                     saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
