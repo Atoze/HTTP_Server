@@ -3,8 +3,7 @@ package jp.co.topgate.atoze.web;
 import jp.co.topgate.atoze.web.util.Status;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -19,8 +18,7 @@ public class HTTPResponseTest {
         HTTPResponse response = new HTTPResponse();
         Status status = new Status();
 
-        File log = new File("src/test/Document/createResponse.txt");
-        OutputStream output = new FileOutputStream(log);
+        OutputStream output = new ByteArrayOutputStream();
 
         status.setStatus(200);
         response.addResponseHeader("ContentType", "text/html");

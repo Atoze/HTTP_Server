@@ -3,10 +3,14 @@ package jp.co.topgate.atoze.web.app.forum;
 import jp.co.topgate.atoze.web.HTTPRequest;
 import jp.co.topgate.atoze.web.HTTPRequestParser;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -17,9 +21,17 @@ import static org.junit.Assert.assertThat;
  */
 
 public class ForumAppTest {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Before
+    public void initFiles() throws IOException {
+        Files.copy(new File("src/test/Document/", "forumAppData.csv").toPath(), new File(tempFolder.getRoot(), "forumAppData.csv").toPath());
+    }
+
     @Test
     public void createThreadテスト() throws IOException {
-        File file = new File("src/test/Document/forumAppData.csv");
+        File file = new File(tempFolder.getRoot(), "forumAppData.csv");
         CSVFile csv = new CSVFile();
         List<String[]> data = csv.readCSV(file);
         int currentLastID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
@@ -53,6 +65,7 @@ public class ForumAppTest {
         assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
         assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
+        file.delete();
     }
 
     @Test
@@ -66,14 +79,6 @@ public class ForumAppTest {
 
     @Test
     public void createThreadSHIFT_JISテスト() throws IOException {
-        File file = new File("src/test/Document/forumAppData.csv");
-        CSVFile csv = new CSVFile();
-        List<String[]> data = csv.readCSV(file);
-        int currentLastID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
-
-        ForumApp app = new ForumApp();
-        app.setForumDataFile(file);
-
         String ENCODER = "UTF-8";
         HTTPRequest request = HTTPRequestParser.parse(new FileInputStream("src/test/Document/forumAppRequestJIS"), "localhost:8080");
         if (request.getHeaderParam("Content-Type") != null) {
@@ -83,14 +88,18 @@ public class ForumAppTest {
             }
         }
 
+        File file = new File(tempFolder.getRoot(), "forumAppData.csv");
+        ForumApp app = new ForumApp();
+        app.setForumDataFile(file);
+        CSVFile csv = new CSVFile();
         app.createThread(request.getQuery(), ENCODER);
-        data = csv.readCSV(file);
-        int newID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
-        assertThat(newID, is(currentLastID + 1));
+        List<String[]> data = csv.readCSV(file);
         assertThat("ほげ", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.NAME.getKey())));
         assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
         assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
+        data.remove(data.size() - 1);
+        file.delete();
     }
 
     private String checkEncode(String encode) {
