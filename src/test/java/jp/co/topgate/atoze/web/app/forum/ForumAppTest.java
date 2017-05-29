@@ -47,7 +47,7 @@ public class ForumAppTest {
         InputStream input = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
         HTTPRequest request = HTTPRequestParser.parse(input, "localhost:8080");
 
-        app.createThread(request.getQuery());
+        app.createThread(request.getQuery(), "UTF-8");
         data = csv.readCSV(file);
         int newID = Integer.parseInt(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.ID.getKey()));
         assertThat(newID, is(currentLastID + 1));
@@ -62,7 +62,7 @@ public class ForumAppTest {
         ForumApp app = new ForumApp();
         File file = new File("src/test/Document/forumAppData.csv");
         app.setForumDataFile(file);
-        app.findThread("test");
+        app.findThread("test", "UTF-8");
         assertThat(app.getMainData().size(),is(3));
     }
 }
