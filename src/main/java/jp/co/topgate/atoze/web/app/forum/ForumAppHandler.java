@@ -34,8 +34,8 @@ public class ForumAppHandler extends HTTPHandler {
 
         if (request.getHeaderParam("Content-Type") != null) {
             String[] encode = request.getHeaderParam("Content-Type").split(";");
-            if (encode.length >= 2 && encode[1].startsWith("charset=")) {
-                ENCODER = checkEncode(encode[1].substring(0, "charset=".length()).trim());
+            if (encode.length >= 2 && encode[1].trim().startsWith("charset=")) {
+                ENCODER = checkEncode(encode[1].substring("charset=".length() + 1).trim());
             }
         }
 
@@ -75,7 +75,7 @@ public class ForumAppHandler extends HTTPHandler {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;
         }
-        if (path.equals("index.html")) {
+        if (path.equals("index.html") || path.equals("")) {
             forum.threadByCSV();
             return;
         }
@@ -87,6 +87,7 @@ public class ForumAppHandler extends HTTPHandler {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;
         }
+        statusCode = 303;
         if ("DELETE".equals(getQueryParam("_method"))) {
             String threadID;
             String requestPassword = getQueryParam(ForumDataPattern.PASSWORD.getQueryKey());
@@ -99,7 +100,6 @@ public class ForumAppHandler extends HTTPHandler {
             }
             return;
         }
-        statusCode = 303;
         forum.createThread(QUERY, ENCODER);
     }
 
@@ -131,7 +131,7 @@ public class ForumAppHandler extends HTTPHandler {
     private String getQueryParam(String key) {
         try {
             return URLDecoder.decode(QUERY.getOrDefault(key, null), ENCODER);
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return null;
         } catch (UnsupportedEncodingException e) {
             return QUERY.getOrDefault(key, null);
