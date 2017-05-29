@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web;
 
+import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPRequestLineTest {
     @Test
-    public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException {
+    public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException, StatusBadRequestException {
         String line = "GET / HTTP/1.1";
         HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
@@ -39,18 +40,16 @@ public class HTTPRequestLineTest {
     }
 
     @Test
-    public void nullテスト() throws IOException {
+    public void nullテスト() throws IOException, StatusBadRequestException {
         String line = null;
         HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
-        //header.readRequestLine(line, "localhost:8080");
-
         assertThat(null, is(header.getMethod()));
         assertThat(null, is(header.getFilePath()));
         assertThat(null, is(header.getProtocolVer()));
     }
 
-    @Test
-    public void エラーテスト() throws IOException {
+    @Test(expected = StatusBadRequestException.class)
+    public void エラーテスト() throws IOException, StatusBadRequestException {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
