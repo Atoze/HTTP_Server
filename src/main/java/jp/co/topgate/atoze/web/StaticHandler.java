@@ -4,6 +4,7 @@ import jp.co.topgate.atoze.web.util.ContentType;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 
@@ -12,6 +13,8 @@ import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
  */
 public class StaticHandler extends HTTPHandler {
     private final File file;
+    //TODO:text/*形式も含んだ方がいいのか否か（cssは独自に設定できるからいらない？）
+    private final static List<String> CHARSET_REQUIRED_FILE_EXTENSION = Arrays.asList("html", "htm", "xml", "txt");
 
     StaticHandler(HTTPRequest request) {
         String filePath = request.getPath();
@@ -26,7 +29,7 @@ public class StaticHandler extends HTTPHandler {
         int statusCode = checkStatusCode(file);
         if (statusCode == 200) {
             HTTPResponse response = new HTTPResponse();
-            if (Arrays.asList("html", "txt").contains(ContentType.getFileExtension(file.toString()))) {
+            if (CHARSET_REQUIRED_FILE_EXTENSION.contains(ContentType.getFileExtension(file.toString()))) {
                 response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()) + "; charset=" + detectFileEncoding(file));
             } else {
                 response.addResponseHeader("Content-Type", ContentType.getContentType(file.toString()));
