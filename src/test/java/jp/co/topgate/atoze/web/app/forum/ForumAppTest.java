@@ -6,6 +6,7 @@ import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -68,8 +69,10 @@ public class ForumAppTest {
         assertThat(name, is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.NAME.getKey())));
         assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
-        assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
-        file.delete();
+
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        String savedPassword= ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey());
+        assertThat(true, is(bCrypt.matches("foo", savedPassword)));
     }
 
     @Test
@@ -101,9 +104,11 @@ public class ForumAppTest {
         assertThat("ほげ", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.NAME.getKey())));
         assertThat("test", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TITLE.getKey())));
         assertThat("document", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.TEXT.getKey())));
-        assertThat("foo", is(ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey())));
+
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        String savedPassword= ForumData.getParameter(data, data.size() - 1, ForumDataPattern.PASSWORD.getKey());
+        assertThat(true, is(bCrypt.matches("foo", savedPassword)));
         data.remove(data.size() - 1);
-        file.delete();
     }
 
     private String checkEncode(String encode) {
