@@ -2,6 +2,7 @@ package jp.co.topgate.atoze.web;
 
 import jp.co.topgate.atoze.web.app.forum.ForumAppHandler;
 import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+import jp.co.topgate.atoze.web.exception.StatusProtocolException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,8 +94,3 @@ public class Server extends Thread {
     }
 }
 
-class StatusProtocolException extends Exception {
-    StatusProtocolException() {
-        super();
-    }
-}
