@@ -127,14 +127,15 @@ public class ForumApp {
         List<String> saveData = new ArrayList<>();
         for (int i = 0; i < ForumDataPattern.size(); i++) {
             String key = ForumDataPattern.getKeyByIndex(i);
-            if (key.equals(ForumDataPattern.ID.getKey()))
+            if (key.equals(ForumDataPattern.ID.getKey())) {
                 saveData.add(key + ":" + retrieveNewID(forumData.getData()));
-            else if (key.equals(ForumDataPattern.DATE.getKey()))
+            } else if (key.equals(ForumDataPattern.DATE.getKey())) {
                 saveData.add(key + ":" + date());
-            else if (key.equals(ForumDataPattern.ENCODER.getKey()))
+            } else if (key.equals(ForumDataPattern.ENCODER.getKey())) {
                 saveData.add(key + ":" + encode);
-            else
+            } else {
                 saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
+            }
         }
         return saveData.toArray(new String[0]);
     }

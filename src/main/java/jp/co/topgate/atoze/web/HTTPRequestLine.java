@@ -137,8 +137,9 @@ class HTTPRequestLine {
 
     private String checkProtocolVer(String protocol) throws StatusBadRequestException {
         if (protocol != null) {
-            if (protocol.startsWith("HTTP/"))
+            if (protocol.startsWith("HTTP/")) {
                 return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
+            }
         }
         throw new StatusBadRequestException("プロトコルが正しく書かれていません");
     }

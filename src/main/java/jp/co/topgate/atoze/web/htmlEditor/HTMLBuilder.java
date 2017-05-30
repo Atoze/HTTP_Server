@@ -68,8 +68,9 @@ public class HTMLBuilder {
     private void generateHead() {
         String head = "";
         for (String headData : this.headData) {
-            if (headData != null && !headData.isEmpty())
+            if (headData != null && !headData.isEmpty()) {
                 head += headData + LINE_FEED;
+            }
         }
         head = head + "<title>" + title + "</title>";
         this.head = head + generateMetaDataField() + generateLinkField();
@@ -123,9 +124,13 @@ public class HTMLBuilder {
         if (data.size() > 0) {
             for (int i = 0; i < data.size(); i++) {
                 String[] value = data.get(i);
-                if (value != null && value.length > 0)
-                    if (value[1] != null) sb.append(" ").append(value[0]).append("=\"").append(value[1]).append("\"");
-                    else sb.append(" ").append(value[0]);
+                if (value != null && value.length > 0) {
+                    if (value[1] != null) {
+                        sb.append(" ").append(value[0]).append("=\"").append(value[1]).append("\"");
+                    } else {
+                        sb.append(" ").append(value[0]);
+                    }
+                }
             }
         }
         sb.append(">").append(LINE_FEED);
