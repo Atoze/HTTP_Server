@@ -17,7 +17,7 @@ public class ForumAppHandler extends HTTPHandler {
     private ForumApp forum;
 
     private final Map<String, String> QUERY;
-    private final String FILE_PATH;
+    private final String PATH;
     private final String HOST;
 
     private String ENCODER = "UTF-8";
@@ -28,7 +28,7 @@ public class ForumAppHandler extends HTTPHandler {
     private static String SEARCH = "search";
 
     public ForumAppHandler(HTTPRequest request) {
-        FILE_PATH = request.getFilePath();
+        PATH = request.getPath();
         QUERY = request.getQuery();
         HOST = request.getHost();
 
@@ -70,7 +70,7 @@ public class ForumAppHandler extends HTTPHandler {
      * "GET"時の処理
      */
     private void handlerGET() throws IOException {
-        String path = FILE_PATH.replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
+        String path = PATH.replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
         if (path.startsWith("search") && getQueryParam("search") != null) {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;

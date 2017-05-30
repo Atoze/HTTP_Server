@@ -19,7 +19,7 @@ public class HTTPRequestLineTest {
         //header.readRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
-        assertThat("/index.html", is(header.getFilePath()));
+        assertThat("/", is(header.getPath()));
         assertThat("1.1", is(header.getProtocolVer()));
 
         line = "GET http://localhost:8080/ HTTP/1.1";
@@ -27,7 +27,7 @@ public class HTTPRequestLineTest {
         //header.readRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
-        assertThat("/index.html", is(header.getFilePath()));
+        assertThat("/", is(header.getPath()));
         assertThat("1.1", is(header.getProtocolVer()));
 
         //URI指定忘れ
@@ -35,7 +35,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat("GET", is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat("1.1", is(header.getProtocolVer()));
     }
 
@@ -44,7 +44,7 @@ public class HTTPRequestLineTest {
         String line = null;
         HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat(null, is(header.getFilePath()));
+        assertThat(null, is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
     }
 
@@ -56,7 +56,7 @@ public class HTTPRequestLineTest {
         HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //二重スペース
@@ -64,7 +64,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //スペースがたりない
@@ -72,7 +72,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //適当な文字列
@@ -80,7 +80,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //適当な文字列
@@ -88,7 +88,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("hoge", is(header.getFilePath()));
+        assertThat("hoge", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //空スペース
@@ -96,7 +96,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
 
         //空スペース
@@ -104,7 +104,7 @@ public class HTTPRequestLineTest {
         header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
-        assertThat("", is(header.getFilePath()));
+        assertThat("", is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
     }
 }

@@ -51,9 +51,9 @@ public class Server extends Thread {
             checkValidRequest(httpRequest);
 
             HTTPHandler handler;
-            String filePath = httpRequest.getFilePath();
+            String path = httpRequest.getPath();
 
-            if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
+            if (path.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
                 handler = new ForumAppHandler(httpRequest);
             } else {
                 handler = new StaticHandler(httpRequest);

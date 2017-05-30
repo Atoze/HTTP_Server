@@ -23,7 +23,7 @@ public class HTTPRequestTest {
 
         assertThat(null, is(httpRequest.getHeader()));
         assertThat(null, is(httpRequest.getMethod()));
-        assertThat(null, is(httpRequest.getFilePath()));
+        assertThat(null, is(httpRequest.getPath()));
         assertThat(null, is(httpRequest.getProtocolVer()));
 
         //データ挿入
@@ -34,7 +34,7 @@ public class HTTPRequestTest {
         }
 
         assertThat("GET", is(httpRequest.getMethod()));
-        assertThat("/public/index.html", is(httpRequest.getFilePath()));
+        assertThat("/public/index.html", is(httpRequest.getPath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
         assertThat("localhost:8080", is(httpRequest.getHeaderParam("Host")));
@@ -45,7 +45,7 @@ public class HTTPRequestTest {
         httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
 
         assertThat("GET", is(httpRequest.getMethod()));
-        assertThat("/hoge.html", is(httpRequest.getFilePath()));
+        assertThat("/hoge.html", is(httpRequest.getPath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
         assertThat("localhost:8080", is(httpRequest.getHeaderParam("Host")));
@@ -61,7 +61,7 @@ public class HTTPRequestTest {
         InputStream input = new FileInputStream(test);
 
         HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
-        assertThat("/hoge.html", is(httpRequest.getFilePath()));
+        assertThat("/hoge.html", is(httpRequest.getPath()));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class HTTPRequestTest {
         InputStream input = new FileInputStream(test);
 
         HTTPRequest httpRequest = HTTPRequestParser.parse(input, "localhost:8080");
-        assertThat("http://hogehoge/hoge.html", is(httpRequest.getFilePath()));
+        assertThat("http://hogehoge/hoge.html", is(httpRequest.getPath()));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class HTTPRequestTest {
             throw new RuntimeException(e);
         }
         assertThat("POST", is(httpRequest.getMethod()));
-        assertThat("/test.html", is(httpRequest.getFilePath()));
+        assertThat("/test.html", is(httpRequest.getPath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
         assertThat("key1=value1&key2=あいうえお", is(httpRequest.getBodyText()));
@@ -106,7 +106,7 @@ public class HTTPRequestTest {
             throw new RuntimeException(e);
         }
         assertThat("POST", is(httpRequest.getMethod()));
-        assertThat("/test.html", is(httpRequest.getFilePath()));
+        assertThat("/test.html", is(httpRequest.getPath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
         String largePOST = httpRequest.getBodyText();
@@ -128,7 +128,7 @@ public class HTTPRequestTest {
             throw new RuntimeException(e);
         }
         assertThat("POST", is(httpRequest.getMethod()));
-        assertThat("/index.html", is(httpRequest.getFilePath()));
+        assertThat("/", is(httpRequest.getPath()));
         assertThat("1.1", is(httpRequest.getProtocolVer()));
 
         assertThat(null, is(httpRequest.getBodyText()));

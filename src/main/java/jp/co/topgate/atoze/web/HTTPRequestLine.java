@@ -17,7 +17,7 @@ import java.util.Set;
 class HTTPRequestLine {
     private String method;
     private String uri;
-    private String filePath;
+    private String path;
     private Map<String, String> query;
     private String protocolVer;
 
@@ -56,10 +56,7 @@ class HTTPRequestLine {
         }
         parse(line);
 
-        filePath = uriQuerySplitter(urlDivider(uri, host));
-        if (filePath.endsWith("/")) {
-            filePath += "index.html";
-        }
+        path = uriQuerySplitter(urlDivider(uri, host));
         checkIsValidMethod(method);
         protocolVer = checkProtocolVer(protocolVer);
     }
@@ -73,58 +70,60 @@ class HTTPRequestLine {
         return this.method;
     }
 
+
+    /**
+     * 要求するリソースのパスを取得します.
+     *
+     * @return パス
+     */
+    String getPath() {
+        return this.path;
+    }
+
+
     /**
      * 要求するリソースのURIを取得します.
      *
-     * @return ファイルパス
+     * @return URI
      */
     String getURI() {
         return this.uri;
     }
 
     /**
-     * 要求するリソースのローカルパスを取得します.
-     *
-     * @return ファイルパス
-     */
-    String getFilePath() {
-        return this.filePath;
-    }
-
-    /**
      * 絶対パスからホスト名を抜き、相対パスにします.
      *
-     * @param filePath
+     * @param uri
      * @param host
-     * @return ファイルパス
+     * @return パス
      */
     @Contract("null, _ -> !null")
-    private String urlDivider(String filePath, String host) {
-        if (filePath == null) {
+    private String urlDivider(String uri, String host) {
+        if (uri == null) {
             return "";
         }
-        if (filePath.startsWith("http://" + host)) {
-            return filePath.substring(filePath.indexOf(host) + host.length());
+        if (uri.startsWith("http://" + host)) {
+            return uri.substring(uri.indexOf(host) + host.length());
         }
-        return filePath;
+        return uri;
     }
 
     /**
-     * ファイルパスとクエリデータを分割します.
+     * URIからパスとクエリデータを分割します.
      *
-     * @param filePath
-     * @return ファイルパス
+     * @param uri
+     * @return パス
      */
-    private String uriQuerySplitter(String filePath) {
-        if (filePath == null) {
+    private String uriQuerySplitter(String uri) {
+        if (uri == null) {
             return "";
         }
 
-        String urlQuery[] = filePath.split("\\?", 2);
-        if (urlQuery[0] != filePath) {
-            this.query = ParseUtil.parseQueryData(urlQuery[1]);
+        String uriQuery[] = uri.split("\\?", 2);
+        if (uriQuery[0] != uri) {
+            this.query = ParseUtil.parseQueryData(uriQuery[1]);
         }
-        return urlQuery[0];
+        return uriQuery[0];
     }
 
     /**

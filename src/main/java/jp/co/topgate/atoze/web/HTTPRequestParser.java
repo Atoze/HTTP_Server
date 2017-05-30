@@ -25,7 +25,7 @@ public class HTTPRequestParser {
         String line = readLine(input);
         HTTPRequestLine requestLine = new HTTPRequestLine(line, host);
         String method = requestLine.getMethod();
-        HTTPRequest request = new HTTPRequest(method, requestLine.getFilePath(), requestLine.getProtocolVer(), host);
+        HTTPRequest request = new HTTPRequest(method, requestLine.getPath(), requestLine.getProtocolVer(), host);
         request.setHeaderQuery(requestLine.getQuery());
 
         //RequestHeader

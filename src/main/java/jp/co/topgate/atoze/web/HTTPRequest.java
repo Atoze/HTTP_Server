@@ -21,16 +21,16 @@ public class HTTPRequest {
     private Map<String, String> headerQuery;
 
     private final String method;
-    private final String filePath;
+    private final String path;
     private final String protocolVer;
     private final String host;
 
     private Map<String, String> headerField = new HashMap<>();
 
 
-    HTTPRequest(String method, String filePath, String protocolVer, String host) {
+    HTTPRequest(String method, String path, String protocolVer, String host) {
         this.method = method;
-        this.filePath = filePath;
+        this.path = path;
         this.protocolVer = protocolVer;
         this.host = host;
     }
@@ -109,8 +109,8 @@ public class HTTPRequest {
         return this.method;
     }
 
-    public String getFilePath() {
-        return this.filePath;
+    public String getPath() {
+        return this.path;
     }
 
     public String getHost() {

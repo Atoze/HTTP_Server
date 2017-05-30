@@ -14,7 +14,10 @@ public class StaticHandler extends HTTPHandler {
     private final File file;
 
     StaticHandler(HTTPRequest request) {
-        String filePath = request.getFilePath();
+        String filePath = request.getPath();
+        if (filePath.endsWith("/")) {
+            filePath += "index.html";
+        }
         file = new File(Server.ROOT_DIRECTORY, filePath);
     }
 
