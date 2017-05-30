@@ -120,22 +120,27 @@ public class ForumData {
     /**
      * #checkDataで作成されたリストに保管されているデータから,指定した属性の値を取り出します.
      *
-     * @param list データ
-     * @param id   リストの番号
-     * @param key  属性
+     * @param list   データ
+     * @param id     リストの番号
+     * @param key    属性
+     * @param encode 値を取る際に、保管された文字コードでエンコードするかどうか決めます.指定しない際はエンコードされます.
      * @return 指定した属性に対応した値
      */
 
-    @Contract(value = "null, _, _ -> null;")
-    static String getParameter(List<String[]> list, int id, String key) {
+    @Contract(value = "null, _, _, _ -> null;")
+    static String getParameter(List<String[]> list, int id, String key, boolean encode) {
         String[] line = list.get(id);
         if (line.length <= 0) {
             return null;
         }
-        return getParameter(line, key);
+        return getParameter(line, key, encode);
     }
 
-    static String getParameter(String[] line, String key) {
+    static String getParameter(List<String[]> list, int id, String key) {
+        return getParameter(list, id, key, true);
+    }
+
+    static String getParameter(String[] line, String key, boolean encode) {
         Map<String, String> data = new HashMap<>();
         String[] name = line[0].split(":", 2);
         if (name.length >= 2) {
@@ -152,17 +157,21 @@ public class ForumData {
                 data.put(String.valueOf(i), values[0]);
             }
         }
-        String encode = checkEncode(data.getOrDefault(ForumDataPattern.ENCODER.getKey(), "UTF-8"));
-        String parameter = data.getOrDefault(key.toUpperCase(), "");
+        if (!encode) {
+            return data.getOrDefault(key, "");
+        }
+        String encoder = checkEncode(data.getOrDefault(ForumDataPattern.ENCODER.getKey(), "UTF-8"));
+        String parameter = data.getOrDefault(key, "");
 
         if (key.equals(ForumDataPattern.ENCODER.getKey())) {
             parameter = data.getOrDefault(key, "UTF-8");
         }
         try {
-            return URLDecoder.decode(parameter, encode);
+            return URLDecoder.decode(parameter, encoder);
         } catch (UnsupportedEncodingException e) {
             return parameter;
         }
+
     }
 
     private static String checkEncode(String encode) {

@@ -2,6 +2,7 @@ package jp.co.topgate.atoze.web.app.forum;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,6 +74,7 @@ public class ForumApp {
         mainData = data;
     }
 
+    //TODO:IDから見るデータとインデックスから見る処理を統合したい
     /**
      * 保存しているデータのID値から一致したものを削除
      */
@@ -84,7 +86,9 @@ public class ForumApp {
 
         for (int i = 0; i < list.size(); i++) {
             if (id.equals(ForumData.getParameter(list, i, ForumDataPattern.ID.getKey()))) {
-                if (requestPassword.equals(ForumData.getParameter(list, i, ForumDataPattern.PASSWORD.getKey()))) {
+                BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+                String savedPassword = ForumData.getParameter(list, i, ForumDataPattern.PASSWORD.getKey());
+                if (bCrypt.matches(requestPassword, savedPassword)) {
                     list.remove(i);
                     mainData = list;
                     forumData.overWriteData(list, csvFile);
@@ -110,12 +114,13 @@ public class ForumApp {
             if (ForumData.getParameter(list, listIndex, ForumDataPattern.PASSWORD.getKey()).isEmpty()) {
                 return;
             }
-            if (requestPassword.equals(ForumData.getParameter(list, listIndex, ForumDataPattern.PASSWORD.getKey()))) {
+            BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+            String savedPassword = ForumData.getParameter(list, listIndex, ForumDataPattern.PASSWORD.getKey());
+            if (bCrypt.matches(requestPassword, savedPassword)) {
                 list.remove(listIndex);
                 mainData = list;
                 forumData.overWriteData(list, csvFile);
             }
-            System.out.println("パスワードが合っていません");
         }
     }
 
@@ -133,6 +138,9 @@ public class ForumApp {
                 saveData.add(key + ":" + date());
             } else if (key.equals(ForumDataPattern.ENCODER.getKey())) {
                 saveData.add(key + ":" + encode);
+            } else if (key.equals(ForumDataPattern.PASSWORD.getKey())) {
+                String password = URLDecoder.decode(query.get(ForumDataPattern.PASSWORD.getQueryKey()), encode);
+                saveData.add(key + ":" + new BCryptPasswordEncoder().encode(password));
             } else {
                 saveData.add(key + ":" + query.get(ForumDataPattern.getQueryKeyByIndex(i)));
             }

@@ -102,7 +102,7 @@ class ForumHTML {
         sb.append("\" size=\"50\" maxlength=\"50\" placeholder=\" 名前を入力してください(50文字まで)\"><br/>");
         sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\" maxlength=\"50\" placeholder=\"タイトルを入力してください(50文字まで)\"><br/>");
         sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"50\" maxlength=\"200\" placeholder=\"コメントを入力してください(200文字まで)\"></textarea><br/>");
-        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\" maxlength=\"10\" ><br/>");
+        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\" maxlength=\"30\" ><br/>");
         sb.append("<INPUT type='submit' value='入力'></form>");
         sb.append("</header>");
 
