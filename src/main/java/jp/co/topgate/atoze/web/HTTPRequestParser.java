@@ -14,7 +14,6 @@ import static jp.co.topgate.atoze.web.util.ParseUtil.readLine;
  */
 public class HTTPRequestParser {
     private final static String LINE_FEED = System.getProperty("line.separator");
-    //private Map<String, String> headerField;
 
     private HTTPRequestParser() {
     }
@@ -27,7 +26,7 @@ public class HTTPRequestParser {
         HTTPRequestLine requestLine = new HTTPRequestLine(line, host);
         String method = requestLine.getMethod();
         HTTPRequest request = new HTTPRequest(method, requestLine.getFilePath(), requestLine.getProtocolVer(), host);
-        request.setHeaderQuery(requestLine.getHeaderQuery());
+        request.setHeaderQuery(requestLine.getQuery());
 
         //RequestHeader
         line = readLine(input);
@@ -50,7 +49,7 @@ public class HTTPRequestParser {
         int contentLength = Integer.parseInt(headerField.get("Content-Length"));
         HTTPRequestBody body = new HTTPRequestBody(bi, contentType, contentLength);
         request.setBody(body.getBodyText(), body.getBodyFile());
-        request.setBodyQuery(body.getQueryData());
+        request.setBodyQuery(body.getQuery());
         return request;
 
     }

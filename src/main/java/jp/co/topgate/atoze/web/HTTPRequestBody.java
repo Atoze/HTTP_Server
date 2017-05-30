@@ -15,7 +15,7 @@ class HTTPRequestBody {
     private String bodyText;
     private byte[] bodyFile;
     InputStream bodyInput;
-    private Map<String, String> queryData = new HashMap<>();
+    private Map<String, String> query = new HashMap<>();
 
     HTTPRequestBody(InputStream input, String contentType, int length) throws IOException {
         readRequest(input, contentType, length);
@@ -26,7 +26,7 @@ class HTTPRequestBody {
         switch (contentTypeValue[0]) {
             case "application/x-www-form-urlencoded":
                 bodyText = readBodyText(input, length);
-                queryData = ParseUtil.parseQueryData(bodyText);
+                query = ParseUtil.parseQueryData(bodyText);
                 break;
 
             //TODO 完成させる
@@ -79,7 +79,7 @@ class HTTPRequestBody {
         return bodyInput;
     }
 
-    Map<String, String> getQueryData() {
-        return queryData;
+    Map<String, String> getQuery() {
+        return query;
     }
 }

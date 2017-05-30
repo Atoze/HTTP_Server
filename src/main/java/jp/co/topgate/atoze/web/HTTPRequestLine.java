@@ -18,7 +18,7 @@ class HTTPRequestLine {
     private String method;
     private String uri;
     private String filePath;
-    private Map<String, String> headQuery;
+    private Map<String, String> query;
     private String protocolVer;
 
     private final static Set<String> METHODS = new HashSet<>();
@@ -122,7 +122,7 @@ class HTTPRequestLine {
 
         String urlQuery[] = filePath.split("\\?", 2);
         if (urlQuery[0] != filePath) {
-            this.headQuery = ParseUtil.parseQueryData(urlQuery[1]);
+            this.query = ParseUtil.parseQueryData(urlQuery[1]);
         }
         return urlQuery[0];
     }
@@ -149,8 +149,8 @@ class HTTPRequestLine {
      *
      * @return クエリ値
      */
-    public Map<String, String> getHeaderQuery() {
-        return this.headQuery;
+    public Map<String, String> getQuery() {
+        return this.query;
     }
 
     private void parse(String line) throws IOException {
