@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Created by atoze on 2017/05/26.
+ * ファイル関連のユーティリティ
  */
 public class FileUtil {
     /**

@@ -1,7 +1,10 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.app.forum.ForumAppHandler;
-import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+import jp.co.topgate.atoze.web.app.board.IndexHandler;
+import jp.co.topgate.atoze.web.exception.BadRequestException;
+import jp.co.topgate.atoze.web.exception.InternalServerErrorException;
+import jp.co.topgate.atoze.web.exception.ProtocolException;
+import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +23,9 @@ public class Server extends Thread {
     private final int PORT;
     private static final String HOST_NAME = "localhost";
     static final String ROOT_DIRECTORY = "./src/main/resources";
+    static final String SERVER_PROTOCOL = "HTTP/1.1";
+
+    public static final String BOARD_APP_DIRECTORY = "/program/board/";
 
     private final static Set<String> SUPPORTED_PROTOCOL_VERSION = new HashSet<>();
 
@@ -47,29 +53,30 @@ public class Server extends Thread {
             output = socket.getOutputStream();
             HTTPRequest httpRequest = HTTPRequestParser.parse(input, HOST_NAME + ":" + PORT);
             System.out.println(httpRequest.getHeader());
-            System.out.println(httpRequest.getBodyText());
             checkValidRequest(httpRequest);
 
-            HTTPHandler handler;
-            String filePath = httpRequest.getFilePath();
+            HTTPHandler handler = null;
+            String path = httpRequest.getPath();
 
-            if (filePath.startsWith(URLPattern.PROGRAM_BOARD.getURL())) {
-                handler = new ForumAppHandler(httpRequest);
+            if (path.startsWith(BOARD_APP_DIRECTORY)) {
+                handler = new IndexHandler(httpRequest);
             } else {
                 handler = new StaticHandler(httpRequest);
             }
             response = handler.generateResponse();
             if (response == null) {
-                throw new Exception();
+                throw new InternalServerErrorException("生成したレスポンスが空です");
             }
-        } catch (StatusBadRequestException e) {
-            response = new HTTPResponse(400);
-            //throw new RuntimeException(e);
-        } catch (StatusProtocolException e) {
-            response = new HTTPResponse(505);
+        } catch (BadRequestException e) {
+            response = new HTTPResponse(Status.BAD_REQUEST);
+        } catch (ProtocolException e) {
+            response = new HTTPResponse(Status.HTTP_VERSION_NOT_SUPPORTED);
+        } catch (InternalServerErrorException e) {
+            response = new HTTPResponse(Status.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            response = new HTTPResponse(500);
-            throw new RuntimeException(e);
+            //response = new HTTPResponse(Status.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            System.exit(1);
         } finally {
             if (response != null && output != null) {
                 response.writeTo(output);
@@ -79,22 +86,21 @@ public class Server extends Thread {
                     socket.close();
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                System.exit(1);
             }
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }
     }
 
-    private void checkValidRequest(HTTPRequest request) throws StatusBadRequestException, StatusProtocolException {
+    private void checkValidRequest(HTTPRequest request) throws BadRequestException, ProtocolException {
         String protocolVer = request.getProtocolVer();
-        if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) throw new StatusProtocolException();
-        if (protocolVer.equals("1.1") && !request.getHost().equals(request.getHeaderParam("Host")))
-            throw new StatusBadRequestException("Hostが指定されていないか間違っています");
+        if (!SUPPORTED_PROTOCOL_VERSION.contains(protocolVer)) {
+            throw new ProtocolException();
+        }
+        if (protocolVer.equals("1.1") && !request.getHost().equals(request.getHeaderParam("Host"))) {
+            throw new BadRequestException("Hostが指定されていないか間違っています");
+        }
     }
 }
 
-class StatusProtocolException extends Exception {
-    StatusProtocolException() {
-        super();
-    }
-}

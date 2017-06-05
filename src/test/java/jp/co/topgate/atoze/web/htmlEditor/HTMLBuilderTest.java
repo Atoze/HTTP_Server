@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web.htmlEditor;
 
+import jp.co.topgate.atoze.web.util.HTMLBuilder;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class HTMLBuilderTest {
     @Test
     public void HTML作成テスト() throws IOException {
         HTMLBuilder html = new HTMLBuilder();
-        assertThat("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<title>null</title><meta charset=\"UTF-8\">\n</head>\n<body>\n</body>\n</html>", is(html.getHTML()));
+        assertThat("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<title>null</title><meta charset=\"UTF-8\">\n</head>\n<body>\n</body>\n</html>", is(html.toString()));
 
         //null代入テスト
         html.addBody(null);

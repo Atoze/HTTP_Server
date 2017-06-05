@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web.app.forum;
+package jp.co.topgate.atoze.web.app.board;
 
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class CSVFileTest {
         //String testFilePath = "src/test/Document/csv_test";
         file = new File(tempFolder.getRoot(), "csv_test");
         String testText = "HOGE";
-        csv.writeData(testText, file);
+        csv.writeData(testText, file, false);
 
         //読み込み
         data = csv.readCSV(file);
@@ -56,7 +56,7 @@ public class CSVFileTest {
 
         //null書き込みテスト
         testText = null;
-        csv.writeData(testText, file);
+        csv.writeData(testText, file, false);
         data = csv.readCSV(file);
         assertThat(data.size(), is(0));
 
@@ -72,7 +72,7 @@ public class CSVFileTest {
 
         //改行判定テスト
         testText = "HOGE\nFOO,BAR\rHOGE1\r\nHOGE2\n\r";
-        csv.writeData(testText, file);
+        csv.writeData(testText, file, false);
         data = csv.readCSV(file);
         assertThat(data.size(), is(5));
 

@@ -1,9 +1,8 @@
-package jp.co.topgate.atoze.web.app.forum;
+package jp.co.topgate.atoze.web.app.board;
 
-import jp.co.topgate.atoze.web.HTTPHandler;
-import jp.co.topgate.atoze.web.HTTPRequest;
-import jp.co.topgate.atoze.web.HTTPResponse;
-import jp.co.topgate.atoze.web.URLPattern;
+import jp.co.topgate.atoze.web.*;
+import jp.co.topgate.atoze.web.exception.RequestBodyParseException;
+import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,37 +12,39 @@ import java.util.Map;
 /**
  * 掲示板の挙動を制御します.
  */
-public class ForumAppHandler extends HTTPHandler {
-    private ForumApp forum;
+public class IndexHandler extends HTTPHandler {
+    private final static String DEFAULT_ENCODING = "UTF-8";
 
-    private final Map<String, String> QUERY;
-    private final String FILE_PATH;
+    private final ForumApp forum;
+
+    private Map<String, String> QUERY;
+    private final String PATH;
     private final String HOST;
 
-    private String ENCODER = "UTF-8";
+    private String ENCODER = DEFAULT_ENCODING;
     private String html;
 
-    private int statusCode = 200;
+    private Status status = Status.OK;
 
     private static String SEARCH = "search";
+    private static String CHARSET_KEY = "charset=";
 
-    public ForumAppHandler(HTTPRequest request) {
-        FILE_PATH = request.getFilePath();
-        QUERY = request.getQuery();
+    public IndexHandler(HTTPRequest request) throws IOException {
+        PATH = request.getPath();
         HOST = request.getHost();
+        forum = new ForumApp();
 
-        if (request.getHeaderParam("Content-Type") != null) {
-            String[] encode = request.getHeaderParam("Content-Type").split(";");
-            if (encode.length >= 2 && encode[1].trim().startsWith("charset=")) {
-                ENCODER = checkEncode(encode[1].substring("charset=".length() + 1).trim());
+        if (request.getContentType() != null) {
+            String[] encode = request.getContentType().split(";",2);
+            if (encode.length >= 2 && encode[1].trim().startsWith(CHARSET_KEY)) {
+                ENCODER = checkEncode(encode[1].substring(CHARSET_KEY.length() + 1).trim());
             }
         }
-
         try {
-            forum = new ForumApp();
+            QUERY = request.getFormQuery();
             handle(request.getMethod());
-        } catch (NullPointerException | IOException e) {
-            statusCode = 500;
+        } catch (RequestBodyParseException e) {
+            status = Status.INTERNAL_SERVER_ERROR;
             e.printStackTrace();
         }
     }
@@ -63,14 +64,15 @@ public class ForumAppHandler extends HTTPHandler {
                 handlerPOST();
                 break;
         }
-        html = new ForumHTML(HOST).getIndexHTML(forum.getMainData());
+        html = new ForumHTML(HOST).getIndexHTML(forum.getOutputData());
     }
 
     /**
      * "GET"時の処理
      */
     private void handlerGET() throws IOException {
-        String path = FILE_PATH.replaceFirst(URLPattern.PROGRAM_BOARD.getURL(), "");
+        String path = PATH.replaceFirst(Server.BOARD_APP_DIRECTORY, "");
+
         if (path.startsWith("search") && getQueryParam("search") != null) {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;
@@ -79,7 +81,7 @@ public class ForumAppHandler extends HTTPHandler {
             forum.threadByCSV();
             return;
         }
-        statusCode = 404;
+        status = Status.NOT_FOUND;
     }
 
     private void handlerPOST() throws IOException {
@@ -87,16 +89,14 @@ public class ForumAppHandler extends HTTPHandler {
             forum.findThread(getQueryParam("search"), ENCODER);
             return;
         }
-        statusCode = 303;
+        status = Status.SEE_OTHER;
         if ("DELETE".equals(getQueryParam("_method"))) {
             String threadID;
-            String requestPassword = getQueryParam(ForumDataPattern.PASSWORD.getQueryKey());
+            String requestPassword = getQueryParam(ForumDataKey.PASSWORD.getQueryKey());
             if ((threadID = getQueryParam("tableIndex")) != null) {
                 forum.deleteThreadByListIndex(threadID, requestPassword);
             } else if ((threadID = getQueryParam("threadID")) != null) {
-                if (ForumData.isNumber(threadID)) {
-                    forum.deleteThreadByID(threadID, requestPassword);
-                }
+                forum.deleteThreadByID(threadID, requestPassword);
             }
             return;
         }
@@ -108,12 +108,12 @@ public class ForumAppHandler extends HTTPHandler {
      */
     @Override
     public HTTPResponse generateResponse() {
-        if (statusCode != 200 && statusCode != 303) {
-            return generateErrorResponse(statusCode);
+        if (status != Status.OK && status != Status.SEE_OTHER) {
+            return generateErrorResponse(status);
         }
-        HTTPResponse response = new HTTPResponse(statusCode);
-        if (statusCode == 303) {
-            response.addResponseHeader("Location", "http://" + HOST + URLPattern.PROGRAM_BOARD.getURL());
+        HTTPResponse response = new HTTPResponse(status.getCode(), status.getMessage());
+        if (status == Status.SEE_OTHER) {
+            response.addResponseHeader("Location", "http://" + HOST + Server.BOARD_APP_DIRECTORY);
         }
         response.setResponseBody(html);
         return response;
@@ -124,7 +124,7 @@ public class ForumAppHandler extends HTTPHandler {
             URLDecoder.decode("", encode);
             return encode;
         } catch (UnsupportedEncodingException e) {
-            return "UTF-8";
+            return DEFAULT_ENCODING;
         }
     }
 

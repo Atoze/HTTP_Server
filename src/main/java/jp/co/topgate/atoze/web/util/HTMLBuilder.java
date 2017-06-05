@@ -1,6 +1,4 @@
-package jp.co.topgate.atoze.web.htmlEditor;
-
-import jp.co.topgate.atoze.web.util.ContentType;
+package jp.co.topgate.atoze.web.util;
 
 import java.util.*;
 
@@ -34,7 +32,7 @@ public class HTMLBuilder {
 
     private void init() {
         //初期言語設定
-        setAttribute("html", true, "lang", "en");
+        setAttribute("html", "lang", "en");
         setMetaData("charset", charset);
     }
 
@@ -67,9 +65,11 @@ public class HTMLBuilder {
 
     private void generateHead() {
         String head = "";
-        for (String headData : this.headData) {
-            if (headData != null && !headData.isEmpty())
+        for (int i = 0; i < headData.size(); i++) {
+            String headData = this.headData.get(i);
+            if (headData != null && !headData.isEmpty()) {
                 head += headData + LINE_FEED;
+            }
         }
         head = head + "<title>" + title + "</title>";
         this.head = head + generateMetaDataField() + generateLinkField();
@@ -82,8 +82,8 @@ public class HTMLBuilder {
 
     private void generateBody() {
         String body = "";
-        for (String bodyData : this.bodyData) {
-            body += bodyData + LINE_FEED;
+        for (int i = 0; i < bodyData.size(); i++) {
+            body += bodyData.get(i) + LINE_FEED;
         }
         this.body = body;
     }
@@ -93,7 +93,7 @@ public class HTMLBuilder {
         return body;
     }
 
-    public String getHTML() {
+    public String toString() {
         generateHTML();
         return html;
     }
@@ -123,9 +123,13 @@ public class HTMLBuilder {
         if (data.size() > 0) {
             for (int i = 0; i < data.size(); i++) {
                 String[] value = data.get(i);
-                if (value != null && value.length > 0)
-                    if (value[1] != null) sb.append(" ").append(value[0]).append("=\"").append(value[1]).append("\"");
-                    else sb.append(" ").append(value[0]);
+                if (value != null && value.length > 0) {
+                    if (value[1] != null) {
+                        sb.append(" ").append(value[0]).append("=\"").append(value[1]).append("\"");
+                    } else {
+                        sb.append(" ").append(value[0]);
+                    }
+                }
             }
         }
         sb.append(">").append(LINE_FEED);
@@ -166,23 +170,29 @@ public class HTMLBuilder {
 
     private String generateLinkField() {
         StringBuffer sb = new StringBuffer();
-        for (String[] stylesheet : this.stylesheet) {
+        for (int i = 0; i < stylesheet.size(); i++) {
+            String[] stylesheet = this.stylesheet.get(i);
             sb.append("<link rel=\"stylesheet\" href=\"").append(stylesheet[0]).append("\" type=\"").append(stylesheet[1]).append("\">");
         }
         return sb.toString();
     }
 
-    public void setAttribute(String tag, boolean clear, String attribute, String value) {
+    public void setAttribute(String tag, String attribute, String value) {
         String[] str = new String[2];
         str[0] = attribute;
         if (value != null) {
             str[1] = value;
         }
-        setAttribute(tag, clear, str);
+        setAttribute(tag, str);
     }
 
-    public void setAttribute(String tag, boolean clear, String[]... attribute) {
-        List<String[]> values = generateAttribute(tag, clear, attribute);
+    public void setAttribute(String tag, String[]... attribute) {
+        List<String[]> values = generateAttribute(tag, true, attribute);
+        this.attribute.put(tag, values);
+    }
+
+    public void appendAttribute(String tag, String[]... attribute) {
+        List<String[]> values = generateAttribute(tag, false, attribute);
         this.attribute.put(tag, values);
     }
 
@@ -217,7 +227,7 @@ public class HTMLBuilder {
     }
 
     public void setLanguage(String language) {
-        setAttribute("html", true, "lang", language);
+        setAttribute("html",  "lang", language);
     }
 
     public void setTitle(String title) {

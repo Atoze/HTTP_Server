@@ -1,4 +1,6 @@
-package jp.co.topgate.atoze.web.app.forum;
+package jp.co.topgate.atoze.web.app.board;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * app.forumパッケージ内で使われるデータの名称を保管します.
@@ -6,7 +8,7 @@ package jp.co.topgate.atoze.web.app.forum;
  * インデックス番号は必ず順番に来るようにしてください.
  * また、DEFAULTのインデックス番号は必ず最後に来るようにしてください。
  */
-public enum ForumDataPattern {
+public enum ForumDataKey {
     ID(0, "ID", null),
     ENCODER(1, "ENCODER", null),
     NAME(2, "NAME", "name"),
@@ -21,7 +23,7 @@ public enum ForumDataPattern {
     private final String key;
     private String queryKey;
 
-    ForumDataPattern(int index, String key, String queryKey) {
+    ForumDataKey(final int index, String key, String queryKey) {
         this.index = index;
         this.key = key;
         this.queryKey = queryKey;
@@ -39,38 +41,17 @@ public enum ForumDataPattern {
         return this.queryKey;
     }
 
-    /**
-     * インデックスIDから対応するキー値を返します.
-     */
-    public static String getKeyByIndex(int index) {
-        String key = "";
-        if (index == ForumDataPattern.DEFAULT.getIndex()) {
-            return key;
-        }
-        for (ForumDataPattern forumDataPattern : ForumDataPattern.values()) {
-            if (forumDataPattern.getIndex() == index) {
-                key = forumDataPattern.getKey();
-                break;
+    @NotNull
+    public static ForumDataKey getPatternByIndex(int index) {
+        ForumDataKey pattern;
+        ForumDataKey[] patterns = ForumDataKey.values();
+        for (int z = 0; z < patterns.length; z++) {
+            pattern = patterns[z];
+            if (pattern.getIndex() == index) {
+                return pattern;
             }
         }
-        return key;
-    }
-
-    /**
-     * インデックスIDから対応するクエリキー値を返します.
-     */
-    public static String getQueryKeyByIndex(int index) {
-        String key = "";
-        if (index == ForumDataPattern.DEFAULT.getIndex()) {
-            return key;
-        }
-        for (ForumDataPattern forumDataPattern : ForumDataPattern.values()) {
-            if (forumDataPattern.getIndex() == index) {
-                key = forumDataPattern.getQueryKey();
-                break;
-            }
-        }
-        return key;
+        return ForumDataKey.DEFAULT;
     }
 
     public void setQueryKey(String queryKey) {
@@ -81,6 +62,6 @@ public enum ForumDataPattern {
      * このENUMに保存されているDEFAULT以外のデータの数を返します.
      */
     public static int size() {
-        return ForumDataPattern.values().length - 1;
+        return ForumDataKey.values().length - 1;
     }
 }

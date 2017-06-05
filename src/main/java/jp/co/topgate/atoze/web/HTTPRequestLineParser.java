@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+import jp.co.topgate.atoze.web.exception.BadRequestException;
 import jp.co.topgate.atoze.web.util.ParseUtil;
 import org.jetbrains.annotations.Contract;
 
@@ -14,11 +14,11 @@ import java.util.Set;
 /**
  * HTTPリクエストのジェネラルラインのデータを読み取ります.
  */
-class HTTPRequestLine {
+class HTTPRequestLineParser {
     private String method;
     private String uri;
-    private String filePath;
-    private Map<String, String> headQuery;
+    private String path;
+    private Map<String, String> query;
     private String protocolVer;
 
     private final static Set<String> METHODS = new HashSet<>();
@@ -35,12 +35,12 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(InputStream input, String host) throws IOException, StatusBadRequestException {
+    HTTPRequestLineParser(InputStream input, String host) throws IOException, BadRequestException {
         String line = ParseUtil.readLine(input);
         readRequest(line, host);
     }
 
-    HTTPRequestLine(String line, String host) throws IOException, StatusBadRequestException {
+    HTTPRequestLineParser(String line, String host) throws IOException, BadRequestException {
         readRequest(line, host);
     }
 
@@ -50,16 +50,13 @@ class HTTPRequestLine {
      * @param line
      * @param host
      */
-    private void readRequest(String line, String host) throws IOException, StatusBadRequestException {
+    private void readRequest(String line, String host) throws IOException, BadRequestException {
         if (line == null) {
             return;
         }
         parse(line);
 
-        filePath = uriQuerySplitter(urlDivider(uri, host));
-        if (filePath.endsWith("/")) {
-            filePath += "index.html";
-        }
+        path = uriQuerySplitter(urlDivider(uri, host));
         checkIsValidMethod(method);
         protocolVer = checkProtocolVer(protocolVer);
     }
@@ -73,58 +70,60 @@ class HTTPRequestLine {
         return this.method;
     }
 
+
+    /**
+     * 要求するリソースのパスを取得します.
+     *
+     * @return パス
+     */
+    String getPath() {
+        return this.path;
+    }
+
+
     /**
      * 要求するリソースのURIを取得します.
      *
-     * @return ファイルパス
+     * @return URI
      */
     String getURI() {
         return this.uri;
     }
 
     /**
-     * 要求するリソースのローカルパスを取得します.
-     *
-     * @return ファイルパス
-     */
-    String getFilePath() {
-        return this.filePath;
-    }
-
-    /**
      * 絶対パスからホスト名を抜き、相対パスにします.
      *
-     * @param filePath
+     * @param uri
      * @param host
-     * @return ファイルパス
+     * @return パス
      */
     @Contract("null, _ -> !null")
-    private String urlDivider(String filePath, String host) {
-        if (filePath == null) {
+    private String urlDivider(String uri, String host) {
+        if (uri == null) {
             return "";
         }
-        if (filePath.startsWith("http://" + host)) {
-            return filePath.substring(filePath.indexOf(host) + host.length());
+        if (uri.startsWith("http://" + host)) {
+            return uri.substring(uri.indexOf(host) + host.length());
         }
-        return filePath;
+        return uri;
     }
 
     /**
-     * ファイルパスとクエリデータを分割します.
+     * URIからパスとクエリデータを分割します.
      *
-     * @param filePath
-     * @return ファイルパス
+     * @param uri
+     * @return パス
      */
-    private String uriQuerySplitter(String filePath) {
-        if (filePath == null) {
+    private String uriQuerySplitter(String uri) {
+        if (uri == null) {
             return "";
         }
 
-        String urlQuery[] = filePath.split("\\?", 2);
-        if (urlQuery[0] != filePath) {
-            this.headQuery = ParseUtil.parseQueryData(urlQuery[1]);
+        String uriQuery[] = uri.split("\\?", 2);
+        if (uriQuery[0] != uri) {
+            this.query = ParseUtil.parseQueryData(uriQuery[1]);
         }
-        return urlQuery[0];
+        return uriQuery[0];
     }
 
     /**
@@ -136,12 +135,13 @@ class HTTPRequestLine {
         return this.protocolVer;
     }
 
-    private String checkProtocolVer(String protocol) throws StatusBadRequestException {
+    private String checkProtocolVer(String protocol) throws BadRequestException {
         if (protocol != null) {
-            if (protocol.startsWith("HTTP/"))
+            if (protocol.startsWith("HTTP/")) {
                 return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
+            }
         }
-        throw new StatusBadRequestException("プロトコルが正しく書かれていません");
+        throw new BadRequestException("プロトコルが正しく書かれていません");
     }
 
     /**
@@ -149,8 +149,8 @@ class HTTPRequestLine {
      *
      * @return クエリ値
      */
-    public Map<String, String> getHeaderQuery() {
-        return this.headQuery;
+    public Map<String, String> getQuery() {
+        return this.query;
     }
 
     private void parse(String line) throws IOException {
@@ -168,9 +168,9 @@ class HTTPRequestLine {
     /**
      * 要求したメソッド名が存在しているか確認します.
      */
-    private void checkIsValidMethod(String method) throws StatusBadRequestException {
+    private void checkIsValidMethod(String method) throws BadRequestException {
         if (!METHODS.contains(method)) {
-            throw new StatusBadRequestException("有効なメソッドではありません");
+            throw new BadRequestException("有効なメソッドではありません");
         }
     }
 }

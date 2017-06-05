@@ -1,4 +1,4 @@
-package jp.co.topgate.atoze.web.app.forum;
+package jp.co.topgate.atoze.web.app.board;
 
 import org.junit.Test;
 
@@ -15,32 +15,32 @@ public class ForumDataTest {
     @Test
     public void 正常CSVテスト() throws IOException {
         File file = new File("src/test/Document/forumData.csv"); //実データに近いもの
-        ForumData forum = new ForumData(file);
+        DataHandler forum = new DataHandler(file);
         assertThat(forum.getData().size(), is(3));
     }
 
     @Test
     public void 空データCSVテスト() throws IOException {
         File file = new File("src/test/Document/forumNoData.csv");
-        ForumData forum = new ForumData(file);
+        DataHandler forum = new DataHandler(file);
         assertThat(forum.getData().size(), is(0));
     }
 
     @Test
-    public void IDか番号から始まらないデータをcheckDataで省くテスト() throws IOException {
+    public void IDか番号から始まらないデータを省くテスト() throws IOException {
         File file = new File("src/test/Document/forumDataWithIdBug.csv");
         CSVFile csv = new CSVFile();
         assertThat((csv.readCSV(file)).size(), is(4));
-        ForumData forum = new ForumData(file);
+        DataHandler forum = new DataHandler(file);
         assertThat(forum.getData().size(), is(2));
     }
 
     @Test
-    public void 重複IDをcheckDataで省くテスト() throws IOException {
+    public void 重複IDを省くテスト() throws IOException {
         File file = new File("src/test/Document/forumDoubledId.csv");
         CSVFile csv = new CSVFile();
         assertThat((csv.readCSV(file)).size(), is(3));
-        ForumData forum = new ForumData(file);
+        DataHandler forum = new DataHandler(file);
         assertThat(forum.getData().size(), is(2));
     }
 }

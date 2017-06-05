@@ -18,7 +18,8 @@ public class Main {
                 new Server(socket, PORT).start();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 }
