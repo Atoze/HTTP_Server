@@ -53,8 +53,8 @@ public class ForumAppTest {
         sb.append("POST /program/board/ HTTP/1.1\n");
         sb.append("Content-Type: application/x-www-form-urlencoded\n");
         String name = RandomStringUtils.randomAlphabetic(20);
-        String query = "&title=test&text=document&password=foo";
-        int length = ForumDataKey.NAME.getQueryKey().getBytes().length + 1 + name.getBytes().length + query.getBytes().length;
+        String queryString = "&title=test&text=document&password=foo";
+        int length = ForumDataKey.NAME.getQueryKey().getBytes().length + 1 + name.getBytes().length + queryString.getBytes().length;
         sb.append("Content-Length:").append(length).append("\n");
         sb.append("\n");
 
@@ -67,7 +67,7 @@ public class ForumAppTest {
         InputStream input = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
         HTTPRequest request = HTTPRequestParser.parse(input, "localhost:8080");
 
-        app.createThread(request.getFormQuery(), "UTF-8");
+        app.createThread(request.getFormQueryParam(), "UTF-8");
         data = csv.readCSV(file);
         lastID = data.get(data.size() - 1);
         int newID = Integer.parseInt(lastID[0]);
@@ -107,7 +107,7 @@ public class ForumAppTest {
         File file = new File(tempFolder.getRoot(), "forumData.csv");
         ForumApp app = new ForumApp();
         app.setForumDataFile(file);
-        app.createThread(request.getFormQuery(), ENCODER);
+        app.createThread(request.getFormQueryParam(), ENCODER);
         ForumData created_thread_data = app.getOutputData().get(app.getOutputData().size()-1);
         assertThat("ほげ", is(URLDecoder.decode(created_thread_data.getName(),ENCODER)));
         assertThat("test", is(URLDecoder.decode(created_thread_data.getTitle(),ENCODER)));

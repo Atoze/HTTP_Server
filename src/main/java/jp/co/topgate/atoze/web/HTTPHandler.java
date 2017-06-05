@@ -15,6 +15,7 @@ import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 public abstract class HTTPHandler {
 
     private final static String SYSTEM_CHARSET = System.getProperty("file.encoding");
+
     public abstract HTTPResponse generateResponse();
 
     /**
@@ -43,7 +44,7 @@ public abstract class HTTPHandler {
 
     protected HTTPResponse generateErrorResponse(int statusCode, String statusMessage, String contentHTML) {
         ExtendedHTTPResponse response = new ExtendedHTTPResponse(statusCode, statusMessage);
-        File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
+        File errorFile = new File("." + Server.ROOT_DIRECTORY, statusCode + ".html");
         try {
             response.setResponseBody(errorFile, ContentType.getContentType(errorFile.toString()), detectFileEncoding(errorFile));
         } catch (FileNotFoundException e) {

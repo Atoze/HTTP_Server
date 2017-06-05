@@ -134,7 +134,7 @@ public class HTTPRequestTest {
 
         assertThat(null, is(httpRequest.getBodyText()));
         assertThat(null, is(httpRequest.getBodyFile()));
-        assertThat(new HashMap<String, String>(), is(httpRequest.getFormQuery()));
+        assertThat(new HashMap<String, String>(), is(httpRequest.getFormQueryParam()));
     }
 
     //直接元画像(src/test/Document/bird.png)と出力画像(src/test/Document/bird2.png)を比べてください

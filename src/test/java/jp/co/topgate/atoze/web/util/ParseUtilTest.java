@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static jp.co.topgate.atoze.web.util.ParseUtil.parseQueryData;
+import static jp.co.topgate.atoze.web.util.ParseUtil.parseQueryString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -14,26 +14,26 @@ import static org.junit.Assert.assertThat;
  */
 public class ParseUtilTest {
     @Test
-    public void parseQueryData_NULL() {
-        Map<String, String> map = parseQueryData(null);
+    public void parseQueryString_NULL() {
+        Map<String, String> map = parseQueryString(null);
         assertThat(null, is(map));
     }
 
     @Test
-    public void parseQueryData_通常() {
+    public void parseQueryString_通常() {
         String text = "hoge=foo";
-        Map<String, String> map = parseQueryData(text);
+        Map<String, String> map = parseQueryString(text);
         assertThat(1, is(map.size()));
         assertThat("foo", is(map.get("hoge")));
 
         text = "hoge=foo&hoge2=bar";
-        map = parseQueryData(text);
+        map = parseQueryString(text);
         assertThat(2, is(map.size()));
         assertThat("foo", is(map.get("hoge")));
         assertThat("bar", is(map.get("hoge2")));
 
         text = "&";
-        map = parseQueryData(text);
+        map = parseQueryString(text);
         assertThat(0, is(map.size()));
         assertThat(new HashMap<>(), is(map));
     }

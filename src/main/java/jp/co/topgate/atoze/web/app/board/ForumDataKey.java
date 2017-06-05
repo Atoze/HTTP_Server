@@ -41,21 +41,21 @@ public enum ForumDataKey {
         return this.queryKey;
     }
 
+    public void setQueryKey(String queryKey) {
+        this.queryKey = queryKey;
+    }
+
     @NotNull
-    public static ForumDataKey getPatternByIndex(int index) {
-        ForumDataKey pattern;
+    public static ForumDataKey getKeyByIndex(int index) {
+        ForumDataKey key;
         ForumDataKey[] patterns = ForumDataKey.values();
         for (int z = 0; z < patterns.length; z++) {
-            pattern = patterns[z];
-            if (pattern.getIndex() == index) {
-                return pattern;
+            key = patterns[z];
+            if (key.getIndex() == index) {
+                return key;
             }
         }
         return ForumDataKey.DEFAULT;
-    }
-
-    public void setQueryKey(String queryKey) {
-        this.queryKey = queryKey;
     }
 
     /**

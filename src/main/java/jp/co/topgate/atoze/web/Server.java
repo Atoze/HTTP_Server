@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.app.board.IndexHandler;
+import jp.co.topgate.atoze.web.app.board.ForumHandler;
 import jp.co.topgate.atoze.web.exception.BadRequestException;
 import jp.co.topgate.atoze.web.exception.InternalServerErrorException;
 import jp.co.topgate.atoze.web.exception.ProtocolException;
@@ -22,7 +22,7 @@ public class Server extends Thread {
     private final Socket socket;
     private final int PORT;
     private static final String HOST_NAME = "localhost";
-    static final String ROOT_DIRECTORY = "./src/main/resources";
+    static final String ROOT_DIRECTORY = "/src/main/resources";
     static final String SERVER_PROTOCOL = "HTTP/1.1";
 
     public static final String BOARD_APP_DIRECTORY = "/program/board/";
@@ -59,7 +59,7 @@ public class Server extends Thread {
             String path = httpRequest.getPath();
 
             if (path.startsWith(BOARD_APP_DIRECTORY)) {
-                handler = new IndexHandler(httpRequest);
+                handler = new ForumHandler(httpRequest);
             } else {
                 handler = new StaticHandler(httpRequest);
             }

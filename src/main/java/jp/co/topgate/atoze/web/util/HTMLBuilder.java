@@ -14,11 +14,6 @@ public class HTMLBuilder {
     private List<String> bodyData = new ArrayList<>();
     private Map<String, List<String[]>> attribute = new HashMap<>();
 
-    private String body;
-    private String head;
-
-    private String html;
-
     private String title;
     private Map<String, String[]> metaData = new HashMap<>();
     private List<String[]> stylesheet = new ArrayList<>();
@@ -59,11 +54,10 @@ public class HTMLBuilder {
     }
 
     public void addBody(String body) {
-
         bodyData.add(body);
     }
 
-    private void generateHead() {
+    private String generateHead() {
         String head = "";
         for (int i = 0; i < headData.size(); i++) {
             String headData = this.headData.get(i);
@@ -72,43 +66,39 @@ public class HTMLBuilder {
             }
         }
         head = head + "<title>" + title + "</title>";
-        this.head = head + generateMetaDataField() + generateLinkField();
+        return head + generateMetaDataField() + generateLinkField();
     }
 
     public String getHeadData() {
-        generateHead();
-        return head;
+        return generateHead();
     }
 
-    private void generateBody() {
+    private String generateBody() {
         String body = "";
         for (int i = 0; i < bodyData.size(); i++) {
             body += bodyData.get(i) + LINE_FEED;
         }
-        this.body = body;
-    }
-
-    public String getBodyData() {
-        generateBody();
         return body;
     }
 
-    public String toString() {
-        generateHTML();
-        return html;
+    public String getBodyData() {
+        return generateBody();
     }
 
-    private void generateHTML() {
+    public String toString() {
+        return generateHTML();
+    }
+
+    private String generateHTML() {
         String doctypeField = "";
         if (doctype != null) {
             doctypeField = "<!DOCTYPE " + doctype + ">" + LINE_FEED;
         }
-        generateHead();
-        String headField = generateMainField("head", head, getAttribute("head")) + LINE_FEED;
-        generateBody();
-        String bodyField = generateMainField("body", body, getAttribute("body")) + LINE_FEED;
+        String headField = generateMainField("head", generateHead(), getAttribute("head")) + LINE_FEED;
+
+        String bodyField = generateMainField("body", generateBody(), getAttribute("body")) + LINE_FEED;
         String content = headField + bodyField;
-        html = doctypeField + generateMainField("html", content, getAttribute("html"));
+        return doctypeField + generateMainField("html", content, getAttribute("html"));
     }
 
     private String generateMainField(String tag, String content, List<String[]> attribute) {
@@ -227,7 +217,7 @@ public class HTMLBuilder {
     }
 
     public void setLanguage(String language) {
-        setAttribute("html",  "lang", language);
+        setAttribute("html", "lang", language);
     }
 
     public void setTitle(String title) {

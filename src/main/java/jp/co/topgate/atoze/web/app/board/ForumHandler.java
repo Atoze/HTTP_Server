@@ -12,12 +12,12 @@ import java.util.Map;
 /**
  * 掲示板の挙動を制御します.
  */
-public class IndexHandler extends HTTPHandler {
+public class ForumHandler extends HTTPHandler {
     private final static String DEFAULT_ENCODING = "UTF-8";
 
     private final ForumApp forum;
 
-    private Map<String, String> QUERY;
+    private Map<String, String> QUERY_PARAM;
     private final String PATH;
     private final String HOST;
 
@@ -26,10 +26,9 @@ public class IndexHandler extends HTTPHandler {
 
     private Status status = Status.OK;
 
-    private static String SEARCH = "search";
     private static String CHARSET_KEY = "charset=";
 
-    public IndexHandler(HTTPRequest request) throws IOException {
+    public ForumHandler(HTTPRequest request) throws IOException {
         PATH = request.getPath();
         HOST = request.getHost();
         forum = new ForumApp();
@@ -41,7 +40,7 @@ public class IndexHandler extends HTTPHandler {
             }
         }
         try {
-            QUERY = request.getFormQuery();
+            QUERY_PARAM = request.getFormQueryParam();
             handle(request.getMethod());
         } catch (RequestBodyParseException e) {
             status = Status.INTERNAL_SERVER_ERROR;
@@ -100,7 +99,7 @@ public class IndexHandler extends HTTPHandler {
             }
             return;
         }
-        forum.createThread(QUERY, ENCODER);
+        forum.createThread(QUERY_PARAM, ENCODER);
     }
 
     /**
@@ -130,11 +129,11 @@ public class IndexHandler extends HTTPHandler {
 
     private String getQueryParam(String key) {
         try {
-            return URLDecoder.decode(QUERY.getOrDefault(key, null), ENCODER);
+            return URLDecoder.decode(QUERY_PARAM.getOrDefault(key, null), ENCODER);
         } catch (NullPointerException e) {
             return null;
         } catch (UnsupportedEncodingException e) {
-            return QUERY.getOrDefault(key, null);
+            return QUERY_PARAM.getOrDefault(key, null);
         }
     }
 }
