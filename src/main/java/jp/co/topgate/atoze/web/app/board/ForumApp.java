@@ -36,8 +36,8 @@ public class ForumApp {
     /**
      * 新規に投稿された時
      */
-    void createThread(Map<String, String> query, String encode) throws IOException {
-        ForumData data = generateNewThreadData(query, encode);
+    void createThread(Map<String, String> queryParam, String encode) throws IOException {
+        ForumData data = generateNewThreadData(queryParam, encode);
         outputData.add(data);
         this.data.save(data);
     }
@@ -117,8 +117,8 @@ public class ForumApp {
     private ForumData generateNewThreadData(Map<String, String> query, String encode) {
         ForumData newData = new ForumData();
         for (int i = 0; i < ForumDataKey.size(); i++) {
-            ForumDataKey pattern = ForumDataKey.getPatternByIndex(i);
-            switch (pattern) {
+            ForumDataKey key = ForumDataKey.getKeyByIndex(i);
+            switch (key) {
                 case ID:
                     newData.setId(retrieveNewID(data.getData()));
                     break;
@@ -129,7 +129,7 @@ public class ForumApp {
                     newData.setEncoder(encode);
                     break;
                 case PASSWORD:
-                    String password = query.get(pattern.getQueryKey());
+                    String password = query.get(key.getQueryKey());
                     try {
                         password = URLDecoder.decode(password, encode);
                     } catch (UnsupportedEncodingException e) {
@@ -138,7 +138,7 @@ public class ForumApp {
                     newData.setPassword(new BCryptPasswordEncoder().encode(password));
                     break;
                 default:
-                    newData = DataHandler.insertValueToData(newData, pattern.getIndex(), query.get(pattern.getQueryKey()));
+                    newData = DataHandler.insertValueToData(newData, key.getIndex(), query.get(key.getQueryKey()));
             }
         }
         return newData;

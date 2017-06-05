@@ -9,20 +9,20 @@ import java.util.Map;
  * Created by atoze on 2017/05/24.
  */
 public class ParseUtil {
-    public static Map<String, String> parseQueryData(String body) {
-        Map<String, String> queryData = new HashMap<>();
-        if (body == null) {
+    public static Map<String, String> parseQueryString(String queryString) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (queryString == null) {
             return null;
-            //return queryData;
+            //return queryParams;
         }
-        String[] data = body.split("&");
+        String[] data = queryString.split("&");
         for (int i = 0; i <= data.length - 1; i++) {
             String[] queryValue = data[i].split("=", 2);
             if (queryValue.length >= 2) {
-                queryData.put(queryValue[0], queryValue[1]);
+                queryParams.put(queryValue[0], queryValue[1]);
             }
         }
-        return queryData;
+        return queryParams;
     }
 
     public static String readLine(InputStream input) throws IOException {

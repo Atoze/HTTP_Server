@@ -17,8 +17,8 @@ public class HTTPRequest {
     private InputStream bodyInput;
 
     private String header;
-    private Map<String, String> headerQuery;
-    private Map<String, String> bodyQuery;
+    private Map<String, String> headerQueryParam;
+    private Map<String, String> bodyQueryParam;
 
     private final String method;
     private final String path;
@@ -44,8 +44,8 @@ public class HTTPRequest {
         this.bodyInput = input;
     }
 
-    void setHeaderQuery(Map<String, String> query) {
-        this.headerQuery = query;
+    void setHeaderQueryParam(Map<String, String> queryParam) {
+        this.headerQueryParam = queryParam;
     }
 
     /**
@@ -105,24 +105,24 @@ public class HTTPRequest {
         return body.getBodyFile();
     }
 
-    public Map<String, String> getFormQuery() throws IOException, RequestBodyParseException {
-        return generateQuery();
+    public Map<String, String> getFormQueryParam() throws IOException, RequestBodyParseException {
+        return generateQueryParam();
     }
 
-    private Map<String, String> generateQuery() throws IOException, RequestBodyParseException {
+    private Map<String, String> generateQueryParam() throws IOException, RequestBodyParseException {
         switch (method) {
             case "GET":
-                return headerQuery;
+                return headerQueryParam;
             case "POST":
                 HTTPRequestBody body = new HTTPRequestBody(bodyInput, headerField);
-                bodyQuery = body.getQuery();
-                return bodyQuery;
+                bodyQueryParam = body.getQueryParam();
+                return bodyQueryParam;
             default:
                 return new HashMap<>();
         }
     }
 
-    public Map<String, String> getUriQuery() {
-        return headerQuery;
+    public Map<String, String> getUriQueryParam() {
+        return headerQueryParam;
     }
 }

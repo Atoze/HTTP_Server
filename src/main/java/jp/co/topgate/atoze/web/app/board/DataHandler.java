@@ -61,7 +61,7 @@ public class DataHandler {
      * @return 挿入済みデータ
      */
     static ForumData insertValueToData(ForumData data, int keyIndex, String value) {
-        ForumDataKey key = ForumDataKey.getPatternByIndex(keyIndex);
+        ForumDataKey key = ForumDataKey.getKeyByIndex(keyIndex);
         switch (key) {
             case ID:
                 int id;
@@ -113,7 +113,7 @@ public class DataHandler {
         String[] values = new String[ForumDataKey.size()];
 
         for (int i = 0; i < values.length; i++) {
-            ForumDataKey key = ForumDataKey.getPatternByIndex(i);
+            ForumDataKey key = ForumDataKey.getKeyByIndex(i);
             String value = "";
             switch (key) {
                 case ID:

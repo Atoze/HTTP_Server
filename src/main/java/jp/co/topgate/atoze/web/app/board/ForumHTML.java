@@ -16,10 +16,10 @@ class ForumHTML {
     private static final String FORUM_TITLE = "簡易掲示板のテスト";
     private static final String CSS_FILE_PATH = "/css/board.css";
     private final String host;
-    private static final String NAME_QUERY = "name";
-    private static final String TITLE_QUERY = "title";
-    private static final String TEXT_QUERY = "text";
-    private static final String PASSWORD_QUERY = "password";
+    private static final String NAME_QUERY_KEY = "name";
+    private static final String TITLE_QUERY_KEY = "title";
+    private static final String TEXT_QUERY_KEY = "text";
+    private static final String PASSWORD_QUERY_KEY = "password";
     private HTMLBuilder html = new HTMLBuilder();
 
 
@@ -28,10 +28,10 @@ class ForumHTML {
     }
 
     String getIndexHTML(List<ForumData> list) throws IOException {
-        ForumDataKey.NAME.setQueryKey(NAME_QUERY);
-        ForumDataKey.TITLE.setQueryKey(TITLE_QUERY);
-        ForumDataKey.TEXT.setQueryKey(TEXT_QUERY);
-        ForumDataKey.PASSWORD.setQueryKey(PASSWORD_QUERY);
+        ForumDataKey.NAME.setQueryKey(NAME_QUERY_KEY);
+        ForumDataKey.TITLE.setQueryKey(TITLE_QUERY_KEY);
+        ForumDataKey.TEXT.setQueryKey(TEXT_QUERY_KEY);
+        ForumDataKey.PASSWORD.setQueryKey(PASSWORD_QUERY_KEY);
 
         html.setLanguage("ja");
         html.setMetaData("charset", "UTF-8");
@@ -99,11 +99,11 @@ class ForumHTML {
         sb.append(FORUM_TITLE).append("<br/>");
         sb.append("<form method=\"post\" action=\"/program/board/\"><br/>");
         sb.append("名前:<input required type=\"text\" name=\"");
-        sb.append(NAME_QUERY);
+        sb.append(NAME_QUERY_KEY);
         sb.append("\" size=\"50\" maxlength=\"50\" placeholder=\" 名前を入力してください(50文字まで)\"><br/>");
-        sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY + "\" size=\"50\" maxlength=\"50\" placeholder=\"タイトルを入力してください(50文字まで)\"><br/>");
-        sb.append("本文:<textarea required name=\"" + TEXT_QUERY + "\" rows=\"10\" cols=\"50\" maxlength=\"200\" placeholder=\"コメントを入力してください(200文字まで)\"></textarea><br/>");
-        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY + "\" maxlength=\"30\" ><br/>");
+        sb.append("タイトル:<input required type=\"text\" name=\"" + TITLE_QUERY_KEY + "\" size=\"50\" maxlength=\"50\" placeholder=\"タイトルを入力してください(50文字まで)\"><br/>");
+        sb.append("本文:<textarea required name=\"" + TEXT_QUERY_KEY + "\" rows=\"10\" cols=\"50\" maxlength=\"200\" placeholder=\"コメントを入力してください(200文字まで)\"></textarea><br/>");
+        sb.append("パスワード:<input required type=\"password\" name=\"" + PASSWORD_QUERY_KEY + "\" maxlength=\"30\" ><br/>");
         sb.append("<INPUT type='submit' value='入力'></form>");
         sb.append("</header>");
 

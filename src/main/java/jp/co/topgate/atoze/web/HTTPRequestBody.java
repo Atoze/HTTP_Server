@@ -16,7 +16,7 @@ public class HTTPRequestBody {
     private String bodyText;
     private byte[] bodyFile;
     InputStream bodyInput;
-    private Map<String, String> query = new HashMap<>();
+    private Map<String, String> queryParam = new HashMap<>();
 
     HTTPRequestBody(InputStream input, Map<String, String> headerField) throws IOException, RequestBodyParseException {
         parse(input, headerField);
@@ -36,7 +36,7 @@ public class HTTPRequestBody {
                 int length = Integer.parseInt(headerField.get("Content-Length"));
                 String text = readBodyText(input, length);
                 bodyText = text;
-                query = ParseUtil.parseQueryData(text);
+                queryParam = ParseUtil.parseQueryString(text);
                 break;
 
             //TODO 完成させる
@@ -92,7 +92,7 @@ public class HTTPRequestBody {
         return bodyInput;
     }
 
-    public Map<String, String> getQuery() {
-        return query;
+    public Map<String, String> getQueryParam() {
+        return queryParam;
     }
 }

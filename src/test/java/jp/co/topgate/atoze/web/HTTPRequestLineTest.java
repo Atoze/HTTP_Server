@@ -11,11 +11,11 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by atoze on 2017/04/17.
  */
-public class HTTPRequestLineParserTest {
+public class HTTPRequestLineTest {
     @Test
     public void HTTPRequestのRequestLineを分けるクラスのテスト() throws IOException, BadRequestException {
         String line = "GET / HTTP/1.1";
-        HTTPRequestLineParser header = new HTTPRequestLineParser(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
@@ -23,7 +23,7 @@ public class HTTPRequestLineParserTest {
         assertThat("1.1", is(header.getProtocolVer()));
 
         line = "GET http://localhost:8080/ HTTP/1.1";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
 
         assertThat("GET", is(header.getMethod()));
@@ -32,7 +32,7 @@ public class HTTPRequestLineParserTest {
 
         //URI指定忘れ
         line = "GET  HTTP/1.1";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat("GET", is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -42,7 +42,7 @@ public class HTTPRequestLineParserTest {
     @Test
     public void nullテスト() throws IOException, BadRequestException {
         String line = null;
-        HTTPRequestLineParser header = new HTTPRequestLineParser(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat(null, is(header.getPath()));
         assertThat(null, is(header.getProtocolVer()));
@@ -53,7 +53,7 @@ public class HTTPRequestLineParserTest {
         //スペースなし
         String line = "GET/HTTP/1.1";
 
-        HTTPRequestLineParser header = new HTTPRequestLineParser(line, "localhost:8080");
+        HTTPRequestLine header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -61,7 +61,7 @@ public class HTTPRequestLineParserTest {
 
         //二重スペース
         line = "GET  /  HTTP/1.1";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -69,7 +69,7 @@ public class HTTPRequestLineParserTest {
 
         //スペースがたりない
         line = "GET HTTP/1.1";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -77,7 +77,7 @@ public class HTTPRequestLineParserTest {
 
         //適当な文字列
         line = "hoge";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -85,7 +85,7 @@ public class HTTPRequestLineParserTest {
 
         //適当な文字列
         line = "hoge hoge hoge";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("hoge", is(header.getPath()));
@@ -93,7 +93,7 @@ public class HTTPRequestLineParserTest {
 
         //空スペース
         line = "   ";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));
@@ -101,7 +101,7 @@ public class HTTPRequestLineParserTest {
 
         //空スペース
         line = "hoge hoge  ";
-        header = new HTTPRequestLineParser(line, "localhost:8080");
+        header = new HTTPRequestLine(line, "localhost:8080");
         //header.readRequestLine(line, "localhost:8080");
         assertThat(null, is(header.getMethod()));
         assertThat("", is(header.getPath()));

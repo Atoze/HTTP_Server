@@ -5,6 +5,8 @@ import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,16 +26,17 @@ public class StaticHandler extends HTTPHandler {
         if (filePath.endsWith("/")) {
             filePath += "index.html";
         }
-        this.filePath = filePath;
+        this.filePath = normalizeFilePath(filePath);
     }
 
     @Override
     public HTTPResponse generateResponse() {
-        File file = new File(Server.ROOT_DIRECTORY, filePath);
-        Status status = checkStatusCode(file);
+        Status status;
+        status = checkStatusCode(filePath);
         if (status == Status.OK) {
+            File file = new File(".", filePath);
             ExtendedHTTPResponse response = new ExtendedHTTPResponse(status.getCode(), status.getMessage());
-            String contentType = ContentType.getContentType(filePath);
+            String contentType = ContentType.getContentType(filePath.toString());
             try {
                 if (CHARSET_REQUIRED_FILE_EXTENSION.contains(contentType)) {
                     response.setResponseBody(file, contentType, detectFileEncoding(file));
@@ -53,10 +56,14 @@ public class StaticHandler extends HTTPHandler {
     /**
      * HTTPリクエストに応じてステータスを返します.
      *
-     * @param file 要求されたファイルパス
+     * @param filePath 要求されたファイルパス
      * @return ステータスコード
      */
-    private Status checkStatusCode(File file) {
+    private Status checkStatusCode(String filePath) {
+        if (filePath == null) {
+            return Status.FORBIDDEN;
+        }
+        File file = new File(".", filePath);
         if (!file.exists()) {
             return Status.NOT_FOUND;
         }
@@ -64,5 +71,18 @@ public class StaticHandler extends HTTPHandler {
             return Status.FORBIDDEN;
         }
         return Status.OK;
+    }
+
+    /**
+     * URIのパスを元に実際のファイルパスを返す
+     *
+     * @return ファイルのパス
+     */
+    private static String normalizeFilePath(String uri) {
+        Path normalizedFilePath = Paths.get(Server.ROOT_DIRECTORY, uri).normalize();
+        if (!normalizedFilePath.startsWith(Server.ROOT_DIRECTORY)) {
+            return null;
+        }
+        return normalizedFilePath.toString();
     }
 }

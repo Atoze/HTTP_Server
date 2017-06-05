@@ -4,6 +4,7 @@ import jp.co.topgate.atoze.web.exception.BadRequestException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import static jp.co.topgate.atoze.web.util.ParseUtil.readLine;
@@ -22,23 +23,24 @@ public class HTTPRequestParser {
 
         //RequestLine
         String line = readLine(input);
-        HTTPRequestLineParser requestLine = new HTTPRequestLineParser(line, host);
+        HTTPRequestLine requestLine = new HTTPRequestLine(line, host);
         String method = requestLine.getMethod();
         HTTPRequest request = new HTTPRequest(method, requestLine.getPath(), requestLine.getProtocolVer(), host);
-        request.setHeaderQuery(requestLine.getQuery());
+        request.setHeaderQueryParam(requestLine.getQueryParam());
 
         //RequestHeader
+        Map<String, String> headerField = new HashMap<>();
         line = readLine(input);
-        StringBuilder text = new StringBuilder();
-
+        StringBuffer header = new StringBuffer();
         while (line != null && !line.isEmpty()) {
-            text.append(line).append(LINE_FEED);
+            header.append(line).append(LINE_FEED);
+            String[] headerLineData = line.split(":", 2);
+            if (headerLineData.length == 2) {
+                headerField.put(headerLineData[0], headerLineData[1].trim());
+            }
             line = readLine(input);
         }
-
-        HTTPRequestHeaderParser header = new HTTPRequestHeaderParser(text.toString());
-        Map<String, String> headerField = header.getHeaderField();
-        request.setHeader(text.toString(), headerField);
+        request.setHeader(header.toString(), headerField);
 
         //RequestBody
         if (input.available() <= 0) {

@@ -14,11 +14,11 @@ import java.util.Set;
 /**
  * HTTPリクエストのジェネラルラインのデータを読み取ります.
  */
-class HTTPRequestLineParser {
+class HTTPRequestLine {
     private String method;
     private String uri;
     private String path;
-    private Map<String, String> query;
+    private Map<String, String> queryParam;
     private String protocolVer;
 
     private final static Set<String> METHODS = new HashSet<>();
@@ -35,12 +35,12 @@ class HTTPRequestLineParser {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLineParser(InputStream input, String host) throws IOException, BadRequestException {
+    HTTPRequestLine(InputStream input, String host) throws IOException, BadRequestException {
         String line = ParseUtil.readLine(input);
         readRequest(line, host);
     }
 
-    HTTPRequestLineParser(String line, String host) throws IOException, BadRequestException {
+    HTTPRequestLine(String line, String host) throws IOException, BadRequestException {
         readRequest(line, host);
     }
 
@@ -56,8 +56,8 @@ class HTTPRequestLineParser {
         }
         parse(line);
 
-        path = uriQuerySplitter(urlDivider(uri, host));
-        checkIsValidMethod(method);
+        splitUriQueryString(getRelativeUri(uri, host));
+        validateMethod(method);
         protocolVer = checkProtocolVer(protocolVer);
     }
 
@@ -86,7 +86,7 @@ class HTTPRequestLineParser {
      *
      * @return URI
      */
-    String getURI() {
+    String getUri() {
         return this.uri;
     }
 
@@ -97,8 +97,8 @@ class HTTPRequestLineParser {
      * @param host
      * @return パス
      */
-    @Contract("null, _ -> !null")
-    private String urlDivider(String uri, String host) {
+    @Contract(pure = true, value = "null, _ -> !null")
+    private String getRelativeUri(String uri, String host) {
         if (uri == null) {
             return "";
         }
@@ -109,21 +109,20 @@ class HTTPRequestLineParser {
     }
 
     /**
-     * URIからパスとクエリデータを分割します.
+     * URIからパスとクエリデータを分割してフィールドにそれぞれ挿入します.
      *
      * @param uri
-     * @return パス
      */
-    private String uriQuerySplitter(String uri) {
+    private void splitUriQueryString(String uri) {
         if (uri == null) {
-            return "";
+            return;
         }
 
         String uriQuery[] = uri.split("\\?", 2);
         if (uriQuery[0] != uri) {
-            this.query = ParseUtil.parseQueryData(uriQuery[1]);
+            this.queryParam = ParseUtil.parseQueryString(uriQuery[1]);
         }
-        return uriQuery[0];
+        path = uriQuery[0];
     }
 
     /**
@@ -149,8 +148,8 @@ class HTTPRequestLineParser {
      *
      * @return クエリ値
      */
-    public Map<String, String> getQuery() {
-        return this.query;
+    public Map<String, String> getQueryParam() {
+        return this.queryParam;
     }
 
     private void parse(String line) throws IOException {
@@ -168,7 +167,7 @@ class HTTPRequestLineParser {
     /**
      * 要求したメソッド名が存在しているか確認します.
      */
-    private void checkIsValidMethod(String method) throws BadRequestException {
+    private void validateMethod(String method) throws BadRequestException {
         if (!METHODS.contains(method)) {
             throw new BadRequestException("有効なメソッドではありません");
         }
