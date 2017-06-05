@@ -1,6 +1,6 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+import jp.co.topgate.atoze.web.exception.BadRequestException;
 import jp.co.topgate.atoze.web.util.ParseUtil;
 import org.jetbrains.annotations.Contract;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * HTTPリクエストのジェネラルラインのデータを読み取ります.
  */
-class HTTPRequestLine {
+class HTTPRequestLineParser {
     private String method;
     private String uri;
     private String path;
@@ -35,12 +35,12 @@ class HTTPRequestLine {
 
     private final int REQUEST_HEADER_VALUE = 3;
 
-    HTTPRequestLine(InputStream input, String host) throws IOException, StatusBadRequestException {
+    HTTPRequestLineParser(InputStream input, String host) throws IOException, BadRequestException {
         String line = ParseUtil.readLine(input);
         readRequest(line, host);
     }
 
-    HTTPRequestLine(String line, String host) throws IOException, StatusBadRequestException {
+    HTTPRequestLineParser(String line, String host) throws IOException, BadRequestException {
         readRequest(line, host);
     }
 
@@ -50,7 +50,7 @@ class HTTPRequestLine {
      * @param line
      * @param host
      */
-    private void readRequest(String line, String host) throws IOException, StatusBadRequestException {
+    private void readRequest(String line, String host) throws IOException, BadRequestException {
         if (line == null) {
             return;
         }
@@ -135,13 +135,13 @@ class HTTPRequestLine {
         return this.protocolVer;
     }
 
-    private String checkProtocolVer(String protocol) throws StatusBadRequestException {
+    private String checkProtocolVer(String protocol) throws BadRequestException {
         if (protocol != null) {
             if (protocol.startsWith("HTTP/")) {
                 return protocol.substring(protocol.indexOf("HTTP/") + "HTTP/".length());
             }
         }
-        throw new StatusBadRequestException("プロトコルが正しく書かれていません");
+        throw new BadRequestException("プロトコルが正しく書かれていません");
     }
 
     /**
@@ -168,9 +168,9 @@ class HTTPRequestLine {
     /**
      * 要求したメソッド名が存在しているか確認します.
      */
-    private void checkIsValidMethod(String method) throws StatusBadRequestException {
+    private void checkIsValidMethod(String method) throws BadRequestException {
         if (!METHODS.contains(method)) {
-            throw new StatusBadRequestException("有効なメソッドではありません");
+            throw new BadRequestException("有効なメソッドではありません");
         }
     }
 }

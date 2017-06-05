@@ -1,6 +1,7 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.exception.StatusBadRequestException;
+import jp.co.topgate.atoze.web.exception.BadRequestException;
+import jp.co.topgate.atoze.web.exception.RequestBodyParseException;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertThat;
  */
 public class HTTPRequestTest {
     @Test
-    public void Requestのデータをパース() throws IOException, StatusBadRequestException {
+    public void Requestのデータをパース() throws IOException, BadRequestException {
         File file = new File("src/test/Document/request.txt"); //実データに近いもの
         HTTPRequest httpRequest = new HTTPRequest(null, null, null, null);
         InputStream input = new FileInputStream(file);
@@ -56,7 +57,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void 絶対パスのテスト() throws IOException, StatusBadRequestException {
+    public void 絶対パスのテスト() throws IOException, BadRequestException {
         File test = new File("src/test/Document/requestAbsolutePath");
         InputStream input = new FileInputStream(test);
 
@@ -65,7 +66,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void サーバーの絶対パスと異なる時のテスト() throws IOException, StatusBadRequestException {
+    public void サーバーの絶対パスと異なる時のテスト() throws IOException, BadRequestException {
         File test = new File("src/test/Document/requestWrongAbsolutePath");
         InputStream input = new FileInputStream(test);
 
@@ -74,7 +75,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTテスト() throws IOException, StatusBadRequestException {
+    public void POSTテスト() throws IOException, BadRequestException, RequestBodyParseException {
         File file = new File("src/test/Document/requestPost.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
         HTTPRequest httpRequest;
@@ -94,7 +95,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTLargeテスト() throws IOException, StatusBadRequestException {
+    public void POSTLargeテスト() throws IOException, BadRequestException, RequestBodyParseException {
         File file = new File("src/test/Document/requestLargePOST.txt"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
@@ -116,7 +117,7 @@ public class HTTPRequestTest {
     }
 
     @Test
-    public void POSTの中身がない場合のテスト() throws IOException, StatusBadRequestException {
+    public void POSTの中身がない場合のテスト() throws IOException, BadRequestException, RequestBodyParseException {
         File file = new File("src/test/Document/requestPostNoData"); //実データに近いもの
         InputStream input = new FileInputStream(file);
 
@@ -133,7 +134,7 @@ public class HTTPRequestTest {
 
         assertThat(null, is(httpRequest.getBodyText()));
         assertThat(null, is(httpRequest.getBodyFile()));
-        assertThat(new HashMap<String, String>(), is(httpRequest.getQuery()));
+        assertThat(new HashMap<String, String>(), is(httpRequest.getFormQuery()));
     }
 
     //直接元画像(src/test/Document/bird.png)と出力画像(src/test/Document/bird2.png)を比べてください
@@ -156,7 +157,7 @@ public class HTTPRequestTest {
         //Imageバイト付きリクエストヘッダの作成
         sb.append("POST /test.html HTTP/1.1").append(lineFeed);
         sb.append("Host: localhost:8080").append(lineFeed);
-        sb.append("Content-Type: image/plain").append(lineFeed);
+        sb.append("Content-Type: multipart/form-data").append(lineFeed);
         sb.append("Content-Length:");
 
         BufferedImage originalImage = ImageIO.read(img);

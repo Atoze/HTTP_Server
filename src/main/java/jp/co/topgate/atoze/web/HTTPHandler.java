@@ -1,10 +1,11 @@
 package jp.co.topgate.atoze.web;
 
-import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
 import jp.co.topgate.atoze.web.util.ContentType;
+import jp.co.topgate.atoze.web.util.HTMLBuilder;
 import jp.co.topgate.atoze.web.util.Status;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 
@@ -13,26 +14,47 @@ import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
  */
 public abstract class HTTPHandler {
 
+    private final static String SYSTEM_CHARSET = System.getProperty("file.encoding");
+    //private final static String PAGE = System.getProperty("file.encoding");
+
     public abstract HTTPResponse generateResponse();
+
+    /**
+     * エラーページを生成し設定します.
+     */
+    protected HTTPResponse generateErrorResponse(Status status) {
+        HTMLBuilder html;
+        switch (status) {
+            case NOT_FOUND:
+                html = new HTMLBuilder();
+                html.setTitle("ファイルが見つかりません");
+                html.setBody("現在お探しのページは、存在していません。");
+                break;
+            default:
+                return generateErrorResponse(status.getCode(), status.getMessage());
+        }
+        return generateErrorResponse(status.getCode(), status.getMessage(), html);
+    }
+
+    protected HTTPResponse generateErrorResponse(int statusCode, String statusMessage) {
+        HTMLBuilder html = new HTMLBuilder();
+        html.setTitle(statusCode + statusMessage);
+        html.setBody(html.generateField("h1", statusCode + statusMessage));
+        return generateErrorResponse(statusCode, statusMessage, html);
+    }
 
     /**
      * エラーページを生成し設定します.
      *
      * @param statusCode ステータスコードの値
      */
-    protected HTTPResponse generateErrorResponse(int statusCode) {
-        HTTPResponse response = new HTTPResponse(statusCode);
-        Status status = new Status();
-        status.setStatus(statusCode);
+    private HTTPResponse generateErrorResponse(int statusCode, String statusMessage, HTMLBuilder html) {
+        ExtendedHTTPResponse response = new ExtendedHTTPResponse(statusCode, statusMessage);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
-        if (errorFile.exists() && errorFile.isFile() && errorFile.canRead()) {
-            response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=" + detectFileEncoding(errorFile));
-            response.setResponseBody(errorFile);
-        } else {
-            response.addResponseHeader("Content-Type", ContentType.getContentType(".html") + "; charset=UTF-8");
-            HTMLBuilder html = new HTMLBuilder();
-            //html.setTitle(status.getStatus());
-            html.setBody("<h1>" + status.getStatus() + "</h1>");
+        try {
+            response.setResponseBody(errorFile, ContentType.getContentType(errorFile.toString()), detectFileEncoding(errorFile));
+        } catch (FileNotFoundException e) {
+            response.setContentType(ContentType.getContentType(".html"), SYSTEM_CHARSET);
             response.setResponseBody(html.getHTML());
         }
         return response;

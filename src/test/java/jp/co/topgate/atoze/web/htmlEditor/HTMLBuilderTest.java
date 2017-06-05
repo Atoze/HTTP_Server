@@ -1,5 +1,6 @@
 package jp.co.topgate.atoze.web.htmlEditor;
 
+import jp.co.topgate.atoze.web.util.HTMLBuilder;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -10,17 +10,17 @@ import static jp.co.topgate.atoze.web.util.ParseUtil.readLine;
 /**
  * Created by atoze on 2017/05/23.
  */
-class HTTPRequestHeader {
+class HTTPRequestHeaderParser {
     private String header;
     private Map<String, String> headerField = new HashMap<>();
 
     private final static String LINE_FEED = System.getProperty("line.separator");
 
-    HTTPRequestHeader(InputStream input) throws IOException {
+    HTTPRequestHeaderParser(InputStream input) throws IOException {
         readRequest(input);
     }
 
-    HTTPRequestHeader(String input) throws IOException {
+    HTTPRequestHeaderParser(String input) throws IOException {
         readRequest(input);
     }
 
@@ -44,7 +44,7 @@ class HTTPRequestHeader {
         for (int i = 0; i < header.length; i++) {
             String[] headerLineData = header[i].split(":", 2);
             if (header.length >= 2) {
-                this.headerField.put(headerLineData[0], headerLineData[1].trim());
+                this.headerField.put(headerLineData[0].trim(), headerLineData[1].trim());
             }
         }
     }

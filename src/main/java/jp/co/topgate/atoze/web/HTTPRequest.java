@@ -1,7 +1,8 @@
 package jp.co.topgate.atoze.web;
 
-import org.jetbrains.annotations.NotNull;
+import jp.co.topgate.atoze.web.exception.RequestBodyParseException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +13,12 @@ import java.util.Map;
  * @author atoze
  */
 public class HTTPRequest {
-    private byte[] bodyFile;
+    private static final String CONTENT_TYPE_KEY = "Content-Type";
     private InputStream bodyInput;
-    private String bodyText;
-    private Map<String, String> bodyQuery;
 
     private String header;
     private Map<String, String> headerQuery;
+    private Map<String, String> bodyQuery;
 
     private final String method;
     private final String path;
@@ -40,22 +40,12 @@ public class HTTPRequest {
         this.headerField = headerField;
     }
 
-    void setBody(String bodyText, byte[] bodyFile) {
-        this.bodyText = bodyText;
-        this.bodyFile = bodyFile;
-    }
-
-    void setBody(String bodyText, InputStream input) {
-        this.bodyText = bodyText;
+    void setBody(InputStream input) {
         this.bodyInput = input;
     }
 
     void setHeaderQuery(Map<String, String> query) {
         this.headerQuery = query;
-    }
-
-    void setBodyQuery(Map<String, String> query) {
-        this.bodyQuery = query;
     }
 
     /**
@@ -77,32 +67,12 @@ public class HTTPRequest {
         return headerField.getOrDefault(key, null);
     }
 
-    /**
-     * 要求するメッセージボディを返します.
-     *
-     * @return リクエストボディメッセージ
-     */
-    public String getBodyText() {
-        return this.bodyText;
+    public Map<String, String> getHeaderField() {
+        return headerField;
     }
 
-
-    /**
-     * 要求するメッセージボディを返します.
-     *
-     * @return リクエストボディメッセージ
-     */
-
-    public byte[] getBodyFile() {
-        return this.bodyFile;
-    }
-
-    public InputStream getBodyInput() {
-        return bodyInput;
-    }
-
-    public Map<String, String> getQuery() {
-        return generateQueryMap();
+    public String getContentType() {
+        return headerField.get(CONTENT_TYPE_KEY);
     }
 
     public String getMethod() {
@@ -121,14 +91,38 @@ public class HTTPRequest {
         return this.protocolVer;
     }
 
-    @NotNull
-    private Map<String, String> generateQueryMap() {
-        if (method.equals("GET")) {
-            if (headerQuery != null) return headerQuery;
-            else return new HashMap<>();
-        } else {
-            if (bodyQuery != null) return bodyQuery;
-            else return new HashMap<>();
+    public InputStream getBodyInput() {
+        return bodyInput;
+    }
+
+    public String getBodyText() throws IOException, RequestBodyParseException {
+        HTTPRequestBody body = new HTTPRequestBody(bodyInput, headerField);
+        return body.getBodyText();
+    }
+
+    public byte[] getBodyFile() throws IOException, RequestBodyParseException {
+        HTTPRequestBody body = new HTTPRequestBody(bodyInput, headerField);
+        return body.getBodyFile();
+    }
+
+    public Map<String, String> getFormQuery() throws IOException, RequestBodyParseException {
+        return generateQuery();
+    }
+
+    private Map<String, String> generateQuery() throws IOException, RequestBodyParseException {
+        switch (method) {
+            case "GET":
+                return headerQuery;
+            case "POST":
+                HTTPRequestBody body = new HTTPRequestBody(bodyInput, headerField);
+                bodyQuery = body.getQuery();
+                return bodyQuery;
+            default:
+                return new HashMap<>();
         }
+    }
+
+    public Map<String, String> getUriQuery() {
+        return headerQuery;
     }
 }

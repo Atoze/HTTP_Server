@@ -1,9 +1,11 @@
-package jp.co.topgate.atoze.web.app.forum;
+package jp.co.topgate.atoze.web.app.board;
 
-import jp.co.topgate.atoze.web.htmlEditor.HTMLBuilder;
+import jp.co.topgate.atoze.web.util.HTMLBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -25,11 +27,11 @@ class ForumHTML {
         this.host = host;
     }
 
-    String getIndexHTML(List list) throws IOException {
-        ForumDataPattern.NAME.setQueryKey(NAME_QUERY);
-        ForumDataPattern.TITLE.setQueryKey(TITLE_QUERY);
-        ForumDataPattern.TEXT.setQueryKey(TEXT_QUERY);
-        ForumDataPattern.PASSWORD.setQueryKey(PASSWORD_QUERY);
+    String getIndexHTML(List<ForumData> list) throws IOException {
+        ForumDataKey.NAME.setQueryKey(NAME_QUERY);
+        ForumDataKey.TITLE.setQueryKey(TITLE_QUERY);
+        ForumDataKey.TEXT.setQueryKey(TEXT_QUERY);
+        ForumDataKey.PASSWORD.setQueryKey(PASSWORD_QUERY);
 
         html.setLanguage("ja");
         html.setMetaData("charset", "UTF-8");
@@ -40,37 +42,36 @@ class ForumHTML {
         html.addBody(table(list));
         html.addBody(footerForm());
         html.addBody("</div>");
-        //html.setBody(headerForm() + table(list) + footerForm());
         return html.getHTML();
     }
 
     @NotNull
-    private String table(List<String[]> list) throws IOException {
+    private String table(List<ForumData> list) throws IOException {
         if (list == null || list.size() == 0) {
             return "<div id=\"content\"><p>No Data</p></div>";
         }
         StringBuffer sb = new StringBuffer();
         //sb.append("<table width=\"50%\" border=\"1\">");
         for (int i = 0; i < list.size(); i++) {
-            //sb.append("<tr>");
-            //sb.append("<td>");
             sb.append("<div id=\"content\">");
             sb.append("<div id=\"wrapper\">");
             sb.append("<table border=\"1\"><tbody>");
             sb.append("<tr>");
             sb.append("<td rowspan=\"3\" width=\"100px\">");
             sb.append("ID:");//Icon Name
-            sb.append(getParameter(list, i, ForumDataPattern.ID.getKey()));//ID
+            ForumData data = list.get(i);
+            sb.append(data.getId());//ID
             sb.append("<br>投稿者:");
-            sb.append(getParameter(list, i, ForumDataPattern.NAME.getKey()));//Name
+            String encoder = data.getEncoder();
+            sb.append(decode(data.getName(), encoder));//Name
             sb.append("</td><td>");
             sb.append("<b>");
-            sb.append(getParameter(list, i, ForumDataPattern.TITLE.getKey()));//Title
+            sb.append(decode(data.getTitle(), encoder));//Title
             sb.append("</b><br>");//Title
-            sb.append(getParameter(list, i, ForumDataPattern.DATE.getKey()));//Date
+            sb.append(data.getDate());//Date
             sb.append("</td>");
             sb.append("</tr><tr><td>");
-            sb.append(getParameter(list, i, ForumDataPattern.TEXT.getKey()));//Text
+            sb.append(decode(data.getText(), encoder));//Text
             sb.append("</td>");
             sb.append("</tr><tr><td id=\"footer\">");
             sb.append("<form method=\"POST\" action=\"/program/board/\">");
@@ -126,35 +127,6 @@ class ForumHTML {
         return sb.toString();
     }
 
-    private static String dataForm(List<String[]> list, Integer id) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        sb.append("<table width=\"50%\"><tbody>");
-        sb.append("<tr>");
-        sb.append("<td rowspan=\"3\">");
-        sb.append(ForumData.getParameter(list, id, "name"));//Icon Name
-        sb.append("</td><td>");
-        sb.append(ForumData.getParameter(list, id, "title"));//Title Date
-        sb.append(ForumData.getParameter(list, id, "date"));//Title Date
-        sb.append("</td>");
-        sb.append("</tr><tr><td>");
-        sb.append(ForumData.getParameter(list, id, "text"));//Text
-        sb.append("</td>");
-        sb.append("</tr><tr><td>");
-        sb.append("Edit");
-        sb.append("</td></tr>");
-        sb.append("</tbody></table>");
-
-        return sb.toString();
-    }
-
-
-    private String getParameter(List<String[]> list, int id, String key) {
-        String keyToFind = key.toUpperCase();
-        String param = ForumData.getParameter(list, id, keyToFind);
-        //String encode = ForumData.getParameter(list, id, ForumDataPattern.ENCODER.getKey());
-        return sanitizeHTML(param);
-    }
-
     /**
      * タグを無害化します。
      *
@@ -163,7 +135,7 @@ class ForumHTML {
      */
     private static String sanitizeHTML(String str) {
         if (str == null) {
-            return str;
+            return null;
         }
         str = str.replaceAll("&", "&amp;");
         str = str.replaceAll("<", "&lt;");
@@ -175,6 +147,15 @@ class ForumHTML {
         if (str.contains("\r\n")) str = str.replaceAll("\r\n", "<br>");
         else str = str.replaceAll("\n", "<br>");
         return str;
+    }
+
+    private String decode(String data, String encoder) {
+        try {
+            data = URLDecoder.decode(data, encoder);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException();
+        }
+        return sanitizeHTML(data);
     }
 
 }
