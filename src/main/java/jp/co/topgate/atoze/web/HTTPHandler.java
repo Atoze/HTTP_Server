@@ -15,14 +15,12 @@ import static jp.co.topgate.atoze.web.util.FileUtil.detectFileEncoding;
 public abstract class HTTPHandler {
 
     private final static String SYSTEM_CHARSET = System.getProperty("file.encoding");
-    //private final static String PAGE = System.getProperty("file.encoding");
-
     public abstract HTTPResponse generateResponse();
 
     /**
      * エラーページを生成し設定します.
      */
-    protected HTTPResponse generateErrorResponse(Status status) {
+    HTTPResponse generateErrorResponse(Status status) {
         HTMLBuilder html;
         switch (status) {
             case NOT_FOUND:
@@ -31,31 +29,26 @@ public abstract class HTTPHandler {
                 html.setBody("現在お探しのページは、存在していません。");
                 break;
             default:
-                return generateErrorResponse(status.getCode(), status.getMessage());
+                html = new HTMLBuilder();
+                html.setTitle(status.getCode() + status.getMessage());
+                html.setBody(html.generateField("h1", status.getCode() + status.getMessage()));
+                return generateErrorResponse(status, html.toString());
         }
-        return generateErrorResponse(status.getCode(), status.getMessage(), html);
+        return generateErrorResponse(status, html.toString());
     }
 
-    protected HTTPResponse generateErrorResponse(int statusCode, String statusMessage) {
-        HTMLBuilder html = new HTMLBuilder();
-        html.setTitle(statusCode + statusMessage);
-        html.setBody(html.generateField("h1", statusCode + statusMessage));
-        return generateErrorResponse(statusCode, statusMessage, html);
+    HTTPResponse generateErrorResponse(Status status, String contentHTML) {
+        return generateErrorResponse(status.getCode(), status.getMessage(), contentHTML);
     }
-
-    /**
-     * エラーページを生成し設定します.
-     *
-     * @param statusCode ステータスコードの値
-     */
-    private HTTPResponse generateErrorResponse(int statusCode, String statusMessage, HTMLBuilder html) {
+    
+    HTTPResponse generateErrorResponse(int statusCode, String statusMessage, String contentHTML) {
         ExtendedHTTPResponse response = new ExtendedHTTPResponse(statusCode, statusMessage);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         try {
             response.setResponseBody(errorFile, ContentType.getContentType(errorFile.toString()), detectFileEncoding(errorFile));
         } catch (FileNotFoundException e) {
             response.setContentType(ContentType.getContentType(".html"), SYSTEM_CHARSET);
-            response.setResponseBody(html.getHTML());
+            response.setResponseBody(contentHTML);
         }
         return response;
     }

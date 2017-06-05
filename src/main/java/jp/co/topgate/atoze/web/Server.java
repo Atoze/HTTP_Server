@@ -64,22 +64,19 @@ public class Server extends Thread {
                 handler = new StaticHandler(httpRequest);
             }
             response = handler.generateResponse();
-
             if (response == null) {
                 throw new InternalServerErrorException("生成したレスポンスが空です");
             }
         } catch (BadRequestException e) {
             response = new HTTPResponse(Status.BAD_REQUEST);
-            throw new RuntimeException(e);
         } catch (ProtocolException e) {
             response = new HTTPResponse(Status.HTTP_VERSION_NOT_SUPPORTED);
-            throw new RuntimeException(e);
         } catch (InternalServerErrorException e) {
             response = new HTTPResponse(Status.INTERNAL_SERVER_ERROR);
-            throw new RuntimeException(e);
         } catch (Exception e) {
-            response = new HTTPResponse(Status.INTERNAL_SERVER_ERROR);
-            throw new RuntimeException(e);
+            //response = new HTTPResponse(Status.INTERNAL_SERVER_ERROR);
+            e.printStackTrace();
+            System.exit(1);
         } finally {
             if (response != null && output != null) {
                 response.writeTo(output);
@@ -89,7 +86,8 @@ public class Server extends Thread {
                     socket.close();
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                System.exit(1);
             }
             System.out.println("Disconnected" + Thread.currentThread().getName());
         }

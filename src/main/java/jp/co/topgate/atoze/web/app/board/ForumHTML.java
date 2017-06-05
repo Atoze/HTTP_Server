@@ -42,7 +42,7 @@ class ForumHTML {
         html.addBody(table(list));
         html.addBody(footerForm());
         html.addBody("</div>");
-        return html.getHTML();
+        return html.toString();
     }
 
     @NotNull

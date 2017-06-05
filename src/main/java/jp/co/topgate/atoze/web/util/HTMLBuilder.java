@@ -93,7 +93,7 @@ public class HTMLBuilder {
         return body;
     }
 
-    public String getHTML() {
+    public String toString() {
         generateHTML();
         return html;
     }
