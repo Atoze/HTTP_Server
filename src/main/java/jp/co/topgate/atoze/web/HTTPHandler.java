@@ -20,7 +20,7 @@ public abstract class HTTPHandler {
     /**
      * エラーページを生成し設定します.
      */
-    HTTPResponse generateErrorResponse(Status status) {
+    protected HTTPResponse generateErrorResponse(Status status) {
         HTMLBuilder html;
         switch (status) {
             case NOT_FOUND:
@@ -37,11 +37,11 @@ public abstract class HTTPHandler {
         return generateErrorResponse(status, html.toString());
     }
 
-    HTTPResponse generateErrorResponse(Status status, String contentHTML) {
+    protected HTTPResponse generateErrorResponse(Status status, String contentHTML) {
         return generateErrorResponse(status.getCode(), status.getMessage(), contentHTML);
     }
-    
-    HTTPResponse generateErrorResponse(int statusCode, String statusMessage, String contentHTML) {
+
+    protected HTTPResponse generateErrorResponse(int statusCode, String statusMessage, String contentHTML) {
         ExtendedHTTPResponse response = new ExtendedHTTPResponse(statusCode, statusMessage);
         File errorFile = new File(Server.ROOT_DIRECTORY, statusCode + ".html");
         try {
